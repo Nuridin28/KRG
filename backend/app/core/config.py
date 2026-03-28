@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # External API keys (loaded from env)
     OPENAI_API_KEY: str = ""
-    VERTEX_AI_PROJECT: str = ""
+    VERTEX_AI_PROJECT: str = "krghack"
     VERTEX_AI_LOCATION: str = "us-central1"
     MAPP_FASHION_API_KEY: str = ""
     MAPP_FASHION_BASE_URL: str = ""
@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     MAX_OUTFITS_PER_REQUEST: int = 10
     DEFAULT_OUTFITS_COUNT: int = 3
 
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
 
     class Config:
         env_file = ".env"

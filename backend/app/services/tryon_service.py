@@ -1,0 +1,219 @@
+"""Virtual try-on service -- Vertex AI VTO with mock fallback."""
+
+from __future__ import annotations
+
+import asyncio
+import base64
+import logging
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, Optional
+
+import httpx
+
+from app.core.config import settings
+from app.models.schemas import TryOnJobResponse, TryOnJobStatus
+
+logger = logging.getLogger(__name__)
+
+VERTEX_VTO_URL = (
+    f"https://{settings.VERTEX_AI_LOCATION}-aiplatform.googleapis.com/v1/"
+    f"projects/{settings.VERTEX_AI_PROJECT}/locations/{settings.VERTEX_AI_LOCATION}/"
+    f"publishers/google/models/virtual-try-on-001:predict"
+)
+
+IMAGE_DIR = Path(settings.IMAGE_STORAGE_PATH)
+IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _get_gcp_access_token() -> Optional[str]:
+    """Get GCP access token via Application Default Credentials."""
+    try:
+        import google.auth
+        import google.auth.transport.requests
+
+        credentials, _ = google.auth.default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        credentials.refresh(google.auth.transport.requests.Request())
+        return credentials.token
+    except Exception as e:
+        logger.warning(f"Could not get GCP credentials: {e}")
+        return None
+
+
+class TryOnService:
+    def __init__(self) -> None:
+        self._jobs: Dict[str, TryOnJobResponse] = {}
+        self._user_counts: Dict[str, int] = {}
+        self._rate_limit = 20
+        self._use_vertex = bool(settings.VERTEX_AI_PROJECT)
+
+        if self._use_vertex:
+            logger.info(f"Vertex AI VTO enabled for project: {settings.VERTEX_AI_PROJECT}")
+        else:
+            logger.info("Vertex AI VTO not configured, using mock mode")
+
+    async def create_job(
+        self,
+        person_image_bytes: bytes,
+        product_id: str,
+        product_image_url: str,
+        user_id: str = "anonymous",
+    ) -> TryOnJobResponse:
+        count = self._user_counts.get(user_id, 0)
+        if count >= self._rate_limit:
+            raise ValueError("Rate limit exceeded. Try again later.")
+
+        if len(person_image_bytes) < 1000:
+            raise ValueError("Image too small. Please upload a higher quality photo.")
+
+        job_id = f"tryon-{uuid.uuid4().hex[:12]}"
+        now = datetime.now(timezone.utc)
+
+        provider = "vertex-ai-vto" if self._use_vertex else "vertex-ai-vto-dev"
+
+        job = TryOnJobResponse(
+            job_id=job_id,
+            status=TryOnJobStatus.QUEUED,
+            progress=0,
+            provider_used=provider,
+            created_at=now,
+        )
+        self._jobs[job_id] = job
+        self._user_counts[user_id] = count + 1
+
+        if self._use_vertex:
+            asyncio.create_task(
+                self._process_vertex(job_id, person_image_bytes, product_image_url)
+            )
+        else:
+            asyncio.create_task(
+                self._simulate_processing(job_id, product_image_url)
+            )
+
+        return job
+
+    # ------------------------------------------------------------------
+    # Real Vertex AI VTO processing
+    # ------------------------------------------------------------------
+
+    async def _process_vertex(
+        self, job_id: str, person_image_bytes: bytes, product_image_url: str
+    ) -> None:
+        job = self._jobs.get(job_id)
+        if not job:
+            return
+
+        job.status = TryOnJobStatus.PROCESSING
+        job.progress = 10
+
+        try:
+            # Step 1: Get access token
+            token = await asyncio.to_thread(_get_gcp_access_token)
+            if not token:
+                raise RuntimeError("Failed to obtain GCP access token")
+            job.progress = 20
+
+            # Step 2: Download garment image
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                garment_resp = await client.get(product_image_url)
+                garment_resp.raise_for_status()
+                garment_bytes = garment_resp.content
+            job.progress = 35
+
+            # Step 3: Encode images to base64
+            person_b64 = base64.b64encode(person_image_bytes).decode("utf-8")
+            garment_b64 = base64.b64encode(garment_bytes).decode("utf-8")
+            job.progress = 40
+
+            # Step 4: Call Vertex AI VTO API
+            payload = {
+                "instances": [
+                    {
+                        "personImage": {
+                            "image": {"bytesBase64Encoded": person_b64}
+                        },
+                        "productImages": [
+                            {
+                                "image": {"bytesBase64Encoded": garment_b64}
+                            }
+                        ],
+                    }
+                ],
+                "parameters": {
+                    "sampleCount": 1,
+                    "baseSteps": 32,
+                    "personGeneration": "allow_adult",
+                },
+            }
+
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                resp = await client.post(
+                    VERTEX_VTO_URL,
+                    json=payload,
+                    headers={
+                        "Authorization": f"Bearer {token}",
+                        "Content-Type": "application/json",
+                    },
+                )
+                job.progress = 80
+
+                if resp.status_code != 200:
+                    error_detail = resp.text[:500]
+                    raise RuntimeError(f"Vertex AI returned {resp.status_code}: {error_detail}")
+
+                result = resp.json()
+
+            # Step 5: Save output image
+            predictions = result.get("predictions", [])
+            if not predictions:
+                raise RuntimeError("No predictions in Vertex AI response")
+
+            output_b64 = predictions[0].get("bytesBase64Encoded", "")
+            if not output_b64:
+                raise RuntimeError("Empty prediction from Vertex AI")
+
+            output_bytes = base64.b64decode(output_b64)
+            output_filename = f"{job_id}.png"
+            output_path = IMAGE_DIR / output_filename
+            output_path.write_bytes(output_bytes)
+
+            job.progress = 100
+            job.status = TryOnJobStatus.COMPLETED
+            job.output_image_url = f"http://localhost:8000/storage/images/{output_filename}"
+            job.completed_at = datetime.now(timezone.utc)
+
+            logger.info(f"Try-on job {job_id} completed via Vertex AI VTO")
+
+        except Exception as e:
+            logger.error(f"Vertex AI VTO failed for job {job_id}: {e}")
+            job.status = TryOnJobStatus.FAILED
+            job.failure_reason = str(e)
+            job.completed_at = datetime.now(timezone.utc)
+
+    # ------------------------------------------------------------------
+    # Mock fallback (dev mode)
+    # ------------------------------------------------------------------
+
+    async def _simulate_processing(self, job_id: str, product_image_url: str) -> None:
+        job = self._jobs.get(job_id)
+        if not job:
+            return
+
+        job.status = TryOnJobStatus.PROCESSING
+        job.progress = 10
+
+        for pct in (30, 50, 70, 90):
+            await asyncio.sleep(0.6)
+            job.progress = pct
+
+        await asyncio.sleep(0.5)
+        job.status = TryOnJobStatus.COMPLETED
+        job.progress = 100
+        job.output_image_url = product_image_url
+        job.completed_at = datetime.now(timezone.utc)
+
+    async def get_job(self, job_id: str) -> Optional[TryOnJobResponse]:
+        return self._jobs.get(job_id)

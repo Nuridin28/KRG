@@ -114,6 +114,7 @@ class OutfitByProductRequest(BaseModel):
     product_id: str
     user_id: Optional[str] = None
     locale: str = "ru"
+    style: Optional[str] = None
     occasion: Optional[str] = None
     budget_max: Optional[float] = None
     size_profile: Optional[Dict[str, str]] = None
