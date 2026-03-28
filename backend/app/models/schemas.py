@@ -150,6 +150,9 @@ class TryOnJobResponse(BaseModel):
     provider_used: Optional[str] = None
     created_at: datetime
     completed_at: Optional[datetime] = None
+    current_step: Optional[str] = None  # e.g. "Примеряем: Рубашка Oxford (2/3)"
+    total_items: int = 1
+    completed_items: int = 0
 
 
 class ChatMessage(BaseModel):

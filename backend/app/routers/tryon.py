@@ -35,6 +35,39 @@ async def create_tryon_job(
     return job
 
 
+@router.post("/outfit-jobs", response_model=TryOnJobResponse)
+async def create_outfit_tryon_job(
+    person_image: UploadFile = File(...),
+    product_ids: str = Form(...),  # comma-separated product IDs
+) -> TryOnJobResponse:
+    ids = [pid.strip() for pid in product_ids.split(",") if pid.strip()]
+    if not ids:
+        raise HTTPException(400, "No product IDs provided")
+
+    product_items: list[dict] = []
+    for pid in ids:
+        product = catalog_service.get_product(pid)
+        if product:
+            product_items.append({
+                "product_id": product.id,
+                "product_name": product.name,
+                "product_image_url": product.image_url,
+            })
+
+    if not product_items:
+        raise HTTPException(404, "None of the provided product IDs were found")
+
+    person_bytes = await person_image.read()
+    if not person_bytes:
+        raise HTTPException(400, "Empty image file")
+
+    job = await tryon_service.create_outfit_job(
+        person_image_bytes=person_bytes,
+        product_items=product_items,
+    )
+    return job
+
+
 @router.get("/jobs/{job_id}", response_model=TryOnJobResponse)
 async def get_tryon_job(job_id: str) -> TryOnJobResponse:
     job = await tryon_service.get_job(job_id)
