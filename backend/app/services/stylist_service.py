@@ -1,4 +1,4 @@
-"""Conversational styling assistant -- OpenAI-powered with keyword fallback."""
+"""Conversational styling assistant -- OpenAI-powered with semantic product search."""
 
 from __future__ import annotations
 
@@ -6,6 +6,8 @@ import json
 import logging
 import re
 from typing import Any, Dict, List, Optional
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.schemas import (
@@ -18,32 +20,28 @@ from app.models.schemas import (
     ProductBrief,
     StyleType,
 )
-from app.services.catalog_service import CatalogService
+from app.services.catalog_service import CatalogService, _row_to_brief
+from app.services.embedding_service import EmbeddingService
 from app.services.recommendation_service import RecommendationService
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Keyword fallback dictionaries
+# ---------------------------------------------------------------------------
+
 OCCASION_KEYWORDS = {
-    "офис": ("office", "work"),
-    "office": ("office", "work"),
-    "работа": ("office", "work"),
-    "work": ("office", "work"),
-    "свидание": ("date", "date"),
-    "date": ("date", "date"),
-    "вечер": ("evening", "party"),
-    "evening": ("evening", "party"),
-    "party": ("evening", "party"),
-    "вечеринка": ("evening", "party"),
-    "спорт": ("sport", "workout"),
-    "sport": ("sport", "workout"),
+    "офис": ("office", "work"), "office": ("office", "work"),
+    "работа": ("office", "work"), "work": ("office", "work"),
+    "свидание": ("date", "date"), "date": ("date", "date"),
+    "вечер": ("evening", "party"), "evening": ("evening", "party"),
+    "party": ("evening", "party"), "вечеринка": ("evening", "party"),
+    "спорт": ("sport", "workout"), "sport": ("sport", "workout"),
     "тренировка": ("sport", "workout"),
-    "casual": ("casual", "casual"),
-    "кэжуал": ("casual", "casual"),
+    "casual": ("casual", "casual"), "кэжуал": ("casual", "casual"),
     "повседнев": ("casual", "daily"),
-    "street": ("street", "casual"),
-    "стрит": ("street", "casual"),
-    "путешестви": ("travel", "travel"),
-    "travel": ("travel", "travel"),
+    "street": ("street", "casual"), "стрит": ("street", "casual"),
+    "путешестви": ("travel", "travel"), "travel": ("travel", "travel"),
     "отпуск": ("travel", "travel"),
     "собеседован": ("office", "work"),
     "smart casual": ("smart_casual", "casual"),
@@ -69,29 +67,48 @@ GENDER_KEYWORDS = {
 
 SUGGESTIONS_RU = [
     "Собери образ на свидание",
-    "Office casual до $200",
+    "Office casual до 100 000 ₸",
     "Уличный стиль в чёрном цвете",
     "Что надеть на вечеринку?",
     "Повседневный образ для мужчины",
-    "Спортивный лук до $100",
+    "Спортивный лук до 50 000 ₸",
     "Элегантный образ на мероприятие",
     "Подбери лук для путешествия",
 ]
 
-SYSTEM_PROMPT = """Ты — AI-стилист в fashion-маркетплейсе. Ты помогаешь пользователям подобрать образы и одежду.
+# ---------------------------------------------------------------------------
+# System prompt
+# ---------------------------------------------------------------------------
 
-Правила:
-- Отвечай по-русски, кратко и дружелюбно.
-- Никогда не комментируй тело или внешность пользователя.
-- Не обещай точность виртуальной посадки одежды.
-- Если пользователь спрашивает не про моду/одежду, вежливо верни его к теме.
-- Извлекай из сообщения: стиль, повод, пол, бюджет, предпочтительные цвета.
-- Если информации недостаточно, задай уточняющий вопрос.
-- Давай конкретные советы по стилю с объяснениями.
+SYSTEM_PROMPT = """Ты — профессиональный AI-стилист в казахстанском fashion-маркетплейсе. Твоя задача — помогать людям выглядеть стильно и уверенно.
+
+## Твоя экспертиза:
+- Теория цвета: аналоговые, комплементарные, триадные сочетания
+- Типы фигур и подходящие силуэты
+- Актуальные тренды 2024-2025
+- Капсульный гардероб и базовые вещи
+- Дресс-коды: casual, smart casual, business casual, cocktail, black tie
+- Сезонные особенности и layering
+
+## Правила общения:
+- Отвечай на русском языке, дружелюбно и с энтузиазмом
+- Будь конкретным: вместо «что-нибудь яркое» говори «терракотовый свитер» или «юбка цвета морской волны»
+- Объясняй ПОЧЕМУ это сочетание работает (цветовая гармония, пропорции, текстуры)
+- Предлагай 2-3 альтернативы разной ценовой категории когда возможно
+- Никогда не комментируй тело, вес или физические особенности пользователя
+- Не обещай точность виртуальной примерки
+- Если вопрос не про моду — вежливо верни к теме стиля
+
+## Контекст товаров:
+Тебе будут предоставлены товары из нашего каталога, наиболее релевантные запросу пользователя. Рекомендуй именно эти товары, называй их по имени и бренду. Если товаров нет — дай общие стилистические советы.
+
+## Извлечение параметров:
+Из каждого сообщения извлекай: стиль, повод, пол, бюджет, цвета. Если чего-то не хватает — спроси.
 
 Доступные стили: casual, office, sport, evening, street, smart_casual, date, travel
 Доступные поводы: daily, work, date, party, workout, travel, event, casual
-Пол: male, female, unisex"""
+Пол: male, female, unisex
+Валюта: тенге (₸)"""
 
 EXTRACT_FUNCTION = {
     "name": "extract_outfit_params",
@@ -108,10 +125,10 @@ EXTRACT_FUNCTION = {
                 "enum": ["daily", "work", "date", "party", "workout", "travel", "event", "casual"],
             },
             "gender": {"type": "string", "enum": ["male", "female", "unisex"]},
-            "budget_max": {"type": "number"},
-            "budget_min": {"type": "number"},
+            "budget_max": {"type": "number", "description": "Максимальный бюджет в тенге"},
+            "budget_min": {"type": "number", "description": "Минимальный бюджет в тенге"},
             "colors": {"type": "array", "items": {"type": "string"}},
-            "needs_outfits": {"type": "boolean"},
+            "needs_outfits": {"type": "boolean", "description": "Нужно ли генерировать образы"},
         },
         "required": ["needs_outfits"],
     },
@@ -123,6 +140,7 @@ class StylistService:
         self.catalog = catalog
         self.recommender = recommender
         self._openai_client = None
+        self._embedding_service = EmbeddingService()
 
         if settings.OPENAI_API_KEY:
             try:
@@ -151,13 +169,9 @@ class StylistService:
                 constraints["gender"] = gender
                 break
 
-        budget_match = re.search(r"(?:до|under|max|<)\s*\$?\s*(\d+)", text_lower)
+        budget_match = re.search(r"(?:до|under|max|<)\s*\$?\s*(\d[\d\s]*)", text_lower)
         if budget_match:
-            constraints["budget_max"] = float(budget_match.group(1))
-
-        budget_min_match = re.search(r"(?:от|from|min|>)\s*\$?\s*(\d+)", text_lower)
-        if budget_min_match:
-            constraints["budget_min"] = float(budget_min_match.group(1))
+            constraints["budget_max"] = float(budget_match.group(1).replace(" ", ""))
 
         return constraints
 
@@ -168,21 +182,39 @@ class StylistService:
         parts = ["Вот что я подобрал для вас!\n"]
         if constraints.get("occasion"):
             occ_names = {
-                "work": "для работы/офиса",
-                "date": "для свидания",
-                "party": "для вечеринки",
-                "casual": "на каждый день",
-                "daily": "на каждый день",
-                "workout": "для спорта",
-                "travel": "для путешествия",
-                "event": "для мероприятия",
+                "work": "для работы/офиса", "date": "для свидания",
+                "party": "для вечеринки", "casual": "на каждый день",
+                "daily": "на каждый день", "workout": "для спорта",
+                "travel": "для путешествия", "event": "для мероприятия",
             }
             occ_text = occ_names.get(constraints["occasion"], constraints["occasion"])
             parts.append(f"Образы подобраны {occ_text}.")
         if constraints.get("budget_max"):
-            parts.append(f"Бюджет: до ${int(constraints['budget_max'])}.")
+            parts.append(f"Бюджет: до {int(constraints['budget_max']):,} ₸.".replace(",", " "))
         parts.append(f"\nНашлось {len(outfits)} комплект(ов). Вы можете заменить любую вещь или добавить весь образ в корзину.")
         return " ".join(parts)
+
+    async def _search_relevant_products(self, query: str, gender: Optional[str] = None) -> List[ProductBrief]:
+        """Search for products semantically relevant to the user query."""
+        db: AsyncSession = self.catalog.db
+        results = await self._embedding_service.search_products(
+            db, query, top_k=12, gender=gender,
+        )
+        return [_row_to_brief(row) for row, score in results if score > 0.2]
+
+    def _format_products_for_prompt(self, products: List[ProductBrief]) -> str:
+        if not products:
+            return "В каталоге нет подходящих товаров по этому запросу."
+
+        lines = ["Вот товары из нашего каталога, релевантные запросу:"]
+        for i, p in enumerate(products[:10], 1):
+            price_str = f"{int(p.price):,}".replace(",", " ")
+            currency = p.currency if p.currency != "USD" else "USD"
+            lines.append(
+                f"{i}. {p.name} ({p.brand}) — {price_str} {currency}"
+                f" | Цвет: {p.color_name or 'н/д'} | Категория: {p.category}"
+            )
+        return "\n".join(lines)
 
     async def _generate_outfits_from_constraints(self, constraints: Dict[str, Any]) -> tuple[List[Outfit], List[ProductBrief]]:
         style = constraints.get("style", "casual")
@@ -193,7 +225,6 @@ class StylistService:
             style_enum = StyleType(style)
         except ValueError:
             style_enum = StyleType.CASUAL
-
         try:
             occasion_enum = OccasionType(occasion)
         except ValueError:
@@ -226,46 +257,45 @@ class StylistService:
             except Exception as e:
                 logger.warning(f"OpenAI call failed, falling back to keyword: {e}")
 
+        # Keyword fallback
         constraints = self._extract_constraints_keyword(request.message)
         outfits, all_products = await self._generate_outfits_from_constraints(constraints)
         answer = self._build_response_text(constraints, outfits)
-
-        explanations = []
-        if constraints.get("occasion"):
-            explanations.append(f"Образ подобран для случая: {constraints['occasion']}")
-        if constraints.get("colors"):
-            explanations.append(f"Учтены цвета: {', '.join(constraints['colors'])}")
-        if constraints.get("budget_max"):
-            explanations.append(f"Бюджет ограничен: до ${int(constraints['budget_max'])}")
-
-        cta_actions = [
-            {"type": "add_all_to_cart", "label": "Купить весь образ"},
-            {"type": "save_outfit", "label": "Сохранить образ"},
-            {"type": "try_on", "label": "Примерить"},
-        ]
 
         return ChatResponse(
             answer=answer,
             extracted_filters=constraints,
             recommended_products=all_products,
             recommended_outfits=outfits,
-            explanations=explanations,
-            cta_actions=cta_actions,
+            explanations=[],
+            cta_actions=[
+                {"type": "add_all_to_cart", "label": "Купить весь образ"},
+                {"type": "try_on", "label": "Примерить"},
+            ] if outfits else [],
         )
 
     async def _chat_openai(self, request: ChatRequest) -> ChatResponse:
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        # 1. Search relevant products by user message
+        relevant_products = await self._search_relevant_products(request.message)
+        product_context = self._format_products_for_prompt(relevant_products)
+
+        # 2. Build messages with product context
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": product_context},
+        ]
         for msg in request.conversation_history[-10:]:
             messages.append({"role": msg.role, "content": msg.content})
         messages.append({"role": "user", "content": request.message})
 
+        # 3. Call OpenAI
         response = self._openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
             tools=[{"type": "function", "function": EXTRACT_FUNCTION}],
             tool_choice="auto",
             temperature=0.7,
-            max_tokens=800,
+            max_tokens=1000,
         )
 
         choice = response.choices[0]
@@ -295,15 +325,21 @@ class StylistService:
                         logger.warning(f"Failed to parse function call: {e}")
 
         outfits: List[Outfit] = []
-        all_products: List[ProductBrief] = []
+        all_products: List[ProductBrief] = relevant_products[:]
 
         if needs_outfits and (constraints.get("style") or constraints.get("occasion")):
-            outfits, all_products = await self._generate_outfits_from_constraints(constraints)
+            outfits, outfit_products = await self._generate_outfits_from_constraints(constraints)
+            # Merge outfit products with relevant products
+            existing_ids = {p.id for p in all_products}
+            for p in outfit_products:
+                if p.id not in existing_ids:
+                    all_products.append(p)
+
             if not answer and outfits:
                 answer = self._build_response_text(constraints, outfits)
 
         if not answer:
-            answer = "Подскажите, какой образ вы ищете? Я могу помочь подобрать одежду для любого повода."
+            answer = "Подскажите, какой образ вы ищете? Я могу помочь подобрать одежду для любого повода — от повседневного стиля до вечернего выхода."
 
         explanations = []
         if constraints.get("occasion"):
@@ -313,20 +349,19 @@ class StylistService:
             if isinstance(colors, list):
                 explanations.append(f"Учтены цвета: {', '.join(colors)}")
         if constraints.get("budget_max"):
-            explanations.append(f"Бюджет ограничен: до ${int(constraints['budget_max'])}")
+            explanations.append(f"Бюджет: до {int(constraints['budget_max']):,} ₸".replace(",", " "))
 
         cta_actions = []
         if outfits:
             cta_actions = [
                 {"type": "add_all_to_cart", "label": "Купить весь образ"},
-                {"type": "save_outfit", "label": "Сохранить образ"},
                 {"type": "try_on", "label": "Примерить"},
             ]
 
         return ChatResponse(
             answer=answer,
             extracted_filters=constraints if constraints else None,
-            recommended_products=all_products,
+            recommended_products=all_products[:12],
             recommended_outfits=outfits,
             explanations=explanations,
             cta_actions=cta_actions,

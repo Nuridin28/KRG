@@ -50,6 +50,7 @@ class Product(Base):
     occasion_tags: Mapped[list] = mapped_column(JSON, default=list)
     season: Mapped[str] = mapped_column(String(50), default="all")
     seller_id: Mapped[str] = mapped_column(String(100), default="marketplace")
+    embedding: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

@@ -9,7 +9,6 @@ import { TryOnPage } from "@/components/tryon/TryOnPage"
 import { ChatPage } from "@/components/chat/ChatPage"
 import { AuthPage } from "@/components/auth/AuthPage"
 import { AdminPage } from "@/components/admin/AdminPage"
-import StyleQuiz from "@/components/quiz/StyleQuiz"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/store/auth"
@@ -47,7 +46,6 @@ function AppLayout() {
     "/stylist": "stylist",
     "/tryon": "tryon",
     "/chat": "chat",
-    "/quiz": "quiz",
     "/auth": "auth",
     "/admin": "admin",
   }
@@ -59,7 +57,6 @@ function AppLayout() {
       stylist: "/stylist",
       tryon: "/tryon",
       chat: "/chat",
-      quiz: "/quiz",
       auth: "/auth",
       admin: "/admin",
     }
@@ -110,7 +107,6 @@ function AppLayout() {
           <Route path="/stylist" element={<StylistPage onTryOnOutfit={handleTryOnOutfit} />} />
           <Route path="/tryon" element={<TryOnPage />} />
           <Route path="/chat" element={<ChatPage />} />
-          <Route path="/quiz" element={<StyleQuiz onComplete={() => navigate("/stylist")} />} />
           <Route path="/auth" element={user ? <Navigate to="/catalog" replace /> : <AuthPage onSuccess={() => navigate("/catalog")} />} />
           <Route path="/admin" element={isAdmin() ? <AdminPage /> : <Navigate to="/catalog" replace />} />
           <Route path="*" element={<Navigate to="/catalog" replace />} />

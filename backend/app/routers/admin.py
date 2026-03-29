@@ -287,3 +287,18 @@ async def list_users(
     result = await db.execute(select(User))
     users = result.scalars().all()
     return [UserResponse.model_validate(u) for u in users]
+
+
+# ---------------------------------------------------------------------------
+# Embeddings
+# ---------------------------------------------------------------------------
+
+@router.post("/embed-products")
+async def embed_products(
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_admin_user),
+) -> dict:
+    from app.services.embedding_service import EmbeddingService
+    svc = EmbeddingService()
+    count = await svc.embed_all_products(db)
+    return {"embedded": count}

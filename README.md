@@ -1,233 +1,140 @@
 # AI Stylist & Virtual Try-On
 
-Fashion-маркетплейс с AI-стилистом, виртуальной примеркой и conversational-ассистентом.
+Fashion-маркетплейс с AI-стилистом, виртуальной примеркой, conversational-ассистентом и админ-панелью.
 
 Архитектурный принцип: **никаких собственных ML-моделей** — решение построено как оркестрация внешних managed AI-сервисов (Mapp Fashion, Vertex AI, OpenAI).
 
+> Подробная инструкция по запуску: [SETUP.md](SETUP.md)
+
 ---
 
-## Текущий стек
+## Стек технологий
 
 | Слой | Технологии |
 |------|-----------|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, Radix UI, Zustand, Lucide Icons |
-| Backend | Python 3, FastAPI, Pydantic v2, uvicorn |
-| AI-провайдеры (planned) | Mapp Fashion API, Google Vertex AI Virtual Try-On, OpenAI API |
+| Frontend | React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, shadcn/ui, Radix UI, Zustand, React Router 7, Lucide Icons, Axios |
+| Backend | Python 3, FastAPI 0.115, Pydantic v2, uvicorn, SQLAlchemy 2 (async), asyncpg |
+| База данных | PostgreSQL (async через asyncpg) |
+| Аутентификация | JWT (python-jose), bcrypt, OAuth2PasswordBearer |
+| AI-провайдеры | OpenAI API (чат-стилист), Google Vertex AI (примерка), Mapp Fashion API (рекомендации), FASHN API (fallback примерка) |
 
 ---
 
-## Что сейчас работает
+## Возможности
 
-### Backend — 23 эндпоинта (`http://localhost:8000`)
+### Каталог товаров
+- 48 товаров в mock-каталоге (tops, bottoms, dresses, outerwear, shoes, accessories)
+- Бренды: Zara, H&M, Mango, COS, Nike, Adidas, Uniqlo, New Balance и др.
+- Фильтрация: категория, стиль, пол, бренд, цвет, диапазон цен, полнотекстовый поиск
+- Пагинация (20 товаров/страница)
+- Детальная карточка товара (диалог): цена, размеры, материал, стиль-теги
+- Рекомендации «Похожие товары» в карточке
+- CTA: «Собрать образ» и «Примерить» на каждом товаре
+
+### AI Стилист — генерация образов
+- Форма: стиль (casual, office, sport, evening, street, smart_casual, date, travel), повод, пол, бюджет
+- Генерация 1-3 образов с анимацией прогресса
+- Category composition: top+bottom+shoes или dress+shoes+accessory
+- Color theory: HSL-оценка совместимости (нейтральные, комплементарные, триадные)
+- Style coherence scoring — стилевая связность комплекта
+- Business rules: фильтрация по наличию, бюджету, occasion-exclusions
+- Compatibility score (0-100%) для каждого образа
+- Badges: «Отличное сочетание», «Всё в наличии», «Бюджетный вариант», «Премиум»
+- Режим сравнения образов (side-by-side до 3 образов)
+- Шеринг образов
+- «Купить всё» и «Примерить» на каждом образе
+
+### Виртуальная примерка
+- Drag-n-drop загрузка фото (JPEG/PNG/WebP до 10 МБ)
+- Два режима: одиночная примерка и примерка всего образа (до 5 вещей)
+- Async job flow: queued -> processing -> completed/failed
+- Progress bar обработки с polling (2 сек интервал)
+- Валидация формата и размера изображения
+- Rate limiting (20 задач/час на пользователя)
+- Dual provider: Vertex AI VTO (prod) / mock-симуляция (dev)
+- Сравнение До/После (side-by-side)
+- CTA: «Добавить в корзину», «Собрать образ»
+
+### AI Чат (Conversational Stylist)
+- Чат-интерфейс с аватарами (user/bot) и typing indicator
+- Два режима NLU: OpenAI gpt-4 с function calling (prod) / keyword extraction (dev)
+- Извлечение intent: стиль, бюджет, цвета, пол, повод — из текста на рус/англ
+- Structured response: ответ + extracted_filters + товары + образы + CTA actions
+- Быстрые подсказки: «Подбери образ на свидание», «Casual лук до $200» и др.
+- Карточки товаров и мини-образы прямо в ответах ассистента
+
+### Аутентификация и авторизация
+- Регистрация и логин по email/password
+- JWT-токены (HS256, 60 мин)
+- Хеширование паролей (bcrypt)
+- Role-based access: user / admin
+- Защищённые эндпоинты через OAuth2PasswordBearer
+- Страница авторизации с переключением login/register
+- Zustand-стор + localStorage для сессии
+
+### Корзина
+- Добавление отдельных товаров и целых образов
+- Управление количеством
+- Подсчёт итоговой суммы
+- Sidebar-drawer с анимацией
+- Персистентное хранение (localStorage)
+
+### Админ-панель
+- Дашборд статистики: товары, пользователи, образы, задачи примерки, события
+- Управление товарами (добавление, редактирование, удаление)
+- Управление пользователями
+- CRUD бизнес-правил
+- Feature flags
+- Мониторинг AI-провайдеров (health, latency)
+- Доступ только для role=admin
+
+### Аналитика и трекинг
+- Batch-отправка событий (view, click, purchase, outfit_generated, try_on_started)
+- Фильтрация по типу события, user_id
+- PostgreSQL-backed хранение
+
+### UI/UX
+- Тёмная и светлая тема (переключатель, localStorage)
+- Адаптивный дизайн (mobile-first)
+- Мобильное меню (slide-out с overlay)
+- Toast-уведомления
+- Skeleton-loaders
+- Модальные окна
+- Роутинг между 7 страницами (React Router)
+
+---
+
+## API — 30+ эндпоинтов
 
 Swagger-документация: `http://localhost:8000/docs`
 
-#### Каталог (`/api/v1/catalog`)
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| GET | `/catalog` | Список товаров с фильтрами (category, gender, style, occasion, brand, color, price_min/max, search, пагинация) |
-| GET | `/catalog/{product_id}` | Карточка товара |
-| GET | `/catalog/brands` | Список брендов |
-| GET | `/catalog/colors` | Список цветов |
-| GET | `/catalog/styles` | Список стилей |
-| GET | `/catalog/occasions` | Список поводов |
-
-- 48 товаров в mock-каталоге (12 tops, 10 bottoms, 4 dresses, 5 outerwear, 9 shoes, 8 accessories)
-- Бренды: Zara, H&M, Mango, COS, Nike, Adidas, Uniqlo, New Balance и др.
-- Фильтрация по всем полям, пагинация, полнотекстовый поиск
-
-#### AI Стилист — генерация образов (`/api/v1/outfits`)
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| POST | `/outfits/generate` | Генерация образов по параметрам (стиль, повод, пол, бюджет, цвета, исключения) |
-| POST | `/outfits/by-product` | Complete the Look — образы на основе конкретного товара |
-| POST | `/outfits/recommend/{product_id}` | Похожие/дополняющие товары |
-
-Что работает в dev-режиме (без внешних API):
-- Автоматическая сборка образов из каталога по правилам category composition (top+bottom+shoes или dress+shoes+accessory)
-- Color theory — оценка цветовой совместимости через HSL (нейтральные цвета, комплементарные, триадные сочетания)
-- Style coherence scoring — оценка стилевой связности комплекта
-- Business rules: фильтрация по наличию, бюджету, occasion-exclusions (нет шорт для офиса и т.д.)
-- Compatibility score (0-100%) для каждого образа
-- Badges: "Отличное сочетание", "Всё в наличии", "Бюджетный вариант"
-- Explanation — текстовое объяснение рекомендации
-
-#### Виртуальная примерка (`/api/v1/tryon`)
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| POST | `/tryon/jobs` | Создать задачу примерки (загрузка фото + product_id) |
-| GET | `/tryon/jobs/{job_id}` | Статус задачи (progress 0-100%, queued/processing/completed/failed) |
-
-Что работает в dev-режиме:
-- Async job flow с прогрессом (имитация 3 сек обработки)
-- Валидация изображения (размер, формат)
-- Rate limiting по user_id
-- Статусы: queued → processing → completed/failed
-
-#### Conversational Stylist (`/api/v1/stylist`)
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| POST | `/stylist/chat` | Чат с AI-стилистом |
-| GET | `/stylist/suggestions` | Готовые подсказки для начала диалога |
-
-Что работает в dev-режиме:
-- Парсинг intent из текста (keyword matching): повод, бюджет, цвета, пол
-- Извлечение constraints из естественного языка (рус/англ): "образ на свидание до $200 в чёрном"
-- Генерация образов через RecommendationService на основе extracted constraints
-- Structured response: ответ + extracted_filters + товары + образы + CTA actions
-
-#### Admin / Backoffice (`/api/v1/admin`)
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| GET/POST | `/admin/rules` | CRUD бизнес-правил |
-| PUT/DELETE | `/admin/rules/{rule_id}` | Обновление/удаление правила |
-| GET | `/admin/stats` | Дашборд статистики |
-| GET | `/admin/providers` | Статус AI-провайдеров (health, latency) |
-| GET/POST | `/admin/feature-flags` | Feature flags |
-
-#### Аналитика (`/api/v1/tracking`)
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| POST | `/tracking/events` | Batch-отправка событий |
-| GET | `/tracking/events` | Получение событий (фильтр по типу, user_id) |
-
----
-
-### Frontend — 4 страницы (`http://localhost:5173`)
-
-#### 1. Каталог
-- Сетка карточек товаров с цветовым превью
-- Панель фильтров: категория, стиль, пол, бренд, диапазон цен, поиск
-- Детальная карточка товара (диалог): цена, размеры, материал, стиль-теги
-- Рекомендации "Похожие товары" в карточке
-- CTA: "Собрать образ" и "Примерить" на каждом товаре
-
-#### 2. AI Стилист
-- Форма: стиль, повод, пол, бюджет (мин/макс)
-- Генерация 1-3 образов с анимацией прогресса
-- Карточка образа: состав, цены, compatibility score, badges, explanation
-- "Купить всё" и "Примерить" на каждом образе
-- Hover: замена вещи, примерка отдельного предмета
-
-#### 3. Виртуальная примерка
-- Drag-n-drop загрузка фото (JPEG/PNG/WebP до 10 МБ)
-- Валидация формата и размера
-- Progress bar обработки с polling статуса
-- Сравнение До/После (side-by-side)
-- CTA: "Добавить в корзину", "Собрать образ"
-
-#### 4. AI Чат
-- Чат-интерфейс с аватарами (user/bot)
-- Быстрые подсказки: "Подбери образ на свидание", "Casual лук до $200" и др.
-- Карточки товаров и мини-образы прямо в ответах ассистента
-- Typing indicator (анимация точек)
-
----
-
-## Что нужно сделать
-
-### Интеграция внешних AI-сервисов
-
-#### 1. Mapp Fashion API (рекомендации)
-- **Зачем:** Сейчас образы собираются по внутренним правилам (category composition + color theory). Mapp Fashion предоставляет production-grade outfit recommendations, personalized suggestions и related products на основе ML.
-- **Что нужно:**
-  - Контракт с Mapp, получение API-ключей
-  - Product data feed export в формат Mapp
-  - Tracking implementation (view, click, purchase events)
-  - Интеграция в `RecommendationService` — вызов Mapp API вместо внутренней логики
-  - Маппинг Mapp response → наши Outfit/Product модели
-  - Failover: если Mapp недоступен → текущая логика как fallback
-- **Альтернативы:** Amazon Personalize, Algolia Recommend
-
-#### 2. Google Vertex AI Virtual Try-On API (примерка)
-- **Зачем:** Сейчас try-on — имитация (возвращает product image). Vertex AI генерирует реальное изображение человека в одежде.
-- **Что нужно:**
-  - GCP проект с включённым Vertex AI API
-  - Image preprocessing service (валидация, ресайз, нормализация)
-  - Интеграция в `TryOnService` — отправка personImage + productImage в Vertex AI
-  - Обработка результата, CDN для output images
-  - Signed URLs для безопасного доступа к изображениям
-- **Fallback:** FASHN API как резервный провайдер
-
-#### 3. OpenAI API (conversational stylist)
-- **Зачем:** Сейчас intent extraction через keyword matching. OpenAI даст полноценное понимание естественного языка, мультимодальный анализ (фото стиля), генерацию объяснений.
-- **Что нужно:**
-  - API-ключ OpenAI
-  - System prompt с guardrails (не комментировать тело, не обещать точность посадки)
-  - Structured output parsing (function calling для извлечения constraints)
-  - Мультимодальный input: текст + изображение
-  - Интеграция в `StylistService`
-- **Fallback:** текущий keyword parser + шаблонные ответы
-
-#### 4. Vertex AI Search for Commerce (опционально)
-- **Зачем:** AI-powered product discovery, персонализированный поиск, conversational commerce
-- **Когда:** после запуска основных модулей
-
-### Функциональные доработки
-
-| Приоритет | Задача | Описание |
-|-----------|--------|----------|
-| P0 | Авторизация | Регистрация, логин, JWT, user profiles |
-| P0 | Реальные изображения товаров | Сейчас цветовые круги вместо фото — нужны реальные product images |
-| P0 | Consent flow для примерки | GDPR-совместимое согласие на обработку фото |
-| P1 | Корзина | Add to cart, add whole outfit, checkout flow |
-| P1 | Wishlist / Saved outfits | Сохранение образов и результатов примерки |
-| P1 | Size profile | Профиль размеров пользователя, фильтрация по доступным размерам |
-| P1 | Admin UI | Frontend для backoffice (сейчас только API) |
-| P2 | A/B testing | Эксперименты: outfit block vs no block, CTA variants |
-| P2 | Персонализация | История просмотров/покупок → персональные рекомендации |
-| P2 | Mobile app | React Native или adaptive PWA |
-| P2 | Image deletion | Удаление пользовательских фото по запросу |
-| P3 | CRM hooks | Интеграция с email/push для персонализированных рекомендаций |
-| P3 | Seller management | Управление продавцами, blacklist, margin rules |
-| P3 | Multi-language | i18n (сейчас RU-first) |
-
-### Нефункциональные требования (TODO)
-
-- **Кэширование:** Redis для hot recommendations (P95 < 300ms)
-- **CDN:** для output images виртуальной примерки
-- **Очередь:** async queue (Celery/ARQ) для try-on jobs вместо asyncio.create_task
-- **База данных:** PostgreSQL для пользователей, заказов, сохранённых образов (сейчас всё in-memory)
-- **Observability:** structured logging, distributed tracing, Prometheus metrics
-- **CI/CD:** GitHub Actions, Docker, staging environment
-- **Безопасность:** RBAC для admin, audit logging, secrets rotation, encryption at rest
-
----
-
-## Запуск
-
-### Backend
-
-```bash
-cd backend
-pip install -r requirements.txt
-python3 -m uvicorn app.main:app --reload --port 8000
-```
-
-API docs: http://localhost:8000/docs
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-UI: http://localhost:5173
-
-### Environment Variables (`.env` в `/backend`)
-
-```env
-# Пока не требуются — всё работает в dev-режиме с mock-данными
-# При подключении внешних сервисов:
-OPENAI_API_KEY=sk-...
-MAPP_FASHION_API_KEY=...
-MAPP_FASHION_BASE_URL=https://api.mapp.com/...
-VERTEX_AI_PROJECT=my-gcp-project
-VERTEX_AI_LOCATION=us-central1
-FASHN_API_KEY=...
-```
+| Группа | Метод | Эндпоинт | Описание |
+|--------|-------|----------|----------|
+| **Auth** | POST | `/api/v1/auth/register` | Регистрация |
+| | POST | `/api/v1/auth/login` | Логин (возвращает JWT) |
+| | GET | `/api/v1/auth/me` | Текущий пользователь |
+| **Каталог** | GET | `/api/v1/catalog` | Список товаров с фильтрами и пагинацией |
+| | GET | `/api/v1/catalog/{product_id}` | Карточка товара |
+| | GET | `/api/v1/catalog/brands` | Список брендов |
+| | GET | `/api/v1/catalog/colors` | Список цветов |
+| | GET | `/api/v1/catalog/styles` | Список стилей |
+| | GET | `/api/v1/catalog/occasions` | Список поводов |
+| **Образы** | POST | `/api/v1/outfits/generate` | Генерация образов по параметрам |
+| | POST | `/api/v1/outfits/by-product` | Complete the Look — образы на основе товара |
+| | POST | `/api/v1/outfits/recommend/{id}` | Похожие/дополняющие товары |
+| **Примерка** | POST | `/api/v1/tryon/jobs` | Создать задачу примерки (фото + товар) |
+| | POST | `/api/v1/tryon/outfit-jobs` | Примерка всего образа (до 5 вещей) |
+| | GET | `/api/v1/tryon/jobs/{job_id}` | Статус задачи (progress 0-100%) |
+| **Чат** | POST | `/api/v1/stylist/chat` | Сообщение AI-стилисту |
+| | GET | `/api/v1/stylist/suggestions` | Подсказки для начала диалога |
+| **Админ** | GET | `/api/v1/admin/stats` | Дашборд статистики |
+| | GET/POST | `/api/v1/admin/rules` | CRUD бизнес-правил |
+| | PUT/DELETE | `/api/v1/admin/rules/{id}` | Обновление/удаление правила |
+| | GET | `/api/v1/admin/providers` | Статус AI-провайдеров |
+| | GET/POST | `/api/v1/admin/feature-flags` | Feature flags |
+| **Трекинг** | POST | `/api/v1/tracking/events` | Batch-отправка событий |
+| | GET | `/api/v1/tracking/events` | Получение событий (фильтр) |
+| **Health** | GET | `/health` | Health check |
 
 ---
 
@@ -238,49 +145,69 @@ KRG/
 ├── backend/
 │   ├── app/
 │   │   ├── core/
-│   │   │   └── config.py              # Настройки (pydantic-settings)
+│   │   │   ├── config.py              # Настройки (pydantic-settings)
+│   │   │   ├── database.py            # Async SQLAlchemy engine
+│   │   │   ├── auth.py                # OAuth2 dependencies
+│   │   │   ├── security.py            # JWT, password hashing (bcrypt)
+│   │   │   └── dependencies.py
 │   │   ├── models/
-│   │   │   └── schemas.py             # Pydantic-модели (Product, Outfit, TryOnJob, Chat...)
+│   │   │   ├── schemas.py             # Pydantic-модели (Product, Outfit, TryOnJob, Chat...)
+│   │   │   ├── db_models.py           # SQLAlchemy ORM (User, Product, TrackingEvent)
+│   │   │   └── auth_schemas.py        # Auth request/response модели
 │   │   ├── routers/
+│   │   │   ├── auth.py                # Регистрация, логин, /me
 │   │   │   ├── catalog.py             # Каталог товаров
 │   │   │   ├── outfits.py             # Генерация образов
 │   │   │   ├── tryon.py               # Виртуальная примерка
 │   │   │   ├── stylist_chat.py        # AI-чат
-│   │   │   ├── admin.py               # Backoffice
+│   │   │   ├── admin.py               # Админ-панель (расширенная)
 │   │   │   └── tracking.py            # Аналитика событий
 │   │   ├── services/
-│   │   │   ├── catalog_service.py     # Работа с каталогом (JSON)
+│   │   │   ├── catalog_service.py     # Работа с каталогом (PostgreSQL)
 │   │   │   ├── recommendation_service.py  # Сборка образов, color theory, scoring
-│   │   │   ├── tryon_service.py       # Async job flow для примерки
-│   │   │   ├── stylist_service.py     # NLU: парсинг intent → образы
+│   │   │   ├── tryon_service.py       # Async job flow, Vertex AI / FASHN / mock
+│   │   │   ├── stylist_service.py     # NLU: OpenAI / keyword fallback → образы
 │   │   │   └── business_rules.py      # Color compatibility, style coherence, filters
-│   │   └── main.py                    # FastAPI app, CORS, routers
+│   │   └── main.py                    # FastAPI app, lifespan, CORS, routers
 │   ├── data/
 │   │   └── catalog.json               # Mock-каталог (48 товаров)
-│   └── requirements.txt
+│   ├── storage/                       # Сгенерированные изображения примерки
+│   ├── seed_db.py                     # Инициализация БД + загрузка каталога + admin user
+│   ├── requirements.txt
+│   └── .env.example
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
-│   │   │   ├── client.ts              # HTTP-клиент (fetch)
+│   │   │   ├── client.ts              # HTTP-клиент (кеширование, dedup, auth header)
 │   │   │   └── types.ts               # TypeScript-типы
 │   │   ├── components/
 │   │   │   ├── catalog/               # CatalogPage, ProductCard, ProductDetail, ProductFilters
-│   │   │   ├── stylist/               # StylistPage, OutfitCard, OutfitForm
+│   │   │   ├── stylist/               # StylistPage, OutfitCard, OutfitForm, OutfitComparison, ShareOutfit
 │   │   │   ├── tryon/                 # TryOnPage, ImageUpload, TryOnResult
 │   │   │   ├── chat/                  # ChatPage, ChatInput, ChatMessage
-│   │   │   ├── layout/               # Header, Footer
-│   │   │   └── ui/                    # shadcn/ui components (button, card, dialog, select...)
+│   │   │   ├── auth/                  # AuthPage (login/register)
+│   │   │   ├── admin/                 # AdminPage (дашборд, управление)
+│   │   │   ├── cart/                  # CartDrawer (sidebar корзина)
+│   │   │   ├── quiz/                  # StyleQuiz (стилевой квиз)
+│   │   │   ├── layout/               # Header (адаптивный + мобильное меню), Footer
+│   │   │   └── ui/                    # shadcn/ui компоненты
 │   │   ├── hooks/
 │   │   │   └── use-toast.ts
+│   │   ├── store/
+│   │   │   ├── auth.ts               # Zustand: авторизация (token, user, role)
+│   │   │   ├── cart.ts               # Zustand: корзина (items, total)
+│   │   │   └── navigation.ts         # Zustand: навигация между страницами (anchor product, try-on)
 │   │   ├── lib/
-│   │   │   └── utils.ts               # cn(), formatPrice()
-│   │   ├── App.tsx                    # Routing между табами
+│   │   │   └── utils.ts              # cn(), formatPrice()
+│   │   ├── App.tsx                    # Роутинг (7 маршрутов), layout
 │   │   └── main.tsx                   # Entry point
 │   ├── package.json
-│   └── vite.config.ts
+│   ├── vite.config.ts
+│   └── .env.example
 │
-└── README.md
+├── README.md                          # Этот файл
+└── SETUP.md                           # Инструкция по запуску
 ```
 
 ---
@@ -288,12 +215,14 @@ KRG/
 ## Архитектура
 
 ```
-Frontend (React + shadcn/ui)
+Frontend (React 19 + shadcn/ui + Zustand)
     │
     ▼
-API Gateway (FastAPI, CORS, validation)
+API Gateway (FastAPI, CORS, JWT auth, validation)
     │
-    ├── Catalog Service ──────────── catalog.json (mock) → БД (prod)
+    ├── Auth Service ─────────────── JWT, bcrypt, role-based access
+    │
+    ├── Catalog Service ──────────── PostgreSQL (async SQLAlchemy)
     │
     ├── Recommendation Service
     │   ├── [dev]  Category composition + Color theory + Business rules
@@ -305,9 +234,76 @@ API Gateway (FastAPI, CORS, validation)
     │
     ├── Stylist Service
     │   ├── [dev]  Keyword intent parser → Recommendation Service
-    │   └── [prod] OpenAI API (NLU + multimodal) → Recommendation Service
+    │   └── [prod] OpenAI API (NLU + function calling) → Recommendation Service
     │
-    ├── Admin Service ──────────── Rules, feature flags, provider health
+    ├── Admin Service ──────────── Stats, rules, feature flags, provider health
     │
-    └── Tracking Service ─────── Event collection → BI/Analytics
+    └── Tracking Service ─────── Event collection → PostgreSQL → BI
 ```
+
+---
+
+## База данных
+
+| Таблица | Описание |
+|---------|----------|
+| `users` | id, email (unique), hashed_password, full_name, role (user/admin), is_active, created_at |
+| `products` | id, sku_id, name, brand, category, subcategory, gender, color, price, sizes (JSON), style_tags (JSON), occasion_tags (JSON), in_stock, ... |
+| `tracking_events` | id, event_type, user_id, product_id, outfit_id, metadata_json, timestamp |
+
+---
+
+## Бизнес-логика
+
+### Color Theory (совместимость цветов)
+- Нейтральные (чёрный, белый, серый, бежевый, нэви) → 90% совместимость с любым
+- HSL-анализ: hue distance < 15° → аналогичные (60-85%), 120° ± 15° → триадные (75%), 180° ± 20° → комплементарные (88%)
+
+### Style Coherence
+- 8 стилей маппятся на предпочтительные подкатегории (shirt, blazer, sneakers и т.д.)
+- Оценка = % предметов, соответствующих стилю
+
+### Outfit Composition
+- Полный образ: tops + bottoms + shoes ИЛИ dress + shoes
+- Occasion exclusions: нет шорт/топов для офиса, нет шлёпанцев
+- Budget filtering: min/max с 5% допуском
+
+### Scoring
+- Compatibility = 60% color score + 40% style score
+- Badges на основе score, наличия, бюджета
+
+---
+
+## Что нужно сделать
+
+### Интеграция внешних AI-сервисов
+
+| Сервис | Статус | Описание |
+|--------|--------|----------|
+| **OpenAI API** | Готов к подключению | Conversational stylist — NLU, function calling, мультимодальный анализ. Fallback: keyword parser |
+| **Google Vertex AI VTO** | Готов к подключению | Виртуальная примерка — генерация реального изображения. Fallback: FASHN API |
+| **Mapp Fashion API** | Готов к подключению | Production-grade рекомендации. Fallback: внутренняя логика |
+
+### Функциональные доработки
+
+| Приоритет | Задача | Описание |
+|-----------|--------|----------|
+| P0 | Реальные изображения товаров | Сейчас цветовые круги — нужны фото |
+| P0 | Consent flow для примерки | GDPR-совместимое согласие на обработку фото |
+| P1 | Checkout flow | Оформление заказа из корзины |
+| P1 | Wishlist / Saved outfits | Сохранение образов и результатов примерки |
+| P1 | Size profile | Профиль размеров, фильтрация по доступным |
+| P2 | A/B testing | Эксперименты: CTA variants, outfit block |
+| P2 | Персонализация | История → персональные рекомендации |
+| P2 | Mobile app | React Native или adaptive PWA |
+| P3 | CRM hooks | Email/push рекомендации |
+| P3 | Multi-language | i18n (сейчас RU-first) |
+
+### Нефункциональные требования (TODO)
+
+- **Кэширование:** Redis для hot recommendations (P95 < 300ms)
+- **CDN:** для output images виртуальной примерки
+- **Очередь:** Celery/ARQ для try-on jobs вместо asyncio.create_task
+- **Observability:** structured logging, distributed tracing, Prometheus metrics
+- **CI/CD:** GitHub Actions, Docker, staging environment
+- **Безопасность:** audit logging, secrets rotation, encryption at rest

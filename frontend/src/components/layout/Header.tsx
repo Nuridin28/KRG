@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Sparkles, Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, ClipboardList, Shield, LogIn, LogOut, User, Menu, X } from "lucide-react"
+import { Sparkles, Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "@/store/cart"
 import { useAuth } from "@/store/auth"
@@ -17,7 +17,6 @@ const navItems = [
   { value: "stylist", label: "AI Стилист", icon: Wand2 },
   { value: "tryon", label: "Примерка", icon: Camera },
   { value: "chat", label: "AI Чат", icon: MessageCircle },
-  { value: "quiz", label: "Стиль-Квиз", icon: ClipboardList },
 ]
 
 export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpenCart }: HeaderProps) {
