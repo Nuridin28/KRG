@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { Loader2, Shirt, Search, X, Check } from "lucide-react"
 import { api } from "@/api/client"
-import type { Product, TryOnJob } from "@/api/types"
+import type { Product } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,19 +15,34 @@ import { useNavigation } from "@/store/navigation"
 const MAX_ITEMS = 5
 
 export function TryOnPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const tryOnProducts = useNavigation((s) => s.tryOnProducts)
+  const job = useNavigation((s) => s.tryOnJob)
+  const personPreview = useNavigation((s) => s.tryOnPersonPreview)
+  const { setTryOnJob, setTryOnPersonPreview, startPolling } = useNavigation()
+
   const [personImage, setPersonImage] = useState<File | null>(null)
-  const [personPreview, setPersonPreview] = useState<string | null>(null)
   const [chosenProducts, setChosenProducts] = useState<Product[]>(tryOnProducts)
-  const [job, setJob] = useState<TryOnJob | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Product search
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(false)
+
+  // Restore job from URL on page refresh
+  useEffect(() => {
+    const jobId = searchParams.get("job")
+    if (jobId && !job) {
+      api.tryon.getJob(jobId).then((restored) => {
+        setTryOnJob(restored)
+        if (restored.status === "queued" || restored.status === "processing") {
+          startPolling(jobId)
+        }
+      }).catch(() => {})
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (tryOnProducts.length > 0) {
@@ -46,38 +62,9 @@ export function TryOnPage() {
       .finally(() => setLoadingProducts(false))
   }, [searchQuery])
 
-  const stopPolling = useCallback(() => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current)
-      pollRef.current = null
-    }
-  }, [])
-
-  useEffect(() => {
-    return stopPolling
-  }, [stopPolling])
-
-  const pollJob = useCallback(
-    (jobId: string) => {
-      stopPolling()
-      pollRef.current = setInterval(async () => {
-        try {
-          const updated = await api.tryon.getJob(jobId)
-          setJob(updated)
-          if (updated.status === "completed" || updated.status === "failed") {
-            stopPolling()
-          }
-        } catch {
-          stopPolling()
-        }
-      }, 2000)
-    },
-    [stopPolling]
-  )
-
   const handleImageSelected = (file: File) => {
     setPersonImage(file)
-    setPersonPreview(URL.createObjectURL(file))
+    setTryOnPersonPreview(URL.createObjectURL(file))
   }
 
   const handleToggleProduct = (product: Product) => {
@@ -97,7 +84,7 @@ export function TryOnPage() {
     if (!personImage || chosenProducts.length === 0) return
     setSubmitting(true)
     setError(null)
-    setJob(null)
+    setTryOnJob(null)
 
     try {
       const productIds = chosenProducts.map((p) => p.id)
@@ -105,8 +92,9 @@ export function TryOnPage() {
         productIds.length === 1
           ? await api.tryon.createJob(personImage, productIds[0])
           : await api.tryon.createOutfitJob(personImage, productIds)
-      setJob(newJob)
-      pollJob(newJob.job_id)
+      setTryOnJob(newJob)
+      setSearchParams({ job: newJob.job_id })
+      startPolling(newJob.job_id)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка запуска примерки")
     } finally {

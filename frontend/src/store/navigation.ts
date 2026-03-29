@@ -1,17 +1,28 @@
 import { create } from "zustand"
-import type { Product, Outfit } from "@/api/types"
+import type { Product, Outfit, TryOnJob } from "@/api/types"
+import { api } from "@/api/client"
+
+let pollInterval: ReturnType<typeof setInterval> | null = null
 
 interface NavigationStore {
   anchorProduct: Product | null
   tryOnProducts: Product[]
+  tryOnJob: TryOnJob | null
+  tryOnPersonPreview: string | null
   setAnchorProduct: (product: Product | null) => void
   setTryOnProducts: (products: Product[]) => void
   setTryOnFromOutfit: (outfit: Outfit) => void
+  setTryOnJob: (job: TryOnJob | null) => void
+  setTryOnPersonPreview: (url: string | null) => void
+  startPolling: (jobId: string) => void
+  stopPolling: () => void
 }
 
-export const useNavigation = create<NavigationStore>()((set) => ({
+export const useNavigation = create<NavigationStore>()((set, get) => ({
   anchorProduct: null,
   tryOnProducts: [],
+  tryOnJob: null,
+  tryOnPersonPreview: null,
 
   setAnchorProduct: (product) => set({ anchorProduct: product }),
 
@@ -38,5 +49,31 @@ export const useNavigation = create<NavigationStore>()((set) => ({
       seller_id: "",
     })) as Product[]
     set({ tryOnProducts: products })
+  },
+
+  setTryOnJob: (job) => set({ tryOnJob: job }),
+
+  setTryOnPersonPreview: (url) => set({ tryOnPersonPreview: url }),
+
+  startPolling: (jobId: string) => {
+    get().stopPolling()
+    pollInterval = setInterval(async () => {
+      try {
+        const updated = await api.tryon.getJob(jobId)
+        set({ tryOnJob: updated })
+        if (updated.status === "completed" || updated.status === "failed") {
+          get().stopPolling()
+        }
+      } catch {
+        get().stopPolling()
+      }
+    }, 2000)
+  },
+
+  stopPolling: () => {
+    if (pollInterval) {
+      clearInterval(pollInterval)
+      pollInterval = null
+    }
   },
 }))
