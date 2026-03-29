@@ -172,7 +172,7 @@ export function OutfitBuilderPage() {
                   <div className="mt-1 flex gap-1 lg:hidden">
                     {SLOTS.filter((s) => s.categories.includes(product.category)).map((slot) => (
                       <button key={slot.id} onClick={() => handleClickAdd(product, slot.id)}
-                        className="flex-1 rounded bg-coral/10 py-0.5 text-[8px] font-medium text-coral hover:bg-coral/20">
+                        className="flex-1 rounded bg-foreground/5 py-0.5 text-[8px] font-medium text-foreground hover:bg-foreground/20">
                         + {slot.label}
                       </button>
                     ))}
@@ -187,7 +187,7 @@ export function OutfitBuilderPage() {
         <div className="space-y-4">
           <div className="rounded-xl border bg-card p-4 shadow-sm">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-              <Sparkles className="h-4 w-4 text-coral" />
+              <Sparkles className="h-4 w-4 text-foreground" />
               Ваш образ
             </h3>
 
@@ -200,7 +200,7 @@ export function OutfitBuilderPage() {
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, slot.id)}
                     className={`flex items-center gap-3 rounded-lg border-2 border-dashed p-3 transition-colors ${
-                      product ? "border-coral/30 bg-coral/5" : "border-muted hover:border-coral/50"
+                      product ? "border-foreground/15 bg-foreground/3" : "border-muted hover:border-foreground/50"
                     }`}
                   >
                     {product ? (

@@ -109,7 +109,7 @@ export function ProfilePhotos() {
       ) : (
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo) => (
-            <Card key={photo.id} className={`overflow-hidden ${photo.is_default ? "ring-2 ring-coral" : ""}`}>
+            <Card key={photo.id} className={`overflow-hidden ${photo.is_default ? "ring-2 ring-foreground" : ""}`}>
               <div className="relative aspect-[3/4]">
                 <img
                   src={`${API_HOST}${photo.image_url}`}
@@ -117,7 +117,7 @@ export function ProfilePhotos() {
                   className="h-full w-full object-cover"
                 />
                 {photo.is_default && (
-                  <div className="absolute left-1.5 top-1.5 rounded bg-coral px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  <div className="absolute left-1.5 top-1.5 rounded bg-foreground px-1.5 py-0.5 text-[10px] font-bold text-white">
                     Основное
                   </div>
                 )}

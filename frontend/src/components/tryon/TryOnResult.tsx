@@ -112,12 +112,12 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
   if (job.status === "queued" || job.status === "processing") {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border bg-card py-20 text-center">
-        <Loader2 className="mb-4 h-10 w-10 animate-spin text-coral" />
+        <Loader2 className="mb-4 h-10 w-10 animate-spin text-muted-foreground" />
         <p className="text-sm font-medium">{getStatusLabel(job.status)}</p>
         <Progress
           value={job.progress}
           className="mx-auto mt-4 max-w-xs"
-          indicatorClassName="bg-coral"
+          indicatorClassName="bg-foreground"
         />
         <p className="mt-2 text-xs text-muted-foreground">{job.progress}%</p>
       </div>
@@ -160,8 +160,8 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
             </div>
           </div>
           <div className="flex justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-coral/10">
-              <ArrowDown className="h-5 w-5 text-coral" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5">
+              <ArrowDown className="h-5 w-5 text-foreground" />
             </div>
           </div>
         </>
@@ -206,14 +206,14 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
 
         {/* Content */}
         <div className="relative">
-          <p className="mb-2 text-center text-sm font-semibold text-coral">
+          <p className="mb-2 text-center text-sm font-semibold text-foreground">
             {viewMode === "video" ? "В движении" : "После"}
           </p>
 
           {/* Photo view */}
           {viewMode === "photo" && job.output_image_url && (
             <div
-              className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-coral/30 shadow-lg"
+              className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-foreground/15 shadow-lg"
               onClick={() => setZoomedImage(job.output_image_url!)}
             >
               <img
@@ -249,7 +249,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
 
           {/* Video view */}
           {viewMode === "video" && hasVideo && (
-            <div className="overflow-hidden rounded-xl border-2 border-coral/30 shadow-lg">
+            <div className="overflow-hidden rounded-xl border-2 border-foreground/15 shadow-lg">
               <video
                 src={videoJob!.video_url!}
                 className="w-full rounded-xl"
@@ -277,7 +277,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
         <div className="rounded-lg border bg-card p-3">
           <div className="mb-1.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-coral" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
               <span className="text-xs font-medium">Создаём видео ~40 сек...</span>
             </div>
             <span className="text-xs text-muted-foreground">{videoJob!.progress}%</span>
@@ -285,7 +285,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           <Progress
             value={videoJob!.progress}
             className="h-1.5 w-full"
-            indicatorClassName="bg-coral"
+            indicatorClassName="bg-foreground"
           />
         </div>
       )}

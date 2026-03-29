@@ -50,8 +50,8 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
       <div className="w-full max-w-md">
         <div className="rounded-2xl border bg-card p-8 shadow-lg">
           <div className="mb-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-coral/10">
-              {isLogin ? <LogIn className="h-6 w-6 text-coral" /> : <UserPlus className="h-6 w-6 text-coral" />}
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/5">
+              {isLogin ? <LogIn className="h-6 w-6 text-foreground" /> : <UserPlus className="h-6 w-6 text-foreground" />}
             </div>
             <h2 className="text-2xl font-bold">{isLogin ? "Вход" : "Регистрация"}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Ваше имя"
-                    className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+                    className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-foreground focus:ring-1 focus:ring-foreground"
                   />
                 </div>
               </div>
@@ -86,7 +86,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email@example.com"
                   required
-                  className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+                  className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-foreground focus:ring-1 focus:ring-foreground"
                 />
               </div>
             </div>
@@ -102,7 +102,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   placeholder="••••••••"
                   required
                   minLength={4}
-                  className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+                  className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-foreground focus:ring-1 focus:ring-foreground"
                 />
               </div>
             </div>
@@ -116,7 +116,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-coral py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="w-full rounded-lg bg-foreground py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {loading ? "Загрузка..." : isLogin ? "Войти" : "Зарегистрироваться"}
             </button>
@@ -126,7 +126,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             {isLogin ? "Нет аккаунта?" : "Уже есть аккаунт?"}{" "}
             <button
               onClick={() => { setIsLogin(!isLogin); setError("") }}
-              className="font-medium text-coral hover:underline"
+              className="font-medium text-foreground hover:underline"
             >
               {isLogin ? "Зарегистрироваться" : "Войти"}
             </button>

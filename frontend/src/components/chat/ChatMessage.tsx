@@ -77,7 +77,7 @@ function MiniProductCard({
         {onTryOn && (
           <button
             onClick={() => onTryOn(product)}
-            className="flex h-7 w-7 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:border-coral hover:text-coral"
+            className="flex h-7 w-7 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
             title="Примерить"
           >
             <Shirt className="h-3.5 w-3.5" />
@@ -89,7 +89,7 @@ function MiniProductCard({
           className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
             added
               ? "bg-green-500 text-white"
-              : "border text-muted-foreground hover:border-coral hover:bg-coral hover:text-white"
+              : "border text-muted-foreground hover:border-foreground hover:bg-foreground hover:text-background"
           }`}
           title={added ? "Добавлено" : "В корзину"}
         >
@@ -156,7 +156,7 @@ function MiniOutfitCard({
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] font-medium transition-colors ${
             added
               ? "bg-green-500 text-white"
-              : "bg-coral text-white hover:bg-coral/90"
+              : "bg-foreground text-background hover:bg-foreground/90"
           }`}
         >
           {added ? <Check className="h-3 w-3" /> : <ShoppingCart className="h-3 w-3" />}
@@ -165,7 +165,7 @@ function MiniOutfitCard({
         {onTryOnOutfit && (
           <button
             onClick={() => onTryOnOutfit(outfit)}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border py-1.5 text-[11px] font-medium transition-colors hover:border-coral hover:text-coral"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border py-1.5 text-[11px] font-medium transition-colors hover:border-foreground hover:text-foreground"
           >
             <Shirt className="h-3 w-3" />
             Примерить

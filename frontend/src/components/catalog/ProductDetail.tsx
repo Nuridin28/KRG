@@ -75,7 +75,7 @@ export function ProductDetail({
             <div className="flex items-baseline gap-3">
               {product.promo_price ? (
                 <>
-                  <span className="text-2xl font-bold text-coral">
+                  <span className="text-2xl font-bold text-foreground">
                     {formatPrice(product.promo_price, product.currency)}
                   </span>
                   <span className="text-lg text-muted-foreground line-through">

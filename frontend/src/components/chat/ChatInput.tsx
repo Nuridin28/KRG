@@ -40,7 +40,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             key={prompt}
             onClick={() => onSend(prompt)}
             disabled={disabled}
-            className="rounded-full border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:border-coral/40 hover:bg-coral/5 hover:text-foreground disabled:opacity-50"
+            className="rounded-full border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:bg-foreground/3 hover:text-foreground disabled:opacity-50"
           >
             {prompt}
           </button>
@@ -54,7 +54,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           placeholder="Спросите AI стилиста..."
           disabled={disabled}
-          className="flex-1 rounded-lg border border-input bg-transparent px-4 py-2.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/30 focus-visible:border-coral/40 disabled:opacity-50 transition-all duration-200"
+          className="flex-1 rounded-lg border border-input bg-transparent px-4 py-2.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10 focus-visible:border-foreground/40 disabled:opacity-50 transition-all duration-200"
         />
         <Button
           variant="coral"

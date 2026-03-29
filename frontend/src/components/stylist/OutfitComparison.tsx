@@ -82,7 +82,7 @@ export function OutfitComparison({
       {/* Header */}
       <div className="flex items-center justify-between border-b px-6 py-4">
         <div className="flex items-center gap-3">
-          <Layers className="h-5 w-5 text-coral" />
+          <Layers className="h-5 w-5 text-foreground" />
           <h2 className="text-lg font-bold">
             Сравнение образов{" "}
             <span className="text-muted-foreground font-normal">
@@ -194,7 +194,7 @@ export function OutfitComparison({
                           <div className="flex items-center gap-2">
                             {item.product.promo_price ? (
                               <>
-                                <span className="text-sm font-semibold text-coral">
+                                <span className="text-sm font-semibold text-foreground">
                                   {formatPrice(item.product.promo_price)}
                                 </span>
                                 <span className="text-xs text-muted-foreground line-through">
@@ -280,7 +280,7 @@ export function OutfitComparison({
         {summary && (
           <div className="animate-fade-in-up mx-auto mt-8 max-w-275 rounded-xl border bg-muted/30 p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-              <Star className="h-4 w-4 text-coral" />
+              <Star className="h-4 w-4 text-foreground" />
               Сводка сравнения
             </h3>
 
@@ -288,7 +288,7 @@ export function OutfitComparison({
               {/* Cheapest */}
               <div className="rounded-lg border bg-card p-3">
                 <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <DollarSign className="h-3.5 w-3.5 text-coral" />
+                  <DollarSign className="h-3.5 w-3.5 text-foreground" />
                   Самый выгодный
                 </div>
                 <p className="text-sm font-semibold">

@@ -171,7 +171,7 @@ export function TryOnPage() {
                 {chosenProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-2 rounded-lg border-2 border-coral/30 bg-coral/5 px-2 py-1.5"
+                    className="flex items-center gap-2 rounded-lg border-2 border-foreground/15 bg-foreground/3 px-2 py-1.5"
                   >
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
                       <img
@@ -227,14 +227,14 @@ export function TryOnPage() {
                               disabled={!selected && chosenProducts.length >= MAX_ITEMS}
                               className={`group relative flex flex-col items-center gap-1 rounded-lg border p-2 text-center transition-all ${
                                 selected
-                                  ? "border-coral bg-coral/10 ring-1 ring-coral/30"
+                                  ? "border-foreground bg-foreground/5 ring-1 ring-foreground/10"
                                   : chosenProducts.length >= MAX_ITEMS
                                     ? "cursor-not-allowed opacity-40"
-                                    : "hover:border-coral/50 hover:bg-coral/5"
+                                    : "hover:border-foreground/50 hover:bg-foreground/3"
                               }`}
                             >
                               {selected && (
-                                <div className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-coral text-white">
+                                <div className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background">
                                   <Check className="h-3 w-3" />
                                 </div>
                               )}
@@ -287,7 +287,7 @@ export function TryOnPage() {
                 <Progress
                   value={job.progress}
                   className="w-full"
-                  indicatorClassName="bg-coral"
+                  indicatorClassName="bg-foreground"
                 />
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">
@@ -304,10 +304,10 @@ export function TryOnPage() {
                         <div
                           className={`h-3 w-3 rounded-full transition-all ${
                             i < job.completed_items
-                              ? "bg-coral"
+                              ? "bg-foreground"
                               : i === job.completed_items &&
                                   job.status === "processing"
-                                ? "animate-pulse bg-coral/50 ring-2 ring-coral/30"
+                                ? "animate-pulse bg-foreground/30 ring-2 ring-foreground/10"
                                 : "bg-muted"
                           }`}
                         />

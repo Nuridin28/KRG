@@ -40,7 +40,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
           <div className="flex items-center gap-2.5">
             <ShoppingBag className="h-5 w-5" />
             <h2 className="text-lg font-semibold">Корзина</h2>
-            <span className="rounded-full bg-coral/10 px-2 py-0.5 text-xs font-medium text-coral">
+            <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-xs font-medium text-foreground">
               {items.length}
             </span>
           </div>

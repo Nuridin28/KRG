@@ -33,7 +33,7 @@ export function AdminPage() {
               onClick={() => setTab(item.id)}
               className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 tab === item.id
-                  ? "bg-coral text-white shadow-sm"
+                  ? "bg-foreground text-background shadow-sm"
                   : "bg-accent text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -125,7 +125,7 @@ function ProductsPanel() {
         <p className="text-sm text-muted-foreground">{products.length} товаров</p>
         <button
           onClick={() => { setShowForm(true); setEditId(null) }}
-          className="flex items-center gap-1.5 rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           <Plus className="h-4 w-4" /> Добавить товар
         </button>
@@ -291,7 +291,7 @@ function ProductForm({
         <div>
           <label className="mb-1 block text-xs font-medium">Категория</label>
           <select value={form.category} onChange={(e) => set("category", e.target.value)}
-            className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-coral">
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground">
             {["tops","bottoms","dresses","outerwear","shoes","accessories"].map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -303,7 +303,7 @@ function ProductForm({
         <div>
           <label className="mb-1 block text-xs font-medium">Пол</label>
           <select value={form.gender} onChange={(e) => set("gender", e.target.value)}
-            className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-coral">
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground">
             {["male","female","unisex"].map((g) => (
               <option key={g} value={g}>{g}</option>
             ))}
@@ -319,7 +319,7 @@ function ProductForm({
             <input type="color" value={form.color_hex} onChange={(e) => set("color_hex", e.target.value)}
               className="h-9 w-12 cursor-pointer rounded border" />
             <input value={form.color_hex} onChange={(e) => set("color_hex", e.target.value)}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-coral" />
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
           </div>
         </div>
 
@@ -338,7 +338,7 @@ function ProductForm({
         <div className="col-span-full sm:col-span-2 lg:col-span-3">
           <label className="mb-1 block text-xs font-medium">Описание</label>
           <textarea value={form.description} onChange={(e) => set("description", e.target.value)}
-            rows={2} className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-coral" />
+            rows={2} className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
         </div>
 
         {error && (
@@ -349,7 +349,7 @@ function ProductForm({
 
         <div className="col-span-full flex gap-3">
           <button type="submit" disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg bg-coral px-5 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50">
+            className="flex items-center gap-1.5 rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50">
             <Check className="h-4 w-4" />
             {loading ? "Сохранение..." : editProduct ? "Сохранить" : "Создать"}
           </button>
@@ -372,7 +372,7 @@ function Input({
     <div>
       <label className="mb-1 block text-xs font-medium">{label}</label>
       <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required}
-        className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-coral" />
+        className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
     </div>
   )
 }
@@ -471,7 +471,7 @@ function FlagsPanel() {
           <button
             onClick={() => toggle(key)}
             className={`relative h-6 w-11 rounded-full transition-colors ${
-              value ? "bg-coral" : "bg-muted"
+              value ? "bg-foreground" : "bg-muted"
             }`}
           >
             <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${

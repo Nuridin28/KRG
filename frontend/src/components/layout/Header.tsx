@@ -12,7 +12,6 @@ interface HeaderProps {
   onOpenCart: () => void
 }
 
-// Primary tabs — always visible in desktop nav
 const primaryNav = [
   { value: "catalog", label: "Каталог", icon: ShoppingBag },
   { value: "stylist", label: "AI Стилист", icon: Wand2 },
@@ -20,7 +19,6 @@ const primaryNav = [
   { value: "chat", label: "AI Чат", icon: MessageCircle },
 ]
 
-// Secondary tabs — inside "Ещё" dropdown on desktop, flat list on mobile
 const secondaryNav = [
   { value: "daily", label: "Образ дня", icon: CalendarDays },
   { value: "wardrobe", label: "Гардероб", icon: Shirt },
@@ -44,19 +42,16 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
 
   const isSecondaryActive = secondaryNav.some((item) => item.value === activeTab)
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false)
     setMoreOpen(false)
   }, [activeTab])
 
-  // Lock body scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : ""
     return () => { document.body.style.overflow = "" }
   }, [mobileOpen])
 
-  // Close "more" dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
@@ -74,34 +69,35 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-lg supports-backdrop-filter:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6">
         {/* Logo */}
-        <button onClick={() => onTabChange("catalog")} className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-coral/10 sm:h-9 sm:w-9">
-            <Sparkles className="h-4 w-4 text-coral sm:h-5 sm:w-5" />
-          </div>
+        <button onClick={() => onTabChange("catalog")} className="flex items-center gap-2.5 transition-opacity hover:opacity-70">
           <span className="text-lg font-bold tracking-tight sm:text-xl" style={{ fontFamily: "'Playfair Display', serif" }}>
             AI Stylist
           </span>
         </button>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-0.5 md:flex">
           {primaryNav.map((item) => {
             const Icon = item.icon
+            const active = activeTab === item.value
             return (
               <button
                 key={item.value}
                 onClick={() => onTabChange(item.value)}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                  activeTab === item.value
-                    ? "bg-coral text-white shadow-sm shadow-coral/25"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                  active
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 <span className="hidden lg:inline">{item.label}</span>
+                {active && (
+                  <span className="absolute bottom-0 left-3 right-3 h-px bg-foreground" />
+                )}
               </button>
             )
           })}
@@ -110,18 +106,21 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
           <div className="relative" ref={moreRef}>
             <button
               onClick={() => setMoreOpen(!moreOpen)}
-              className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+              className={`relative flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                 isSecondaryActive
-                  ? "bg-coral text-white shadow-sm shadow-coral/25"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <span className="hidden lg:inline">Ещё</span>
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${moreOpen ? "rotate-180" : ""}`} />
+              {isSecondaryActive && (
+                <span className="absolute bottom-0 left-3 right-3 h-px bg-foreground" />
+              )}
             </button>
 
             {moreOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border bg-background p-1 shadow-lg">
+              <div className="animate-scale-in absolute right-0 top-full z-50 mt-2 w-48 rounded-lg border bg-background p-1 shadow-lg">
                 {secondaryNav.map((item) => {
                   const Icon = item.icon
                   return (
@@ -130,7 +129,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                       onClick={() => handleNav(item.value)}
                       className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                         activeTab === item.value
-                          ? "bg-coral/10 text-coral"
+                          ? "bg-foreground/5 text-foreground"
                           : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       }`}
                     >
@@ -146,14 +145,17 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
           {isAdmin() && (
             <button
               onClick={() => onTabChange("admin")}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                 activeTab === "admin"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-950"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Shield className="h-4 w-4" />
               <span className="hidden lg:inline">Админ</span>
+              {activeTab === "admin" && (
+                <span className="absolute bottom-0 left-3 right-3 h-px bg-foreground" />
+              )}
             </button>
           )}
         </nav>
@@ -163,35 +165,26 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
           {user ? (
             <button
               onClick={() => onTabChange("profile")}
-              className="hidden items-center gap-1.5 rounded-lg bg-accent px-2.5 py-1.5 text-xs transition-colors hover:bg-accent/80 sm:flex"
+              className="hidden items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-all hover:bg-accent sm:flex"
               title="Мой профиль"
             >
               <User className="h-3.5 w-3.5" />
               <span className="max-w-25 truncate">{user.full_name || user.email}</span>
-              {user.role === "admin" && (
-                <span className="rounded bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-400">
-                  admin
-                </span>
-              )}
             </button>
           ) : null}
 
           {user ? (
             <button
               onClick={() => { logout(); routerNavigate("/catalog") }}
-              className="hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:flex"
+              className="hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground sm:flex"
               title="Выйти"
             >
-              <LogOut className="h-4.5 w-4.5" />
+              <LogOut className="h-4 w-4" />
             </button>
           ) : (
             <button
               onClick={() => onTabChange("auth")}
-              className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:flex ${
-                activeTab === "auth"
-                  ? "bg-coral text-white"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
-              }`}
+              className="hidden items-center gap-1.5 rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition-all hover:opacity-90 sm:flex"
             >
               <LogIn className="h-4 w-4" />
               <span>Войти</span>
@@ -200,12 +193,12 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
 
           <button
             onClick={onOpenCart}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
             title="Корзина"
           >
-            <CartIcon className="h-4.5 w-4.5" />
+            <CartIcon className="h-4 w-4" />
             {totalItems > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-bold text-background">
                 {totalItems}
               </span>
             )}
@@ -213,16 +206,16 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
 
           <button
             onClick={onToggleTheme}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
             title={darkMode ? "Светлая тема" : "Тёмная тема"}
           >
-            {darkMode ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
-          {/* Burger button — mobile only */}
+          {/* Burger — mobile */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:hidden"
             aria-label="Меню"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -230,53 +223,46 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
         </div>
       </div>
 
-      {/* Mobile menu overlay */}
+      {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 top-14 z-30 bg-black/40 md:hidden"
+          className="fixed inset-0 top-14 z-30 bg-black/40 backdrop-blur-sm md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* Mobile slide-out menu */}
+      {/* Mobile menu */}
       <div
-        className={`fixed right-0 top-14 z-40 flex h-[calc(100dvh-3.5rem)] w-72 flex-col border-l bg-background shadow-xl transition-all duration-300 ease-in-out md:hidden ${
+        className={`fixed right-0 top-14 z-40 flex h-[calc(100dvh-3.5rem)] w-72 flex-col border-l bg-background shadow-2xl transition-all duration-300 ease-out md:hidden ${
           mobileOpen ? "translate-x-0 opacity-100 visible" : "translate-x-full opacity-0 invisible"
         }`}
       >
-        {/* User info (mobile) */}
         {user && (
           <button
             onClick={() => handleNav("profile")}
             className="flex w-full items-center gap-3 border-b px-5 py-4 text-left transition-colors hover:bg-accent"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-coral/10 text-coral">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border">
               <User className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{user.full_name || user.email}</p>
               <p className="truncate text-xs text-muted-foreground">{user.email}</p>
             </div>
-            {user.role === "admin" && (
-              <span className="shrink-0 rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-400">
-                admin
-              </span>
-            )}
           </button>
         )}
 
-        {/* Nav items — all flat on mobile */}
         <nav className="flex-1 overflow-y-auto px-3 py-3">
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {allNav.map((item) => {
               const Icon = item.icon
               return (
                 <button
                   key={item.value}
                   onClick={() => handleNav(item.value)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                     activeTab === item.value
-                      ? "bg-coral text-white shadow-sm shadow-coral/25"
+                      ? "bg-foreground text-background"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
@@ -289,10 +275,10 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
             {isAdmin() && (
               <button
                 onClick={() => handleNav("admin")}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   activeTab === "admin"
-                    ? "bg-purple-600 text-white shadow-sm"
-                    : "text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-950"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
                 <Shield className="h-5 w-5" />
@@ -302,12 +288,11 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
           </div>
         </nav>
 
-        {/* Bottom actions */}
         <div className="border-t px-3 py-3 space-y-1">
           {user ? (
             <button
               onClick={() => { logout(); setMobileOpen(false); routerNavigate("/catalog") }}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/30"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <LogOut className="h-5 w-5" />
               Выйти
@@ -315,7 +300,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
           ) : (
             <button
               onClick={() => handleNav("auth")}
-              className="flex w-full items-center gap-3 rounded-lg bg-coral px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-coral/90"
+              className="flex w-full items-center gap-3 rounded-lg bg-foreground px-3 py-2.5 text-sm font-medium text-background transition-all hover:opacity-90"
             >
               <LogIn className="h-5 w-5" />
               Войти

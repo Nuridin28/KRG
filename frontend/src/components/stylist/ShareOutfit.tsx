@@ -73,7 +73,7 @@ function drawRoundedRect(
 }
 
 async function renderOutfitToCanvas(outfit: Outfit): Promise<HTMLCanvasElement> {
-  const CORAL = "#FF6B6B"
+  const CORAL = "#0a0a0a"
   const cols = Math.min(outfit.items.length, 3)
   const rows = Math.ceil(outfit.items.length / cols)
   const thumbSize = 140
@@ -296,7 +296,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Share2 className="h-5 w-5 text-coral" />
+            <Share2 className="h-5 w-5 text-foreground" />
             Поделиться образом
           </DialogTitle>
           <DialogDescription>
@@ -307,7 +307,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
         {/* Preview card */}
         <div className="fade-in-up rounded-xl border bg-muted/30 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-semibold text-coral">
+            <span className="text-sm font-semibold text-foreground">
               ✨ AI Stylist
             </span>
             <span

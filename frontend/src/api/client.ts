@@ -212,6 +212,11 @@ export const api = {
 
   wardrobe: {
     getItems: () => request<WardrobeItem[]>("/wardrobe/items"),
+    uploadPhoto: (file: File) => {
+      const formData = new FormData()
+      formData.append("photo", file)
+      return request<WardrobeItem>("/wardrobe/upload", { method: "POST", body: formData })
+    },
     addItem: (data: { product_id?: string; category?: string; name?: string; color_name?: string; color_hex?: string }) =>
       request<WardrobeItem>("/wardrobe/items", {
         method: "POST",

@@ -6,8 +6,8 @@ export function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-coral/10">
-          <User className="h-5 w-5 text-coral" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/5">
+          <User className="h-5 w-5 text-foreground" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Мой профиль</h1>

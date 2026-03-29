@@ -97,8 +97,8 @@ export function ChatPage() {
           <div className="space-y-4 p-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in-up">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-coral/10">
-                  <MessageCircle className="h-7 w-7 text-coral/60" />
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-foreground/5">
+                  <MessageCircle className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-sm font-medium">Начните диалог с AI стилистом</p>
                 <p className="mt-1 max-w-sm text-xs text-muted-foreground">

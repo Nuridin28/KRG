@@ -206,8 +206,8 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
         <div className="animate-fade-in-up rounded-2xl border border-border bg-card p-6 shadow-lg">
           {/* Header */}
           <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-coral/10">
-              <Sparkles className="h-6 w-6 text-coral" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-foreground/5">
+              <Sparkles className="h-6 w-6 text-foreground" />
             </div>
             <div>
               <h2 className="font-heading text-xl font-bold">Ваш стиль-профиль</h2>
@@ -296,19 +296,19 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
       {/* Header */}
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Crown className="h-5 w-5 text-coral" />
+          <Crown className="h-5 w-5 text-foreground" />
           <span className="text-sm font-medium text-muted-foreground">
             Шаг {step + 1} из {TOTAL_STEPS}
           </span>
         </div>
-        <Palette className="h-5 w-5 text-coral" />
+        <Palette className="h-5 w-5 text-foreground" />
       </div>
 
       {/* Progress */}
       <Progress
         value={progress}
         className="mb-6 h-2"
-        indicatorClassName="bg-coral transition-all duration-500"
+        indicatorClassName="bg-foreground transition-all duration-500"
       />
 
       {/* Step Content */}
@@ -328,22 +328,22 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
                   onClick={() => setSelectedStyles(toggleMulti(selectedStyles, s.id, 3))}
                   className={cn(
                     "group relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-200",
-                    "hover:border-coral/40 hover:shadow-md",
+                    "hover:border-foreground/40 hover:shadow-md",
                     active
-                      ? "border-coral bg-coral/5 shadow-md"
+                      ? "border-foreground bg-foreground/3 shadow-md"
                       : "border-border bg-card"
                   )}
                 >
                   {active && (
-                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-coral">
+                    <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
                       <Check className="h-3 w-3 text-white" />
                     </span>
                   )}
                   <div className={cn(
                     "flex h-12 w-12 items-center justify-center rounded-full transition-colors",
-                    active ? "bg-coral/15" : "bg-muted"
+                    active ? "bg-foreground/15" : "bg-muted"
                   )}>
-                    <Icon className={cn("h-6 w-6", active ? "text-coral" : "text-muted-foreground")} />
+                    <Icon className={cn("h-6 w-6", active ? "text-foreground" : "text-muted-foreground")} />
                   </div>
                   <span className="text-sm font-semibold">{s.label}</span>
                   <span className="text-xs text-muted-foreground">{s.desc}</span>
@@ -366,20 +366,20 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
                     "group flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-200",
                     "hover:shadow-md",
                     active
-                      ? "border-coral bg-coral/5 shadow-md"
-                      : "border-border bg-card hover:border-coral/30"
+                      ? "border-foreground bg-foreground/3 shadow-md"
+                      : "border-border bg-card hover:border-foreground/15"
                   )}
                 >
                   <div className="relative">
                     <span
                       className={cn(
                         "block h-10 w-10 rounded-full border-2 shadow-sm transition-transform duration-200",
-                        active ? "scale-110 border-coral" : "border-transparent group-hover:scale-105"
+                        active ? "scale-110 border-foreground" : "border-transparent group-hover:scale-105"
                       )}
                       style={{ backgroundColor: c.hex }}
                     />
                     {active && (
-                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-coral shadow">
+                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground shadow">
                         <Check className="h-3 w-3 text-white" />
                       </span>
                     )}
@@ -402,24 +402,24 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
                   onClick={() => setSelectedFit(f.id)}
                   className={cn(
                     "flex items-center gap-4 rounded-xl border-2 p-4 text-left transition-all duration-200",
-                    "hover:border-coral/40 hover:shadow-md",
+                    "hover:border-foreground/40 hover:shadow-md",
                     active
-                      ? "border-coral bg-coral/5 shadow-md"
+                      ? "border-foreground bg-foreground/3 shadow-md"
                       : "border-border bg-card"
                   )}
                 >
                   <div className={cn(
                     "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors",
-                    active ? "bg-coral/15" : "bg-muted"
+                    active ? "bg-foreground/15" : "bg-muted"
                   )}>
-                    <Shirt className={cn("h-6 w-6", active ? "text-coral" : "text-muted-foreground")} />
+                    <Shirt className={cn("h-6 w-6", active ? "text-foreground" : "text-muted-foreground")} />
                   </div>
                   <div className="min-w-0">
                     <span className="block text-sm font-semibold">{f.label}</span>
                     <span className="block text-xs text-muted-foreground">{f.desc}</span>
                   </div>
                   {active && (
-                    <span className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-coral">
+                    <span className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-foreground">
                       <Check className="h-4 w-4 text-white" />
                     </span>
                   )}
@@ -441,21 +441,21 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
                   onClick={() => setSelectedOccasions(toggleMulti(selectedOccasions, o.id, 5))}
                   className={cn(
                     "group flex items-center gap-3 rounded-xl border-2 p-4 transition-all duration-200",
-                    "hover:border-coral/40 hover:shadow-md",
+                    "hover:border-foreground/40 hover:shadow-md",
                     active
-                      ? "border-coral bg-coral/5 shadow-md"
+                      ? "border-foreground bg-foreground/3 shadow-md"
                       : "border-border bg-card"
                   )}
                 >
                   <div className={cn(
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors",
-                    active ? "bg-coral/15" : "bg-muted"
+                    active ? "bg-foreground/15" : "bg-muted"
                   )}>
-                    <Icon className={cn("h-5 w-5", active ? "text-coral" : "text-muted-foreground")} />
+                    <Icon className={cn("h-5 w-5", active ? "text-foreground" : "text-muted-foreground")} />
                   </div>
                   <span className="text-sm font-semibold">{o.label}</span>
                   {active && (
-                    <Check className="ml-auto h-4 w-4 text-coral" />
+                    <Check className="ml-auto h-4 w-4 text-foreground" />
                   )}
                 </button>
               )
@@ -470,7 +470,7 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">Минимум</span>
-                <span className="rounded-lg bg-coral/10 px-3 py-1 text-sm font-bold text-coral">
+                <span className="rounded-lg bg-foreground/5 px-3 py-1 text-sm font-bold text-foreground">
                   {formatPrice(budgetMin)}
                 </span>
               </div>
@@ -493,7 +493,7 @@ export default function StyleQuiz({ onComplete }: StyleQuizProps) {
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">Максимум</span>
-                <span className="rounded-lg bg-coral/10 px-3 py-1 text-sm font-bold text-coral">
+                <span className="rounded-lg bg-foreground/5 px-3 py-1 text-sm font-bold text-foreground">
                   {formatPrice(budgetMax)}
                 </span>
               </div>

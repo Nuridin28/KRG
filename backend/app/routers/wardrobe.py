@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user
@@ -37,6 +37,35 @@ async def list_wardrobe(
         )
         for it in items
     ]
+
+
+@router.post("/upload", response_model=WardrobeItemResponse)
+async def upload_clothing_photo(
+    photo: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a photo of clothing — GPT Vision identifies and adds to wardrobe."""
+    content = await photo.read()
+    if len(content) < 1000:
+        raise HTTPException(400, "Файл слишком маленький")
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(400, "Файл слишком большой (макс. 10 МБ)")
+
+    svc = CapsuleService(db)
+    item = await svc.add_item_from_photo(user.id, content, photo.filename or "photo.jpg")
+
+    return WardrobeItemResponse(
+        id=item.id,
+        product_id=item.product_id,
+        category=item.category,
+        name=item.name,
+        color_name=item.color_name,
+        color_hex=item.color_hex,
+        image_url=item.image_url,
+        style_tags=item.style_tags or [],
+        created_at=item.created_at,
+    )
 
 
 @router.post("/items", response_model=WardrobeItemResponse)

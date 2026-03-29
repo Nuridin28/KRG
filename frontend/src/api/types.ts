@@ -177,12 +177,23 @@ export interface WardrobeItem {
   created_at: string
 }
 
+export interface RecommendationInsight {
+  product_id: string
+  reason: string
+  new_outfits_count: number
+  pairs_with: string[]
+  marketing_hook: string
+}
+
 export interface CapsuleAnalysis {
   total_items: number
+  current_outfits_count: number
   possible_outfits: Outfit[]
   missing_categories: string[]
   gap_recommendations: ProductBrief[]
+  recommendation_insights: RecommendationInsight[]
   analysis_text: string
+  style_tips: string[]
 }
 
 // Daily Outfit (Feature 3)

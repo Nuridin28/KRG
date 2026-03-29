@@ -45,7 +45,7 @@ function weatherTip(summary: string, temp: number | null | undefined): string {
 
 function scoreLabel(score: number): { text: string; color: string } {
   if (score >= 85) return { text: "Идеально", color: "text-emerald-600" }
-  if (score >= 70) return { text: "Хорошо", color: "text-coral" }
+  if (score >= 70) return { text: "Хорошо", color: "text-foreground" }
   if (score >= 50) return { text: "Нормально", color: "text-amber-500" }
   return { text: "Можно лучше", color: "text-muted-foreground" }
 }
@@ -134,7 +134,7 @@ export function DailyOutfitPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-coral" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -225,7 +225,7 @@ export function DailyOutfitPage() {
         <CardContent className="py-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Palette className="h-4 w-4 text-coral" />
+              <Palette className="h-4 w-4 text-foreground" />
               <span className="text-sm font-semibold">Как подобран образ</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -235,7 +235,7 @@ export function DailyOutfitPage() {
           </div>
 
           {/* Score bar */}
-          <Progress value={score} className="mb-3 h-2" indicatorClassName="bg-coral" />
+          <Progress value={score} className="mb-3 h-2" indicatorClassName="bg-foreground" />
 
           {/* Score breakdown */}
           <div className="grid grid-cols-2 gap-3 text-xs">
@@ -293,13 +293,13 @@ export function DailyOutfitPage() {
                   <Badge variant="outline" className="mb-1 text-[9px] uppercase">{item.role}</Badge>
                   <p className="truncate text-xs font-medium">{item.product.name}</p>
                   <p className="text-[10px] text-muted-foreground">{item.product.brand}</p>
-                  <p className="mt-0.5 text-xs font-bold text-coral">
+                  <p className="mt-0.5 text-xs font-bold text-foreground">
                     {formatPrice(item.product.promo_price || item.product.price, item.product.currency)}
                   </p>
                   {hasPhotos() && (
                     <button
                       onClick={() => handleQuickTryOn(item.product.id)}
-                      className="mt-1.5 flex w-full items-center justify-center gap-1 rounded bg-accent px-2 py-1 text-[10px] font-medium transition-colors hover:bg-coral hover:text-white"
+                      className="mt-1.5 flex w-full items-center justify-center gap-1 rounded bg-accent px-2 py-1 text-[10px] font-medium transition-colors hover:bg-foreground hover:text-background"
                     >
                       <Shirt className="h-3 w-3" /> Примерить
                     </button>

@@ -152,7 +152,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
             onClick={() => setMode("upload")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
               mode === "upload"
-                ? "border-coral/40 bg-coral/5 text-coral"
+                ? "border-foreground/40 bg-foreground/3 text-foreground"
                 : "text-muted-foreground hover:bg-muted"
             }`}
           >
@@ -163,7 +163,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
             onClick={() => setMode("camera")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
               mode === "camera"
-                ? "border-coral/40 bg-coral/5 text-coral"
+                ? "border-foreground/40 bg-foreground/3 text-foreground"
                 : "text-muted-foreground hover:bg-muted"
             }`}
           >
@@ -213,7 +213,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
               </button>
               <button
                 onClick={capturePhoto}
-                className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-coral text-white shadow-lg transition-transform active:scale-90"
+                className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-foreground text-background shadow-lg transition-transform active:scale-90"
                 title="Сделать фото"
               >
                 <CircleDot className="h-7 w-7" />
@@ -238,7 +238,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
         /* File upload drop zone */
         <div
           className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-all duration-200 ${
-            dragActive ? "border-coral bg-coral/5" : "border-border hover:border-coral/50"
+            dragActive ? "border-foreground bg-foreground/3" : "border-border hover:border-foreground/50"
           }`}
           onDragOver={(e) => {
             e.preventDefault()

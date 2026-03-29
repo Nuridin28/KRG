@@ -63,7 +63,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
 
   return (
     <Card className={`group flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
-      tryOnSelected ? "ring-2 ring-coral" : ""
+      tryOnSelected ? "ring-2 ring-foreground" : ""
     }`}>
       <div className="relative shrink-0" onClick={() => onSelect(product)}>
         <div className="aspect-square overflow-hidden bg-muted/50">
@@ -118,8 +118,8 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
             onClick={(e) => { e.stopPropagation(); onToggleTryOn(product) }}
             className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all ${
               tryOnSelected
-                ? "border-coral bg-coral text-white"
-                : "border-white/80 bg-black/30 text-white hover:bg-coral/80 hover:border-coral"
+                ? "border-foreground bg-foreground text-background"
+                : "border-white/80 bg-black/30 text-white hover:bg-foreground/80 hover:border-foreground"
             }`}
             title={tryOnSelected ? "Убрать из примерки" : "Добавить к примерке"}
           >
@@ -142,7 +142,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
         <div className="flex items-baseline gap-2">
           {product.promo_price ? (
             <>
-              <span className="text-sm font-bold text-coral">
+              <span className="text-sm font-bold text-foreground">
                 {formatPrice(product.promo_price, product.currency)}
               </span>
               <span className="text-xs text-muted-foreground line-through">

@@ -278,12 +278,23 @@ class WardrobeItemResponse(BaseModel):
         from_attributes = True
 
 
+class RecommendationInsight(BaseModel):
+    product_id: str
+    reason: str = ""
+    new_outfits_count: int = 0
+    pairs_with: List[str] = []
+    marketing_hook: str = ""
+
+
 class CapsuleAnalysisResponse(BaseModel):
     total_items: int
+    current_outfits_count: int = 0
     possible_outfits: List[Outfit] = []
     missing_categories: List[str] = []
     gap_recommendations: List[ProductBrief] = []
+    recommendation_insights: List[RecommendationInsight] = []
     analysis_text: str = ""
+    style_tips: List[str] = []
 
 
 # ---------------------------------------------------------------------------

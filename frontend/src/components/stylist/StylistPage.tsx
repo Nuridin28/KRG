@@ -97,7 +97,7 @@ export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
             <div className="space-y-4">
               <div className="space-y-3 rounded-xl border bg-card p-6 text-center shadow-sm">
                 <p className="text-sm font-medium">AI подбирает образы...</p>
-                <Progress value={progress} className="mx-auto max-w-xs" indicatorClassName="bg-coral" />
+                <Progress value={progress} className="mx-auto max-w-xs" indicatorClassName="bg-foreground" />
               </div>
               {[1, 2].map((i) => (
                 <OutfitCardSkeleton key={i} />
@@ -113,8 +113,8 @@ export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
 
           {!loading && outfits.length === 0 && !error && (
             <div className="flex flex-col items-center justify-center rounded-xl border bg-card py-20 text-center shadow-sm animate-fade-in-up">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-coral/10">
-                <Sparkles className="h-9 w-9 text-coral/40" />
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-foreground/5">
+                <Sparkles className="h-9 w-9 text-foreground/40" />
               </div>
               <p className="text-lg font-medium">Создайте свой первый образ</p>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
