@@ -89,6 +89,7 @@ class ProductBrief(BaseModel):
     color_name: str
     price: float
     promo_price: Optional[float] = None
+    currency: str = "USD"
     image_url: str
     in_stock: bool = True
 

@@ -1,24 +1,32 @@
-import { useState, useEffect, useMemo } from "react"
-import { PackageOpen } from "lucide-react"
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { PackageOpen, Shirt, X } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { api, prefetch } from "@/api/client"
 import type { Product } from "@/api/types"
 import { ProductCardSkeleton } from "@/components/ui/skeleton"
 import { ProductCard } from "./ProductCard"
 import { ProductFilters, type FilterValues } from "./ProductFilters"
 import { ProductDetail } from "./ProductDetail"
+import { Button } from "@/components/ui/button"
+import { useNavigation } from "@/store/navigation"
 
 interface CatalogPageProps {
   onTryOn: (product: Product) => void
   onBuildOutfit: (product: Product) => void
 }
 
+const MAX_TRYON = 5
+
 export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
+  const navigate = useNavigate()
+  const setTryOnProducts = useNavigation((s) => s.setTryOnProducts)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [brands, setBrands] = useState<string[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [tryOnSet, setTryOnSet] = useState<Map<string, Product>>(new Map())
   const [filters, setFilters] = useState<FilterValues>({
     search: "",
     category: "",
@@ -29,7 +37,6 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
     priceMax: "",
   })
 
-  // Prefetch brands on mount
   useEffect(() => {
     prefetch("/catalog/brands", 300_000)
   }, [])
@@ -38,7 +45,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
     setLoading(true)
     setError(null)
 
-    const params: Record<string, string> = { page_size: "50" }
+    const params: Record<string, string> = { page_size: "100" }
     if (filters.category) params.category = filters.category
     if (filters.gender) params.gender = filters.gender
 
@@ -74,6 +81,24 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
     setSelectedProduct(product)
     setDetailOpen(true)
   }
+
+  const handleToggleTryOn = useCallback((product: Product) => {
+    setTryOnSet((prev) => {
+      const next = new Map(prev)
+      if (next.has(product.id)) {
+        next.delete(product.id)
+      } else if (next.size < MAX_TRYON) {
+        next.set(product.id, product)
+      }
+      return next
+    })
+  }, [])
+
+  const handleGoToTryOn = useCallback(() => {
+    const items = Array.from(tryOnSet.values())
+    setTryOnProducts(items)
+    navigate("/tryon")
+  }, [tryOnSet, setTryOnProducts, navigate])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
@@ -118,9 +143,20 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
             </div>
           ) : (
             <>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Найдено: {filteredProducts.length}
-              </p>
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Найдено: {filteredProducts.length}
+                </p>
+                {tryOnSet.size > 0 && (
+                  <button
+                    onClick={() => setTryOnSet(new Map())}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                    Сбросить выбор ({tryOnSet.size})
+                  </button>
+                )}
+              </div>
               <div className="stagger-children grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
                 {filteredProducts.map((product) => (
                   <ProductCard
@@ -128,6 +164,8 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
                     product={product}
                     onSelect={handleSelectProduct}
                     onTryOn={onTryOn}
+                    tryOnSelected={tryOnSet.has(product.id)}
+                    onToggleTryOn={handleToggleTryOn}
                   />
                 ))}
               </div>
@@ -135,6 +173,24 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
           )}
         </main>
       </div>
+
+      {/* Floating try-on button */}
+      {tryOnSet.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
+          <Button
+            variant="coral"
+            size="lg"
+            className="gap-2 rounded-full px-6 shadow-lg"
+            onClick={handleGoToTryOn}
+          >
+            <Shirt className="h-4 w-4" />
+            Примерить
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-bold">
+              {tryOnSet.size}
+            </span>
+          </Button>
+        </div>
+      )}
 
       <ProductDetail
         product={selectedProduct}

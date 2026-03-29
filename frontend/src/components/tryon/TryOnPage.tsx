@@ -37,17 +37,11 @@ export function TryOnPage() {
   // Load products for selection
   useEffect(() => {
     setLoadingProducts(true)
-    const params: Record<string, string> = { page_size: "20" }
+    const params: Record<string, string> = { page_size: "100" }
     if (searchQuery) params.search = searchQuery
     api.catalog
       .getAll(params)
-      .then((res) =>
-        setProducts(
-          res.items.filter((p) =>
-            ["tops", "bottoms", "dresses", "outerwear"].includes(p.category)
-          )
-        )
-      )
+      .then((res) => setProducts(res.items))
       .catch(() => setProducts([]))
       .finally(() => setLoadingProducts(false))
   }, [searchQuery])

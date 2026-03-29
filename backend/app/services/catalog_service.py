@@ -57,6 +57,7 @@ def _row_to_brief(row: ProductDB) -> ProductBrief:
         color_name=row.color_name,
         price=row.price,
         promo_price=row.promo_price,
+        currency=row.currency,
         image_url=row.image_url,
         in_stock=row.in_stock,
     )
@@ -174,6 +175,7 @@ class CatalogService:
             color_name=product.color_name,
             price=product.price,
             promo_price=product.promo_price,
+            currency=product.currency,
             image_url=product.image_url,
             in_stock=product.in_stock,
         )

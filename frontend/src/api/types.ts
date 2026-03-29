@@ -40,6 +40,7 @@ export interface ProductBrief {
   color_name: string
   price: number
   promo_price?: number
+  currency?: string
   image_url: string
   in_stock: boolean
 }
