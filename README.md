@@ -16,7 +16,7 @@ Fashion-маркетплейс с AI-стилистом, виртуальной 
 | Backend | Python 3, FastAPI 0.115, Pydantic v2, uvicorn, SQLAlchemy 2 (async), asyncpg |
 | База данных | PostgreSQL (async через asyncpg) |
 | Аутентификация | JWT (python-jose), bcrypt, OAuth2PasswordBearer |
-| AI-провайдеры | OpenAI API (чат-стилист), Google Vertex AI (примерка), Mapp Fashion API (рекомендации), FASHN API (fallback примерка) |
+| AI/ML | OpenAI API (чат-стилист + embeddings), OpenAI text-embedding-3-small (vector search), Google Vertex AI (примерка), Mapp Fashion API (рекомендации), FASHN API (fallback примерка) |
 
 ---
 
@@ -55,13 +55,20 @@ Fashion-маркетплейс с AI-стилистом, виртуальной 
 - Сравнение До/После (side-by-side)
 - CTA: «Добавить в корзину», «Собрать образ»
 
-### AI Чат (Conversational Stylist)
+### AI Чат с RAG (Conversational Stylist + Vector Embeddings)
+- **Semantic search (RAG):** запрос пользователя → vector embedding → cosine similarity по каталогу → top-12 релевантных товаров как контекст для LLM
+- **Embedding model:** OpenAI `text-embedding-3-small` (1536 dimensions)
+- **Vector storage:** PostgreSQL JSON-колонка в таблице products (без внешнего vector DB)
+- **Rich text representation:** для каждого товара формируется текст из name, brand, category, color, material, style_tags, occasion_tags, gender, season, description
+- Batch-генерация эмбеддингов через админ-эндпоинт `POST /admin/embed-products` (100 товаров за batch)
 - Чат-интерфейс с аватарами (user/bot) и typing indicator
-- Два режима NLU: OpenAI gpt-4 с function calling (prod) / keyword extraction (dev)
+- Два режима NLU: OpenAI gpt-4o-mini с function calling (prod) / keyword extraction (dev)
 - Извлечение intent: стиль, бюджет, цвета, пол, повод — из текста на рус/англ
-- Structured response: ответ + extracted_filters + товары + образы + CTA actions
+- LLM получает найденные через embeddings товары как system prompt context → ответы привязаны к реальному каталогу
+- Structured response: ответ + extracted_filters + товары (semantic search) + образы + CTA actions
 - Быстрые подсказки: «Подбери образ на свидание», «Casual лук до $200» и др.
 - Карточки товаров и мини-образы прямо в ответах ассистента
+- Fallback: без OpenAI API key — keyword-based search + шаблонные ответы
 
 ### Аутентификация и авторизация
 - Регистрация и логин по email/password
@@ -84,6 +91,7 @@ Fashion-маркетплейс с AI-стилистом, виртуальной 
 - Управление товарами (добавление, редактирование, удаление)
 - Управление пользователями
 - CRUD бизнес-правил
+- Генерация vector embeddings для каталога (`POST /admin/embed-products`)
 - Feature flags
 - Мониторинг AI-провайдеров (health, latency)
 - Доступ только для role=admin
@@ -132,6 +140,7 @@ Swagger-документация: `http://localhost:8000/docs`
 | | PUT/DELETE | `/api/v1/admin/rules/{id}` | Обновление/удаление правила |
 | | GET | `/api/v1/admin/providers` | Статус AI-провайдеров |
 | | GET/POST | `/api/v1/admin/feature-flags` | Feature flags |
+| | POST | `/api/v1/admin/embed-products` | Генерация vector embeddings для каталога |
 | **Трекинг** | POST | `/api/v1/tracking/events` | Batch-отправка событий |
 | | GET | `/api/v1/tracking/events` | Получение событий (фильтр) |
 | **Health** | GET | `/health` | Health check |
@@ -165,8 +174,9 @@ KRG/
 │   │   ├── services/
 │   │   │   ├── catalog_service.py     # Работа с каталогом (PostgreSQL)
 │   │   │   ├── recommendation_service.py  # Сборка образов, color theory, scoring
+│   │   │   ├── embedding_service.py   # Vector embeddings (OpenAI text-embedding-3-small), semantic search
 │   │   │   ├── tryon_service.py       # Async job flow, Vertex AI / FASHN / mock
-│   │   │   ├── stylist_service.py     # NLU: OpenAI / keyword fallback → образы
+│   │   │   ├── stylist_service.py     # RAG: semantic search + OpenAI NLU → образы
 │   │   │   └── business_rules.py      # Color compatibility, style coherence, filters
 │   │   └── main.py                    # FastAPI app, lifespan, CORS, routers
 │   ├── data/
@@ -232,9 +242,12 @@ API Gateway (FastAPI, CORS, JWT auth, validation)
     │   ├── [dev]  Async simulation (3 сек)
     │   └── [prod] Vertex AI VTO API → FASHN fallback → CDN
     │
-    ├── Stylist Service
+    ├── Embedding Service ─────── OpenAI text-embedding-3-small → PostgreSQL JSON
+    │
+    ├── Stylist Service (RAG)
     │   ├── [dev]  Keyword intent parser → Recommendation Service
-    │   └── [prod] OpenAI API (NLU + function calling) → Recommendation Service
+    │   └── [prod] Query → Embedding → Cosine similarity → Top-k products
+    │             → OpenAI gpt-4o-mini (NLU + product context) → Recommendation Service
     │
     ├── Admin Service ──────────── Stats, rules, feature flags, provider health
     │
@@ -248,7 +261,7 @@ API Gateway (FastAPI, CORS, JWT auth, validation)
 | Таблица | Описание |
 |---------|----------|
 | `users` | id, email (unique), hashed_password, full_name, role (user/admin), is_active, created_at |
-| `products` | id, sku_id, name, brand, category, subcategory, gender, color, price, sizes (JSON), style_tags (JSON), occasion_tags (JSON), in_stock, ... |
+| `products` | id, sku_id, name, brand, category, subcategory, gender, color, price, sizes (JSON), style_tags (JSON), occasion_tags (JSON), in_stock, **embedding** (JSON, 1536-dim vector), ... |
 | `tracking_events` | id, event_type, user_id, product_id, outfit_id, metadata_json, timestamp |
 
 ---

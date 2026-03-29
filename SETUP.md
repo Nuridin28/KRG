@@ -72,6 +72,20 @@ python seed_db.py
 - Загрузит 48 товаров из `data/catalog.json`
 - Создаст админ-пользователя: `admin@krg.com` / `admin123`
 
+### Генерация vector embeddings (опционально, нужен OPENAI_API_KEY)
+
+Если указан `OPENAI_API_KEY`, можно сгенерировать embeddings для семантического поиска в AI-чате:
+
+```bash
+# После запуска сервера — через API (требуется admin-токен):
+curl -X POST http://localhost:8000/api/v1/admin/embed-products \
+  -H "Authorization: Bearer <admin_jwt_token>"
+```
+
+Или через Swagger UI: `http://localhost:8000/docs` → `POST /api/v1/admin/embed-products`
+
+Без embeddings AI-чат работает через keyword-based search (fallback).
+
 ### Запуск сервера
 
 ```bash
@@ -169,7 +183,7 @@ curl -X POST http://localhost:8000/api/v1/auth/register \
 
 ## 6. Подключение внешних AI-сервисов
 
-### OpenAI (Conversational Stylist)
+### OpenAI (Conversational Stylist + Vector Embeddings)
 
 1. Получите API-ключ: https://platform.openai.com/api-keys
 2. Добавьте в `.env`:
@@ -177,8 +191,13 @@ curl -X POST http://localhost:8000/api/v1/auth/register \
    OPENAI_API_KEY=sk-...
    ```
 3. Перезапустите backend
+4. Сгенерируйте embeddings для каталога: `POST /api/v1/admin/embed-products` (admin-only)
 
-Без ключа чат работает через keyword-based intent extraction (fallback).
+Используется:
+- `gpt-4o-mini` — NLU, function calling, генерация ответов
+- `text-embedding-3-small` — vector embeddings (1536 dims) для semantic search по каталогу
+
+Без ключа чат работает через keyword-based intent extraction и поиск (fallback).
 
 ### Google Vertex AI (Virtual Try-On)
 

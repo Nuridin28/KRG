@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { MessageCircle } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { api } from "@/api/client"
 import type { ChatMessage, ChatResponse, ProductBrief, Outfit } from "@/api/types"
 import { ChatMessageComponent } from "./ChatMessage"
 import { ChatInput } from "./ChatInput"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useNavigation } from "@/store/navigation"
 
 interface MessageWithData {
   message: ChatMessage
@@ -13,6 +15,8 @@ interface MessageWithData {
 }
 
 export function ChatPage() {
+  const navigate = useNavigate()
+  const { setTryOnProducts, setTryOnFromOutfit } = useNavigation()
   const [messages, setMessages] = useState<MessageWithData[]>([])
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -58,6 +62,22 @@ export function ChatPage() {
     }
   }
 
+  const handleTryOnProduct = useCallback((product: ProductBrief) => {
+    setTryOnProducts([{
+      ...product,
+      sku_id: "", subcategory: "", gender: "unisex" as const,
+      description: "", color: "", pattern: "", fit: "", material: "",
+      currency: product.currency || "USD", sizes: [],
+      style_tags: [], occasion_tags: [], season: "all", seller_id: "",
+    }])
+    navigate("/tryon")
+  }, [navigate, setTryOnProducts])
+
+  const handleTryOnOutfit = useCallback((outfit: Outfit) => {
+    setTryOnFromOutfit(outfit)
+    navigate("/tryon")
+  }, [navigate, setTryOnFromOutfit])
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
       <div className="mb-6">
@@ -94,6 +114,8 @@ export function ChatPage() {
                   message={m.message}
                   products={m.products}
                   outfits={m.outfits}
+                  onTryOnProduct={handleTryOnProduct}
+                  onTryOnOutfit={handleTryOnOutfit}
                 />
               </div>
             ))}
