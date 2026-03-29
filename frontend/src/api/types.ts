@@ -111,3 +111,27 @@ export interface ChatResponse {
   explanations: string[]
   cta_actions: { type: string; label: string }[]
 }
+
+// Auth types
+export interface AuthUser {
+  id: number
+  email: string
+  full_name: string
+  role: "user" | "admin"
+  is_active: boolean
+}
+
+export interface TokenResponse {
+  access_token: string
+  token_type: string
+}
+
+// Admin types
+export interface AdminStats {
+  total_products: number
+  total_users: number
+  total_events: number
+  total_outfits_generated: number
+  total_tryon_jobs: number
+  active_rules: number
+}

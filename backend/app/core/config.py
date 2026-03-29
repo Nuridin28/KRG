@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     API_V1_PREFIX: str = "/api/v1"
 
+    # Database
+    DATABASE_URL: str = "postgresql+asyncpg://nuridinnurman@localhost:5432/krg_stylist"
+
+    # JWT Auth
+    SECRET_KEY: str = "change-me-in-production-use-openssl-rand-hex-32"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ALGORITHM: str = "HS256"
+
     # External API keys (loaded from env)
     OPENAI_API_KEY: str = ""
     VERTEX_AI_PROJECT: str = "krghack"

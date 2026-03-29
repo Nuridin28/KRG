@@ -23,10 +23,6 @@ from app.services.recommendation_service import RecommendationService
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Keyword fallback dictionaries (used when OpenAI is unavailable)
-# ---------------------------------------------------------------------------
-
 OCCASION_KEYWORDS = {
     "офис": ("office", "work"),
     "office": ("office", "work"),
@@ -82,10 +78,6 @@ SUGGESTIONS_RU = [
     "Подбери лук для путешествия",
 ]
 
-# ---------------------------------------------------------------------------
-# OpenAI system prompt & function definition
-# ---------------------------------------------------------------------------
-
 SYSTEM_PROMPT = """Ты — AI-стилист в fashion-маркетплейсе. Ты помогаешь пользователям подобрать образы и одежду.
 
 Правила:
@@ -110,38 +102,19 @@ EXTRACT_FUNCTION = {
             "style": {
                 "type": "string",
                 "enum": ["casual", "office", "sport", "evening", "street", "smart_casual", "date", "travel"],
-                "description": "Стиль образа"
             },
             "occasion": {
                 "type": "string",
                 "enum": ["daily", "work", "date", "party", "workout", "travel", "event", "casual"],
-                "description": "Повод/событие"
             },
-            "gender": {
-                "type": "string",
-                "enum": ["male", "female", "unisex"],
-                "description": "Пол"
-            },
-            "budget_max": {
-                "type": "number",
-                "description": "Максимальный бюджет в USD"
-            },
-            "budget_min": {
-                "type": "number",
-                "description": "Минимальный бюджет в USD"
-            },
-            "colors": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "Предпочтительные цвета (на английском: Black, White, Red, Blue, Green, Grey, Pink, Beige, Brown, Navy)"
-            },
-            "needs_outfits": {
-                "type": "boolean",
-                "description": "Нужно ли генерировать образы (true если пользователь просит подобрать одежду/образ)"
-            },
+            "gender": {"type": "string", "enum": ["male", "female", "unisex"]},
+            "budget_max": {"type": "number"},
+            "budget_min": {"type": "number"},
+            "colors": {"type": "array", "items": {"type": "string"}},
+            "needs_outfits": {"type": "boolean"},
         },
-        "required": ["needs_outfits"]
-    }
+        "required": ["needs_outfits"],
+    },
 }
 
 
@@ -158,10 +131,6 @@ class StylistService:
                 logger.info("OpenAI stylist initialized successfully")
             except Exception as e:
                 logger.warning(f"Failed to initialize OpenAI: {e}. Using keyword fallback.")
-
-    # ------------------------------------------------------------------
-    # Keyword-based extraction (fallback)
-    # ------------------------------------------------------------------
 
     def _extract_constraints_keyword(self, text: str) -> Dict[str, Any]:
         text_lower = text.lower()
@@ -192,16 +161,102 @@ class StylistService:
 
         return constraints
 
-    # ------------------------------------------------------------------
-    # OpenAI-powered chat
-    # ------------------------------------------------------------------
+    def _build_response_text(self, constraints: Dict[str, Any], outfits: List[Outfit]) -> str:
+        if not outfits:
+            return "К сожалению, не удалось подобрать образ с заданными параметрами. Попробуйте изменить фильтры."
 
-    def _chat_openai(self, request: ChatRequest) -> ChatResponse:
+        parts = ["Вот что я подобрал для вас!\n"]
+        if constraints.get("occasion"):
+            occ_names = {
+                "work": "для работы/офиса",
+                "date": "для свидания",
+                "party": "для вечеринки",
+                "casual": "на каждый день",
+                "daily": "на каждый день",
+                "workout": "для спорта",
+                "travel": "для путешествия",
+                "event": "для мероприятия",
+            }
+            occ_text = occ_names.get(constraints["occasion"], constraints["occasion"])
+            parts.append(f"Образы подобраны {occ_text}.")
+        if constraints.get("budget_max"):
+            parts.append(f"Бюджет: до ${int(constraints['budget_max'])}.")
+        parts.append(f"\nНашлось {len(outfits)} комплект(ов). Вы можете заменить любую вещь или добавить весь образ в корзину.")
+        return " ".join(parts)
+
+    async def _generate_outfits_from_constraints(self, constraints: Dict[str, Any]) -> tuple[List[Outfit], List[ProductBrief]]:
+        style = constraints.get("style", "casual")
+        occasion = constraints.get("occasion", "daily")
+        gender = constraints.get("gender", GenderType.FEMALE)
+
+        try:
+            style_enum = StyleType(style)
+        except ValueError:
+            style_enum = StyleType.CASUAL
+
+        try:
+            occasion_enum = OccasionType(occasion)
+        except ValueError:
+            occasion_enum = OccasionType.CASUAL
+
+        gen_req = OutfitGenerateRequest(
+            style=style_enum,
+            occasion=occasion_enum,
+            gender=gender if isinstance(gender, GenderType) else GenderType.FEMALE,
+            budget_max=constraints.get("budget_max"),
+            budget_min=constraints.get("budget_min"),
+            colors=constraints.get("colors"),
+            count=3,
+        )
+
+        outfits = await self.recommender.generate_outfits(gen_req)
+
+        all_products: List[ProductBrief] = []
+        for outfit in outfits:
+            for item in outfit.items:
+                if item.product.id not in {p.id for p in all_products}:
+                    all_products.append(item.product)
+
+        return outfits, all_products
+
+    async def chat(self, request: ChatRequest) -> ChatResponse:
+        if self._openai_client:
+            try:
+                return await self._chat_openai(request)
+            except Exception as e:
+                logger.warning(f"OpenAI call failed, falling back to keyword: {e}")
+
+        constraints = self._extract_constraints_keyword(request.message)
+        outfits, all_products = await self._generate_outfits_from_constraints(constraints)
+        answer = self._build_response_text(constraints, outfits)
+
+        explanations = []
+        if constraints.get("occasion"):
+            explanations.append(f"Образ подобран для случая: {constraints['occasion']}")
+        if constraints.get("colors"):
+            explanations.append(f"Учтены цвета: {', '.join(constraints['colors'])}")
+        if constraints.get("budget_max"):
+            explanations.append(f"Бюджет ограничен: до ${int(constraints['budget_max'])}")
+
+        cta_actions = [
+            {"type": "add_all_to_cart", "label": "Купить весь образ"},
+            {"type": "save_outfit", "label": "Сохранить образ"},
+            {"type": "try_on", "label": "Примерить"},
+        ]
+
+        return ChatResponse(
+            answer=answer,
+            extracted_filters=constraints,
+            recommended_products=all_products,
+            recommended_outfits=outfits,
+            explanations=explanations,
+            cta_actions=cta_actions,
+        )
+
+    async def _chat_openai(self, request: ChatRequest) -> ChatResponse:
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-
         for msg in request.conversation_history[-10:]:
             messages.append({"role": msg.role, "content": msg.content})
-
         messages.append({"role": "user", "content": request.message})
 
         response = self._openai_client.chat.completions.create(
@@ -243,37 +298,7 @@ class StylistService:
         all_products: List[ProductBrief] = []
 
         if needs_outfits and (constraints.get("style") or constraints.get("occasion")):
-            style = constraints.get("style", "casual")
-            occasion = constraints.get("occasion", "daily")
-            gender = constraints.get("gender", GenderType.FEMALE)
-
-            try:
-                style_enum = StyleType(style)
-            except ValueError:
-                style_enum = StyleType.CASUAL
-
-            try:
-                occasion_enum = OccasionType(occasion)
-            except ValueError:
-                occasion_enum = OccasionType.CASUAL
-
-            gen_req = OutfitGenerateRequest(
-                style=style_enum,
-                occasion=occasion_enum,
-                gender=gender if isinstance(gender, GenderType) else GenderType.FEMALE,
-                budget_max=constraints.get("budget_max"),
-                budget_min=constraints.get("budget_min"),
-                colors=constraints.get("colors"),
-                count=3,
-            )
-
-            outfits = self.recommender.generate_outfits(gen_req)
-
-            for outfit in outfits:
-                for item in outfit.items:
-                    if item.product.id not in {p.id for p in all_products}:
-                        all_products.append(item.product)
-
+            outfits, all_products = await self._generate_outfits_from_constraints(constraints)
             if not answer and outfits:
                 answer = self._build_response_text(constraints, outfits)
 
@@ -307,106 +332,6 @@ class StylistService:
             cta_actions=cta_actions,
         )
 
-    # ------------------------------------------------------------------
-    # Response text builder
-    # ------------------------------------------------------------------
-
-    def _build_response_text(self, constraints: Dict[str, Any], outfits: List[Outfit]) -> str:
-        if not outfits:
-            return "К сожалению, не удалось подобрать образ с заданными параметрами. Попробуйте изменить фильтры."
-
-        parts = ["Вот что я подобрал для вас!\n"]
-
-        if constraints.get("occasion"):
-            occ_names = {
-                "work": "для работы/офиса",
-                "date": "для свидания",
-                "party": "для вечеринки",
-                "casual": "на каждый день",
-                "daily": "на каждый день",
-                "workout": "для спорта",
-                "travel": "для путешествия",
-                "event": "для мероприя��ия",
-            }
-            occ_text = occ_names.get(constraints["occasion"], constraints["occasion"])
-            parts.append(f"Образы подобраны {occ_text}.")
-
-        if constraints.get("budget_max"):
-            parts.append(f"Бюджет: до ${int(constraints['budget_max'])}.")
-
-        parts.append(f"\nНашлось {len(outfits)} комплект(ов). Вы можете заменить любую вещь или добавить весь образ в корзину.")
-
-        return " ".join(parts)
-
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
-    def chat(self, request: ChatRequest) -> ChatResponse:
-        if self._openai_client:
-            try:
-                return self._chat_openai(request)
-            except Exception as e:
-                logger.warning(f"OpenAI call failed, falling back to keyword: {e}")
-
-        # Keyword fallback
-        constraints = self._extract_constraints_keyword(request.message)
-
-        style = constraints.get("style", "casual")
-        occasion = constraints.get("occasion", "daily")
-        gender = constraints.get("gender", GenderType.FEMALE)
-
-        try:
-            style_enum = StyleType(style)
-        except ValueError:
-            style_enum = StyleType.CASUAL
-
-        try:
-            occasion_enum = OccasionType(occasion)
-        except ValueError:
-            occasion_enum = OccasionType.CASUAL
-
-        gen_req = OutfitGenerateRequest(
-            style=style_enum,
-            occasion=occasion_enum,
-            gender=gender,
-            budget_max=constraints.get("budget_max"),
-            budget_min=constraints.get("budget_min"),
-            colors=constraints.get("colors"),
-            count=3,
-        )
-
-        outfits = self.recommender.generate_outfits(gen_req)
-        answer = self._build_response_text(constraints, outfits)
-
-        all_products: List[ProductBrief] = []
-        for outfit in outfits:
-            for item in outfit.items:
-                if item.product.id not in {p.id for p in all_products}:
-                    all_products.append(item.product)
-
-        explanations = []
-        if constraints.get("occasion"):
-            explanations.append(f"Образ подобран для случая: {constraints['occasion']}")
-        if constraints.get("colors"):
-            explanations.append(f"Учтены цвета: {', '.join(constraints['colors'])}")
-        if constraints.get("budget_max"):
-            explanations.append(f"Бюджет ограничен: до ${int(constraints['budget_max'])}")
-
-        cta_actions = [
-            {"type": "add_all_to_cart", "label": "Купить весь образ"},
-            {"type": "save_outfit", "label": "Сохранить образ"},
-            {"type": "try_on", "label": "Примерить"},
-        ]
-
-        return ChatResponse(
-            answer=answer,
-            extracted_filters=constraints,
-            recommended_products=all_products,
-            recommended_outfits=outfits,
-            explanations=explanations,
-            cta_actions=cta_actions,
-        )
-
-    def get_suggestions(self) -> List[str]:
+    @staticmethod
+    def get_suggestions() -> List[str]:
         return SUGGESTIONS_RU

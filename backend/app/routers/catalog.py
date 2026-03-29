@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
 from app.models.schemas import (
     CatalogFilters,
     CatalogResponse,
@@ -16,7 +18,6 @@ from app.models.schemas import (
 from app.services.catalog_service import CatalogService
 
 router = APIRouter(prefix="/catalog", tags=["Catalog"])
-catalog_service = CatalogService()
 
 
 @router.get("", response_model=CatalogResponse)
@@ -33,6 +34,7 @@ async def get_catalog(
     search: Optional[str] = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
 ) -> CatalogResponse:
     filters = CatalogFilters(
         category=category,
@@ -48,31 +50,26 @@ async def get_catalog(
         page=page,
         page_size=page_size,
     )
-    return catalog_service.get_products(filters)
+    catalog = CatalogService(db)
+    return await catalog.get_products(filters)
 
 
 @router.get("/brands", response_model=List[str])
-async def get_brands() -> List[str]:
-    return catalog_service.get_brands()
+async def get_brands(db: AsyncSession = Depends(get_db)) -> List[str]:
+    return await CatalogService(db).get_brands()
 
 
 @router.get("/colors", response_model=List[str])
-async def get_colors() -> List[str]:
-    return catalog_service.get_colors()
+async def get_colors(db: AsyncSession = Depends(get_db)) -> List[str]:
+    return await CatalogService(db).get_colors()
 
 
 @router.get("/styles")
 async def get_styles() -> dict:
     return {
         "styles": [
-            "casual",
-            "office",
-            "sport",
-            "evening",
-            "street",
-            "smart_casual",
-            "date",
-            "travel",
+            "casual", "office", "sport", "evening",
+            "street", "smart_casual", "date", "travel",
         ]
     }
 
@@ -81,20 +78,16 @@ async def get_styles() -> dict:
 async def get_occasions() -> dict:
     return {
         "occasions": [
-            "daily",
-            "work",
-            "date",
-            "party",
-            "workout",
-            "travel",
-            "event",
+            "daily", "work", "date", "party",
+            "workout", "travel", "event",
         ]
     }
 
 
 @router.get("/{product_id}", response_model=Product)
-async def get_product(product_id: str) -> Product:
-    product = catalog_service.get_product(product_id)
+async def get_product(product_id: str, db: AsyncSession = Depends(get_db)) -> Product:
+    catalog = CatalogService(db)
+    product = await catalog.get_product(product_id)
     if not product:
         raise HTTPException(404, "Product not found")
     return product

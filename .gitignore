@@ -1,0 +1,29 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Storage
+backend/storage/images/*
+!backend/storage/images/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+*.sw?
+
+# Misc
+*.log
+.vite/

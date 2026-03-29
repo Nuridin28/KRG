@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
 from app.models.schemas import TryOnJobResponse
 from app.services.catalog_service import CatalogService
 from app.services.tryon_service import TryOnService
@@ -11,15 +13,16 @@ from app.services.tryon_service import TryOnService
 router = APIRouter(prefix="/tryon", tags=["Virtual Try-On"])
 
 tryon_service = TryOnService()
-catalog_service = CatalogService()
 
 
 @router.post("/jobs", response_model=TryOnJobResponse)
 async def create_tryon_job(
     person_image: UploadFile = File(...),
     product_id: str = Form(...),
+    db: AsyncSession = Depends(get_db),
 ) -> TryOnJobResponse:
-    product = catalog_service.get_product(product_id)
+    catalog = CatalogService(db)
+    product = await catalog.get_product(product_id)
     if not product:
         raise HTTPException(404, "Product not found")
 
@@ -38,15 +41,17 @@ async def create_tryon_job(
 @router.post("/outfit-jobs", response_model=TryOnJobResponse)
 async def create_outfit_tryon_job(
     person_image: UploadFile = File(...),
-    product_ids: str = Form(...),  # comma-separated product IDs
+    product_ids: str = Form(...),
+    db: AsyncSession = Depends(get_db),
 ) -> TryOnJobResponse:
     ids = [pid.strip() for pid in product_ids.split(",") if pid.strip()]
     if not ids:
         raise HTTPException(400, "No product IDs provided")
 
+    catalog = CatalogService(db)
     product_items: list[dict] = []
     for pid in ids:
-        product = catalog_service.get_product(pid)
+        product = await catalog.get_product(pid)
         if product:
             product_items.append({
                 "product_id": product.id,

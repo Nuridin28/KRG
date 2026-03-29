@@ -18,6 +18,7 @@ from app.models.schemas import (
 )
 from app.services.business_rules import (
     apply_business_rules,
+    color_compatibility_score,
     filter_by_budget,
     outfit_color_score,
     style_coherence_score,
@@ -70,7 +71,6 @@ class RecommendationService:
         if anchor:
             scored = []
             for p in products:
-                from app.services.business_rules import color_compatibility_score
                 c_score = color_compatibility_score(
                     anchor.color_hex, anchor.color_name,
                     p.color_hex, p.color_name,
@@ -123,7 +123,7 @@ class RecommendationService:
             badges=badges,
         )
 
-    def _assemble_outfit(
+    async def _assemble_outfit(
         self,
         gender: GenderType,
         style: str,
@@ -133,7 +133,7 @@ class RecommendationService:
         excluded_brands: Optional[List[str]] = None,
         colors: Optional[List[str]] = None,
     ) -> Optional[Outfit]:
-        all_products = self.catalog.products[:]
+        all_products = await self.catalog.get_all_products()
         all_products = [p for p in all_products if p.gender == gender or p.gender == GenderType.UNISEX]
         all_products = apply_business_rules(all_products, occasion)
 
@@ -200,10 +200,10 @@ class RecommendationService:
 
         return self._build_outfit(items, style, occasion)
 
-    def generate_outfits(self, req: OutfitGenerateRequest) -> List[Outfit]:
+    async def generate_outfits(self, req: OutfitGenerateRequest) -> List[Outfit]:
         anchor = None
         if req.anchor_product_id:
-            anchor = self.catalog.get_product(req.anchor_product_id)
+            anchor = await self.catalog.get_product(req.anchor_product_id)
 
         outfits: List[Outfit] = []
         attempts = 0
@@ -211,7 +211,7 @@ class RecommendationService:
 
         while len(outfits) < req.count and attempts < max_attempts:
             attempts += 1
-            outfit = self._assemble_outfit(
+            outfit = await self._assemble_outfit(
                 gender=req.gender,
                 style=req.style.value,
                 occasion=req.occasion.value,
@@ -232,8 +232,8 @@ class RecommendationService:
         outfits.sort(key=lambda o: o.compatibility_score, reverse=True)
         return outfits
 
-    def get_outfits_by_product(self, req: OutfitByProductRequest) -> List[Outfit]:
-        anchor = self.catalog.get_product(req.product_id)
+    async def get_outfits_by_product(self, req: OutfitByProductRequest) -> List[Outfit]:
+        anchor = await self.catalog.get_product(req.product_id)
         if not anchor:
             return []
 
@@ -244,7 +244,7 @@ class RecommendationService:
         attempts = 0
         while len(outfits) < 3 and attempts < 15:
             attempts += 1
-            outfit = self._assemble_outfit(
+            outfit = await self._assemble_outfit(
                 gender=anchor.gender,
                 style=style,
                 occasion=occasion,
@@ -262,15 +262,15 @@ class RecommendationService:
 
         return outfits
 
-    def get_recommendations(self, product_id: str) -> List[ProductBrief]:
-        product = self.catalog.get_product(product_id)
+    async def get_recommendations(self, product_id: str) -> List[ProductBrief]:
+        product = await self.catalog.get_product(product_id)
         if not product:
             return []
 
         comp_cats = COMPLEMENTARY_MAP.get(product.category.value, [])
         candidates: List[Product] = []
         for cat in comp_cats:
-            candidates.extend(self.catalog.get_by_category(cat))
+            candidates.extend(await self.catalog.get_by_category(cat))
 
         candidates = [
             c for c in candidates

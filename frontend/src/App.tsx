@@ -6,18 +6,23 @@ import { CatalogPage } from "@/components/catalog/CatalogPage"
 import { StylistPage } from "@/components/stylist/StylistPage"
 import { TryOnPage } from "@/components/tryon/TryOnPage"
 import { ChatPage } from "@/components/chat/ChatPage"
+import { AuthPage } from "@/components/auth/AuthPage"
+import { AdminPage } from "@/components/admin/AdminPage"
 import StyleQuiz from "@/components/quiz/StyleQuiz"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/store/auth"
 import type { Product } from "@/api/types"
 
-type TabValue = "catalog" | "stylist" | "tryon" | "chat" | "quiz"
+type TabValue = "catalog" | "stylist" | "tryon" | "chat" | "quiz" | "auth" | "admin"
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabValue>("catalog")
   const [cartOpen, setCartOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const { toasts, toast, dismiss } = useToast()
+  const user = useAuth((s) => s.user)
+  const isAdmin = useAuth((s) => s.isAdmin)
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark" ||
@@ -32,6 +37,20 @@ function App() {
   }, [darkMode])
 
   const toggleTheme = useCallback(() => setDarkMode((prev) => !prev), [])
+
+  // Redirect away from admin if not admin
+  useEffect(() => {
+    if (activeTab === "admin" && !isAdmin()) {
+      setActiveTab("catalog")
+    }
+  }, [activeTab, isAdmin, user])
+
+  // Redirect away from auth if logged in
+  useEffect(() => {
+    if (activeTab === "auth" && user) {
+      setActiveTab("catalog")
+    }
+  }, [activeTab, user])
 
   const handleTryOn = useCallback(
     (product: Product) => {
@@ -90,6 +109,10 @@ function App() {
         {activeTab === "quiz" && (
           <StyleQuiz onComplete={() => setActiveTab("stylist")} />
         )}
+        {activeTab === "auth" && (
+          <AuthPage onSuccess={() => setActiveTab("catalog")} />
+        )}
+        {activeTab === "admin" && isAdmin() && <AdminPage />}
       </main>
 
       <Footer />

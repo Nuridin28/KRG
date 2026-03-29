@@ -1,5 +1,6 @@
-import { Sparkles, Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, ClipboardList } from "lucide-react"
+import { Sparkles, Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, ClipboardList, Shield, LogIn, LogOut, User } from "lucide-react"
 import { useCart } from "@/store/cart"
+import { useAuth } from "@/store/auth"
 
 interface HeaderProps {
   activeTab: string
@@ -20,6 +21,9 @@ const navItems = [
 export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpenCart }: HeaderProps) {
   const items = useCart((s) => s.items)
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
+  const user = useAuth((s) => s.user)
+  const logout = useAuth((s) => s.logout)
+  const isAdmin = useAuth((s) => s.isAdmin)
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
@@ -51,9 +55,56 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
               </button>
             )
           })}
+
+          {isAdmin() && (
+            <button
+              onClick={() => onTabChange("admin")}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                activeTab === "admin"
+                  ? "bg-purple-600 text-white shadow-sm"
+                  : "text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-950"
+              }`}
+            >
+              <Shield className="h-4 w-4" />
+              <span className="hidden sm:inline">Админ</span>
+            </button>
+          )}
         </nav>
 
         <div className="flex items-center gap-1">
+          {user ? (
+            <div className="flex items-center gap-1">
+              <div className="hidden items-center gap-1.5 rounded-lg bg-accent px-2.5 py-1.5 text-xs sm:flex">
+                <User className="h-3.5 w-3.5" />
+                <span className="max-w-[100px] truncate">{user.full_name || user.email}</span>
+                {user.role === "admin" && (
+                  <span className="rounded bg-purple-100 px-1 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-950 dark:text-purple-400">
+                    admin
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={logout}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                title="Выйти"
+              >
+                <LogOut className="h-[18px] w-[18px]" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => onTabChange("auth")}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                activeTab === "auth"
+                  ? "bg-coral text-white"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              }`}
+            >
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline">Войти</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenCart}
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
