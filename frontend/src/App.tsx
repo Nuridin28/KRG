@@ -13,6 +13,9 @@ import { WishlistPage } from "@/components/wishlist/WishlistPage"
 import { OutfitHistoryPage } from "@/components/history/OutfitHistoryPage"
 import { SharedOutfitPage } from "@/components/shared/SharedOutfitPage"
 import { OutfitBuilderPage } from "@/components/builder/OutfitBuilderPage"
+import { ProfilePage } from "@/components/profile/ProfilePage"
+import { WardrobePage } from "@/components/wardrobe/WardrobePage"
+import { DailyOutfitPage } from "@/components/daily/DailyOutfitPage"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/store/auth"
@@ -47,6 +50,7 @@ function AppLayout() {
     "/": "catalog", "/catalog": "catalog", "/stylist": "stylist",
     "/tryon": "tryon", "/chat": "chat", "/builder": "builder",
     "/wishlist": "wishlist", "/history": "history",
+    "/profile": "profile", "/wardrobe": "wardrobe", "/daily": "daily",
     "/auth": "auth", "/admin": "admin",
   }
   const activeTab = pathToTab[location.pathname] || "catalog"
@@ -55,7 +59,8 @@ function AppLayout() {
     const tabToPath: Record<string, string> = {
       catalog: "/catalog", stylist: "/stylist", tryon: "/tryon",
       chat: "/chat", builder: "/builder", wishlist: "/wishlist",
-      history: "/history", auth: "/auth", admin: "/admin",
+      history: "/history", profile: "/profile", wardrobe: "/wardrobe",
+      daily: "/daily", auth: "/auth", admin: "/admin",
     }
     navigate(tabToPath[tab] || "/catalog")
   }, [navigate])
@@ -108,6 +113,9 @@ function AppLayout() {
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/history" element={<OutfitHistoryPage />} />
           <Route path="/outfit/:outfitId" element={<SharedOutfitPage />} />
+          <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/auth" replace />} />
+          <Route path="/wardrobe" element={user ? <WardrobePage /> : <Navigate to="/auth" replace />} />
+          <Route path="/daily" element={<DailyOutfitPage />} />
           <Route path="/auth" element={user ? <Navigate to="/catalog" replace /> : <AuthPage onSuccess={() => navigate("/catalog")} />} />
           <Route path="/admin" element={isAdmin() ? <AdminPage /> : <Navigate to="/catalog" replace />} />
           <Route path="*" element={<Navigate to="/catalog" replace />} />

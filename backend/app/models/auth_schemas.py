@@ -25,6 +25,9 @@ class UserResponse(BaseModel):
     full_name: str
     role: str
     is_active: bool
+    preferred_styles: list[str] | None = None
+    preferred_gender: str | None = None
+    city: str | None = None
 
     class Config:
         from_attributes = True

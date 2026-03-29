@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     MAX_OUTFITS_PER_REQUEST: int = 10
     DEFAULT_OUTFITS_COUNT: int = 3
 
+    # Weather API (Feature 3: style of the day)
+    OPENWEATHER_API_KEY: str = ""
+
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
 
     class Config:

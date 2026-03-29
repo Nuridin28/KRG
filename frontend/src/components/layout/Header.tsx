@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Sparkles, Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X, Heart, Puzzle, History } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Sparkles, Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X, Heart, Puzzle, History, Shirt, CalendarDays, ChevronDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "@/store/cart"
 import { useAuth } from "@/store/auth"
@@ -12,15 +12,24 @@ interface HeaderProps {
   onOpenCart: () => void
 }
 
-const navItems = [
+// Primary tabs — always visible in desktop nav
+const primaryNav = [
   { value: "catalog", label: "Каталог", icon: ShoppingBag },
   { value: "stylist", label: "AI Стилист", icon: Wand2 },
-  { value: "builder", label: "Конструктор", icon: Puzzle },
   { value: "tryon", label: "Примерка", icon: Camera },
   { value: "chat", label: "AI Чат", icon: MessageCircle },
+]
+
+// Secondary tabs — inside "Ещё" dropdown on desktop, flat list on mobile
+const secondaryNav = [
+  { value: "daily", label: "Образ дня", icon: CalendarDays },
+  { value: "wardrobe", label: "Гардероб", icon: Shirt },
+  { value: "builder", label: "Конструктор", icon: Puzzle },
   { value: "wishlist", label: "Избранное", icon: Heart },
   { value: "history", label: "История", icon: History },
 ]
+
+const allNav = [...primaryNav, ...secondaryNav]
 
 export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpenCart }: HeaderProps) {
   const items = useCart((s) => s.items)
@@ -30,10 +39,15 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
   const isAdmin = useAuth((s) => s.isAdmin)
   const routerNavigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef<HTMLDivElement>(null)
+
+  const isSecondaryActive = secondaryNav.some((item) => item.value === activeTab)
 
   // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false)
+    setMoreOpen(false)
   }, [activeTab])
 
   // Lock body scroll when menu is open
@@ -42,9 +56,21 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
     return () => { document.body.style.overflow = "" }
   }, [mobileOpen])
 
+  // Close "more" dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [])
+
   function handleNav(tab: string) {
     onTabChange(tab)
     setMobileOpen(false)
+    setMoreOpen(false)
   }
 
   return (
@@ -62,7 +88,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 md:flex">
-          {navItems.map((item) => {
+          {primaryNav.map((item) => {
             const Icon = item.icon
             return (
               <button
@@ -79,6 +105,43 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
               </button>
             )
           })}
+
+          {/* "More" dropdown */}
+          <div className="relative" ref={moreRef}>
+            <button
+              onClick={() => setMoreOpen(!moreOpen)}
+              className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                isSecondaryActive
+                  ? "bg-coral text-white shadow-sm shadow-coral/25"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              }`}
+            >
+              <span className="hidden lg:inline">Ещё</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {moreOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border bg-background p-1 shadow-lg">
+                {secondaryNav.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <button
+                      key={item.value}
+                      onClick={() => handleNav(item.value)}
+                      className={`flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        activeTab === item.value
+                          ? "bg-coral/10 text-coral"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
 
           {isAdmin() && (
             <button
@@ -98,7 +161,11 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
         {/* Right actions */}
         <div className="flex items-center gap-1">
           {user ? (
-            <div className="hidden items-center gap-1.5 rounded-lg bg-accent px-2.5 py-1.5 text-xs sm:flex">
+            <button
+              onClick={() => onTabChange("profile")}
+              className="hidden items-center gap-1.5 rounded-lg bg-accent px-2.5 py-1.5 text-xs transition-colors hover:bg-accent/80 sm:flex"
+              title="Мой профиль"
+            >
               <User className="h-3.5 w-3.5" />
               <span className="max-w-25 truncate">{user.full_name || user.email}</span>
               {user.role === "admin" && (
@@ -106,7 +173,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                   admin
                 </span>
               )}
-            </div>
+            </button>
           ) : null}
 
           {user ? (
@@ -179,7 +246,10 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
       >
         {/* User info (mobile) */}
         {user && (
-          <div className="flex items-center gap-3 border-b px-5 py-4">
+          <button
+            onClick={() => handleNav("profile")}
+            className="flex w-full items-center gap-3 border-b px-5 py-4 text-left transition-colors hover:bg-accent"
+          >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-coral/10 text-coral">
               <User className="h-5 w-5" />
             </div>
@@ -192,13 +262,13 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                 admin
               </span>
             )}
-          </div>
+          </button>
         )}
 
-        {/* Nav items */}
+        {/* Nav items — all flat on mobile */}
         <nav className="flex-1 overflow-y-auto px-3 py-3">
           <div className="space-y-1">
-            {navItems.map((item) => {
+            {allNav.map((item) => {
               const Icon = item.icon
               return (
                 <button

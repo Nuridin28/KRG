@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, String, Text, func
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,6 +18,10 @@ class User(Base):
     full_name: Mapped[str] = mapped_column(String(255), default="")
     role: Mapped[str] = mapped_column(String(20), default="user")  # "user" | "admin"
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Preferences (Feature 3: Style of the day)
+    preferred_styles: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    preferred_gender: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -83,5 +87,52 @@ class TrackingEvent(Base):
     outfit_id: Mapped[str] = mapped_column(String(50), nullable=True)
     metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
     timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class UserPhoto(Base):
+    """Saved user photos for one-click try-on."""
+    __tablename__ = "user_photos"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, index=True)
+    image_path: Mapped[str] = mapped_column(String(500))
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class WardrobeItem(Base):
+    """User's personal wardrobe for capsule analysis."""
+    __tablename__ = "wardrobe_items"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, index=True)
+    product_id: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    category: Mapped[str] = mapped_column(String(50))
+    name: Mapped[str] = mapped_column(String(255), default="")
+    color_name: Mapped[str] = mapped_column(String(50), default="")
+    color_hex: Mapped[str] = mapped_column(String(10), default="")
+    image_url: Mapped[str] = mapped_column(Text, default="")
+    style_tags: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class DailyOutfit(Base):
+    """Pre-generated daily outfit recommendation per user."""
+    __tablename__ = "daily_outfits"
+    __table_args__ = (UniqueConstraint("user_id", "date", name="uq_user_date"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, index=True)
+    date: Mapped[str] = mapped_column(String(10), index=True)
+    outfit_json: Mapped[dict] = mapped_column(JSON)
+    weather_summary: Mapped[str] = mapped_column(String(200), default="")
+    temperature_c: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

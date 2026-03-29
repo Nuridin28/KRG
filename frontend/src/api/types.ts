@@ -136,3 +136,46 @@ export interface AdminStats {
   total_tryon_jobs: number
   active_rules: number
 }
+
+// Profile & Photos (Feature 1)
+export interface UserPhoto {
+  id: number
+  image_url: string
+  is_default: boolean
+  created_at: string
+}
+
+export interface UserPreferences {
+  preferred_styles: string[]
+  preferred_gender?: string
+  city?: string
+}
+
+// Wardrobe & Capsule (Feature 2)
+export interface WardrobeItem {
+  id: number
+  product_id?: string
+  category: string
+  name: string
+  color_name: string
+  color_hex: string
+  image_url: string
+  style_tags: string[]
+  created_at: string
+}
+
+export interface CapsuleAnalysis {
+  total_items: number
+  possible_outfits: Outfit[]
+  missing_categories: string[]
+  gap_recommendations: ProductBrief[]
+  analysis_text: string
+}
+
+// Daily Outfit (Feature 3)
+export interface DailyOutfit {
+  outfit: Outfit
+  weather_summary: string
+  temperature_c?: number
+  date: string
+}

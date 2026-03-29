@@ -1,9 +1,15 @@
-import { Shirt, Check, Heart } from "lucide-react"
+import { useState, useCallback } from "react"
+import { Shirt, Check, Heart, Zap, Plus, Loader2 } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { useWishlist } from "@/store/wishlist"
+import { useProfile } from "@/store/profile"
+import { useWardrobe } from "@/store/wardrobe"
+import { useAuth } from "@/store/auth"
+import { api } from "@/api/client"
+import { useToast } from "@/hooks/use-toast"
 import type { Product } from "@/api/types"
 
 interface ProductCardProps {
@@ -12,11 +18,48 @@ interface ProductCardProps {
   onTryOn: (product: Product) => void
   tryOnSelected?: boolean
   onToggleTryOn?: (product: Product) => void
+  onQuickTryOn?: (jobId: string) => void
 }
 
-export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggleTryOn }: ProductCardProps) {
+export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggleTryOn, onQuickTryOn }: ProductCardProps) {
   const wishlist = useWishlist()
   const isWished = wishlist.has(product.id)
+  const hasPhotos = useProfile((s) => s.hasPhotos)
+  const isLoggedIn = useAuth((s) => s.isLoggedIn)
+  const inWardrobe = useWardrobe((s) => s.hasProduct(product.id))
+  const wardrobeAdd = useWardrobe((s) => s.addItem)
+  const { toast } = useToast()
+  const [quickLoading, setQuickLoading] = useState(false)
+  const [wardrobeLoading, setWardrobeLoading] = useState(false)
+
+  const handleQuickTryOn = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setQuickLoading(true)
+    try {
+      const job = await api.profile.quickTryOn(product.id)
+      onQuickTryOn?.(job.job_id)
+      toast({ title: "Примерка запущена", description: product.name })
+    } catch (err: any) {
+      toast({ title: "Ошибка", description: err.message })
+    } finally {
+      setQuickLoading(false)
+    }
+  }, [product, onQuickTryOn, toast])
+
+  const handleAddToWardrobe = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (inWardrobe) return
+    setWardrobeLoading(true)
+    try {
+      const item = await api.wardrobe.addItem({ product_id: product.id })
+      wardrobeAdd(item)
+      toast({ title: "Добавлено в гардероб", description: product.name })
+    } catch (err: any) {
+      toast({ title: "Ошибка", description: err.message })
+    } finally {
+      setWardrobeLoading(false)
+    }
+  }, [product, inWardrobe, wardrobeAdd, toast])
 
   return (
     <Card className={`group flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
@@ -123,19 +166,52 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
         )}
       </CardContent>
 
-      <CardFooter className="mt-auto border-t p-3">
-        <Button
-          size="sm"
-          variant="coral"
-          className="w-full text-xs"
-          onClick={(e) => {
-            e.stopPropagation()
-            onTryOn(product)
-          }}
-        >
-          <Shirt className="mr-1.5 h-3.5 w-3.5" />
-          Примерить
-        </Button>
+      <CardFooter className="mt-auto border-t p-2.5">
+        <div className="flex w-full flex-col gap-1.5">
+          {/* Quick try-on (if user has saved photos) */}
+          {isLoggedIn() && hasPhotos() ? (
+            <Button
+              size="sm"
+              variant="coral"
+              className="w-full text-xs"
+              disabled={quickLoading}
+              onClick={handleQuickTryOn}
+            >
+              {quickLoading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Zap className="mr-1.5 h-3.5 w-3.5" />}
+              Примерить на себя
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="coral"
+              className="w-full text-xs"
+              onClick={(e) => { e.stopPropagation(); onTryOn(product) }}
+            >
+              <Shirt className="mr-1.5 h-3.5 w-3.5" />
+              Примерить
+            </Button>
+          )}
+
+          {/* Add to wardrobe */}
+          {isLoggedIn() && (
+            <Button
+              size="sm"
+              variant={inWardrobe ? "secondary" : "outline"}
+              className="w-full text-xs"
+              disabled={inWardrobe || wardrobeLoading}
+              onClick={handleAddToWardrobe}
+            >
+              {wardrobeLoading ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : inWardrobe ? (
+                <Check className="mr-1.5 h-3.5 w-3.5" />
+              ) : (
+                <Plus className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {inWardrobe ? "В гардеробе" : "В гардероб"}
+            </Button>
+          )}
+        </div>
       </CardFooter>
     </Card>
   )

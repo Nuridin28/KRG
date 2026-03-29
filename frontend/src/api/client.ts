@@ -2,15 +2,20 @@ import { useAuth } from "@/store/auth"
 import type {
   AdminStats,
   AuthUser,
+  CapsuleAnalysis,
   CatalogResponse,
   ChatMessage,
   ChatResponse,
+  DailyOutfit,
   Outfit,
   OutfitGenerateRequest,
   Product,
   ProductBrief,
   TokenResponse,
   TryOnJob,
+  UserPhoto,
+  UserPreferences,
+  WardrobeItem,
 } from "./types"
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api/v1"
@@ -169,6 +174,47 @@ export const api = {
     history: (limit = 20) => request<any[]>(`/outfits/history?limit=${limit}`),
     delete: (id: string) => request<any>(`/outfits/history/${id}`, { method: "DELETE" }),
     getShared: (id: string) => request<any>(`/outfits/shared/${id}`),
+  },
+
+  profile: {
+    getPhotos: () => request<UserPhoto[]>("/profile/photos"),
+    uploadPhoto: (file: File) => {
+      const formData = new FormData()
+      formData.append("photo", file)
+      return request<UserPhoto>("/profile/photos", { method: "POST", body: formData })
+    },
+    deletePhoto: (id: number) =>
+      request<{ deleted: number }>(`/profile/photos/${id}`, { method: "DELETE" }),
+    setDefault: (id: number) =>
+      request<UserPhoto>(`/profile/photos/${id}/default`, { method: "PUT" }),
+    quickTryOn: (productId: string, photoId?: number) =>
+      request<TryOnJob>("/profile/quick-tryon", {
+        method: "POST",
+        body: JSON.stringify({ product_id: productId, photo_id: photoId }),
+      }),
+    getPreferences: () => request<UserPreferences>("/profile/preferences"),
+    updatePreferences: (data: Partial<UserPreferences>) =>
+      request<UserPreferences>("/profile/preferences", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+  },
+
+  wardrobe: {
+    getItems: () => request<WardrobeItem[]>("/wardrobe/items"),
+    addItem: (data: { product_id?: string; category?: string; name?: string; color_name?: string; color_hex?: string }) =>
+      request<WardrobeItem>("/wardrobe/items", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    removeItem: (id: number) =>
+      request<{ deleted: number }>(`/wardrobe/items/${id}`, { method: "DELETE" }),
+    analyze: () => request<CapsuleAnalysis>("/wardrobe/analyze", { method: "POST" }),
+  },
+
+  dailyOutfit: {
+    getToday: () => request<DailyOutfit>("/daily-outfit"),
+    regenerate: () => request<DailyOutfit>("/daily-outfit/regenerate", { method: "POST" }),
   },
 
   admin: {

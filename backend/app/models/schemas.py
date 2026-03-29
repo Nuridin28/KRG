@@ -200,3 +200,81 @@ class CatalogResponse(BaseModel):
     page: int
     page_size: int
     total_pages: int
+
+
+# ---------------------------------------------------------------------------
+# Profile & Photos (Feature 1: one-click try-on)
+# ---------------------------------------------------------------------------
+
+class UserPhotoResponse(BaseModel):
+    id: int
+    image_url: str
+    is_default: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class QuickTryOnRequest(BaseModel):
+    product_id: str
+    photo_id: Optional[int] = None  # None = use default photo
+
+
+class UserPreferencesUpdate(BaseModel):
+    preferred_styles: Optional[List[str]] = None
+    preferred_gender: Optional[str] = None
+    city: Optional[str] = None
+
+
+class UserPreferencesResponse(BaseModel):
+    preferred_styles: List[str] = []
+    preferred_gender: Optional[str] = None
+    city: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Wardrobe & Capsule (Feature 2)
+# ---------------------------------------------------------------------------
+
+class WardrobeItemCreate(BaseModel):
+    product_id: Optional[str] = None
+    category: Optional[str] = None
+    name: Optional[str] = None
+    color_name: Optional[str] = None
+    color_hex: Optional[str] = None
+    style_tags: List[str] = []
+
+
+class WardrobeItemResponse(BaseModel):
+    id: int
+    product_id: Optional[str] = None
+    category: str
+    name: str
+    color_name: str
+    color_hex: str
+    image_url: str
+    style_tags: List[str] = []
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class CapsuleAnalysisResponse(BaseModel):
+    total_items: int
+    possible_outfits: List[Outfit] = []
+    missing_categories: List[str] = []
+    gap_recommendations: List[ProductBrief] = []
+    analysis_text: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Daily Outfit (Feature 3: style of the day)
+# ---------------------------------------------------------------------------
+
+class DailyOutfitResponse(BaseModel):
+    outfit: Outfit
+    weather_summary: str = ""
+    temperature_c: Optional[float] = None
+    date: str
