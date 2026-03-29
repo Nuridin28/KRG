@@ -53,6 +53,13 @@ class TryOnJobStatus(str, enum.Enum):
     FAILED = "failed"
 
 
+class VideoJobStatus(str, enum.Enum):
+    QUEUED = "queued"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
 class Product(BaseModel):
     id: str
     sku_id: str
@@ -154,6 +161,16 @@ class TryOnJobResponse(BaseModel):
     current_step: Optional[str] = None  # e.g. "Примеряем: Рубашка Oxford (2/3)"
     total_items: int = 1
     completed_items: int = 0
+
+
+class VideoJobResponse(BaseModel):
+    job_id: str
+    status: VideoJobStatus
+    progress: int = 0
+    video_url: Optional[str] = None
+    failure_reason: Optional[str] = None
+    created_at: datetime
+    completed_at: Optional[datetime] = None
 
 
 class ChatMessage(BaseModel):

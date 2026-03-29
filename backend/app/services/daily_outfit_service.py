@@ -64,12 +64,13 @@ class DailyOutfitService:
                 )
             )
 
-        # Get weather
+        # Get weather — use user's city, or detect via IP, or default
+        city = user.city or await self._detect_city()
         weather = None
         weather_summary = ""
         temperature_c = None
-        if user.city:
-            weather = await self.weather.get_weather(user.city)
+        if city:
+            weather = await self.weather.get_weather(city)
             if weather:
                 weather_summary = f"{weather.description}, {weather.temperature_c}°C"
                 temperature_c = weather.temperature_c
@@ -135,6 +136,20 @@ class DailyOutfitService:
             temperature_c=temperature_c,
             date=today,
         )
+
+    async def _detect_city(self) -> str:
+        """Try to detect city by IP geolocation, fallback to Almaty."""
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                resp = await client.get("http://ip-api.com/json/?fields=city")
+                if resp.status_code == 200:
+                    city = resp.json().get("city", "")
+                    if city:
+                        return city
+        except Exception:
+            pass
+        return "Almaty"
 
     async def generate_for_all(self) -> int:
         """Generate daily outfits for all users with preferences set."""

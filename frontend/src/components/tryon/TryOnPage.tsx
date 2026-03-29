@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Loader2, Shirt, Search, X, Check } from "lucide-react"
 import { api } from "@/api/client"
-import type { Product } from "@/api/types"
+import type { Product, CategoryType } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +13,17 @@ import { TryOnResult } from "./TryOnResult"
 import { useNavigation } from "@/store/navigation"
 
 const MAX_ITEMS = 5
+
+const CATEGORY_LABELS: Record<CategoryType, string> = {
+  tops: "Верх",
+  bottoms: "Низ",
+  outerwear: "Верхняя одежда",
+  dresses: "Платья",
+  shoes: "Обувь",
+  accessories: "Аксессуары",
+}
+
+const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories"]
 
 export function TryOnPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -104,6 +115,20 @@ export function TryOnPage() {
 
   const isProductSelected = (id: string) => chosenProducts.some((p) => p.id === id)
 
+  const groupedProducts = useMemo(() => {
+    const map = new Map<CategoryType, Product[]>()
+    for (const p of products) {
+      const cat = p.category as CategoryType
+      if (!map.has(cat)) map.set(cat, [])
+      map.get(cat)!.push(p)
+    }
+    return CATEGORY_ORDER.filter((cat) => map.has(cat)).map((cat) => ({
+      category: cat,
+      label: CATEGORY_LABELS[cat],
+      items: map.get(cat)!,
+    }))
+  }, [products])
+
   const buttonLabel =
     chosenProducts.length <= 1
       ? "Примерить"
@@ -186,40 +211,49 @@ export function TryOnPage() {
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {products.map((product) => {
-                    const selected = isProductSelected(product.id)
-                    return (
-                      <button
-                        key={product.id}
-                        onClick={() => handleToggleProduct(product)}
-                        disabled={!selected && chosenProducts.length >= MAX_ITEMS}
-                        className={`group relative flex flex-col items-center gap-1 rounded-lg border p-2 text-center transition-all ${
-                          selected
-                            ? "border-coral bg-coral/10 ring-1 ring-coral/30"
-                            : chosenProducts.length >= MAX_ITEMS
-                              ? "cursor-not-allowed opacity-40"
-                              : "hover:border-coral/50 hover:bg-coral/5"
-                        }`}
-                      >
-                        {selected && (
-                          <div className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-coral text-white">
-                            <Check className="h-3 w-3" />
-                          </div>
-                        )}
-                        <div className="aspect-square w-full overflow-hidden rounded-md bg-muted/50">
-                          <img
-                            src={product.image_url}
-                            alt={product.name}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        <p className="line-clamp-1 text-[10px] font-medium">{product.name}</p>
-                        <p className="text-[9px] text-muted-foreground">{product.brand}</p>
-                      </button>
-                    )
-                  })}
+                <div className="space-y-4">
+                  {groupedProducts.map((group) => (
+                    <div key={group.category}>
+                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {group.label}
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                        {group.items.map((product) => {
+                          const selected = isProductSelected(product.id)
+                          return (
+                            <button
+                              key={product.id}
+                              onClick={() => handleToggleProduct(product)}
+                              disabled={!selected && chosenProducts.length >= MAX_ITEMS}
+                              className={`group relative flex flex-col items-center gap-1 rounded-lg border p-2 text-center transition-all ${
+                                selected
+                                  ? "border-coral bg-coral/10 ring-1 ring-coral/30"
+                                  : chosenProducts.length >= MAX_ITEMS
+                                    ? "cursor-not-allowed opacity-40"
+                                    : "hover:border-coral/50 hover:bg-coral/5"
+                              }`}
+                            >
+                              {selected && (
+                                <div className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-coral text-white">
+                                  <Check className="h-3 w-3" />
+                                </div>
+                              )}
+                              <div className="aspect-square w-full overflow-hidden rounded-md bg-muted/50">
+                                <img
+                                  src={product.image_url}
+                                  alt={product.name}
+                                  className="h-full w-full object-cover"
+                                  loading="lazy"
+                                />
+                              </div>
+                              <p className="line-clamp-1 text-[10px] font-medium">{product.name}</p>
+                              <p className="text-[9px] text-muted-foreground">{product.brand}</p>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </ScrollArea>

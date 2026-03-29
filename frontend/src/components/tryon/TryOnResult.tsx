@@ -1,8 +1,10 @@
-import { useState } from "react"
-import { ShoppingCart, Sparkles, AlertCircle, Loader2, ArrowDown, ZoomIn } from "lucide-react"
+import { useState, useEffect, useCallback, useRef } from "react"
+import { ShoppingCart, Sparkles, AlertCircle, Loader2, ArrowDown, ZoomIn, Play, RotateCw, Image as ImageIcon, Film } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import type { TryOnJob } from "@/api/types"
+import { api } from "@/api/client"
+import { useToast } from "@/hooks/use-toast"
+import type { TryOnJob, VideoJob } from "@/api/types"
 
 interface TryOnResultProps {
   job: TryOnJob | null
@@ -25,8 +27,73 @@ function getStatusLabel(status: string): string {
   }
 }
 
+type ViewMode = "photo" | "video"
+
 export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultProps) {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null)
+  const [videoJob, setVideoJob] = useState<VideoJob | null>(null)
+  const [videoLoading, setVideoLoading] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>("photo")
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const { toast } = useToast()
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current)
+    }
+  }, [])
+
+  // Reset video job when try-on job changes
+  useEffect(() => {
+    setVideoJob(null)
+    setViewMode("photo")
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current)
+      pollingRef.current = null
+    }
+  }, [job?.job_id])
+
+  const startVideoPolling = useCallback((jobId: string) => {
+    if (pollingRef.current) clearInterval(pollingRef.current)
+    pollingRef.current = setInterval(async () => {
+      try {
+        const updated = await api.video.getJob(jobId)
+        setVideoJob(updated)
+        if (updated.status === "completed" || updated.status === "failed") {
+          if (pollingRef.current) clearInterval(pollingRef.current)
+          pollingRef.current = null
+          if (updated.status === "completed") {
+            setViewMode("video")
+          }
+          if (updated.status === "failed") {
+            toast({ title: "Не удалось создать видео", description: updated.failure_reason || "" })
+          }
+        }
+      } catch {
+        if (pollingRef.current) clearInterval(pollingRef.current)
+        pollingRef.current = null
+      }
+    }, 3000)
+  }, [toast])
+
+  const handleGenerateVideo = useCallback(async () => {
+    if (!job?.output_image_url) return
+    setVideoLoading(true)
+    setVideoJob(null)
+    try {
+      const vJob = await api.video.generate(job.output_image_url)
+      setVideoJob(vJob)
+      startVideoPolling(vJob.job_id)
+    } catch (err: any) {
+      toast({ title: "Ошибка", description: err.message })
+    } finally {
+      setVideoLoading(false)
+    }
+  }, [job, startVideoPolling, toast])
+
+  const hasVideo = videoJob?.status === "completed" && videoJob.video_url
+  const videoGenerating = videoJob && (videoJob.status === "queued" || videoJob.status === "processing")
 
   if (!job) {
     return (
@@ -72,71 +139,200 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
   // completed
   return (
     <div className="space-y-4">
-      {/* Before */}
+      {/* Before / After comparison */}
       {personPreview && (
-        <div className="space-y-2">
-          <p className="text-center text-sm font-semibold text-muted-foreground">До</p>
-          <div
-            className="group relative cursor-pointer overflow-hidden rounded-xl border shadow-sm"
-            onClick={() => setZoomedImage(personPreview)}
-          >
-            <img
-              src={personPreview}
-              alt="Оригинальное фото"
-              className="w-full rounded-xl object-contain"
-              style={{ maxHeight: "60vh" }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
-              <ZoomIn className="h-8 w-8 text-white drop-shadow-lg" />
+        <>
+          <div className="space-y-2">
+            <p className="text-center text-sm font-semibold text-muted-foreground">До</p>
+            <div
+              className="group relative cursor-pointer overflow-hidden rounded-xl border shadow-sm"
+              onClick={() => setZoomedImage(personPreview)}
+            >
+              <img
+                src={personPreview}
+                alt="Оригинальное фото"
+                className="w-full rounded-xl object-contain"
+                style={{ maxHeight: "50vh" }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
+                <ZoomIn className="h-8 w-8 text-white drop-shadow-lg" />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Arrow */}
-      {personPreview && (
-        <div className="flex justify-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-coral/10">
-            <ArrowDown className="h-5 w-5 text-coral" />
-          </div>
-        </div>
-      )}
-
-      {/* After */}
-      <div className="space-y-2">
-        <p className="text-center text-sm font-semibold text-coral">После</p>
-        {job.output_image_url ? (
-          <div
-            className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-coral/30 shadow-lg"
-            onClick={() => setZoomedImage(job.output_image_url!)}
-          >
-            <img
-              src={job.output_image_url}
-              alt="Результат примерки"
-              className="w-full rounded-xl object-contain"
-              style={{ maxHeight: "70vh" }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
-              <ZoomIn className="h-8 w-8 text-white drop-shadow-lg" />
+          <div className="flex justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-coral/10">
+              <ArrowDown className="h-5 w-5 text-coral" />
             </div>
           </div>
-        ) : (
-          <div className="flex aspect-3/4 items-center justify-center rounded-xl bg-muted">
-            <p className="text-xs text-muted-foreground">Изображение недоступно</p>
+        </>
+      )}
+
+      {/* Result section — photo + video tabs */}
+      <div className="space-y-3">
+        {/* Tab switcher — only when video exists or is generating */}
+        {(hasVideo || videoGenerating) && (
+          <div className="flex items-center justify-center gap-1 rounded-lg bg-muted p-1">
+            <button
+              onClick={() => setViewMode("photo")}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-all ${
+                viewMode === "photo"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <ImageIcon className="h-3.5 w-3.5" />
+              Фото
+            </button>
+            <button
+              onClick={() => hasVideo && setViewMode("video")}
+              disabled={!hasVideo}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-all ${
+                viewMode === "video"
+                  ? "bg-background text-foreground shadow-sm"
+                  : !hasVideo
+                    ? "cursor-not-allowed text-muted-foreground/50"
+                    : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {videoGenerating ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Film className="h-3.5 w-3.5" />
+              )}
+              {videoGenerating ? "Генерация..." : "Видео"}
+            </button>
           </div>
         )}
+
+        {/* Content */}
+        <div className="relative">
+          <p className="mb-2 text-center text-sm font-semibold text-coral">
+            {viewMode === "video" ? "В движении" : "После"}
+          </p>
+
+          {/* Photo view */}
+          {viewMode === "photo" && job.output_image_url && (
+            <div
+              className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-coral/30 shadow-lg"
+              onClick={() => setZoomedImage(job.output_image_url!)}
+            >
+              <img
+                src={job.output_image_url}
+                alt="Результат примерки"
+                className="w-full rounded-xl object-contain"
+                style={{ maxHeight: "65vh" }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
+                <ZoomIn className="h-8 w-8 text-white drop-shadow-lg" />
+              </div>
+
+              {/* Floating "generate video" overlay — when no video yet */}
+              {!hasVideo && !videoGenerating && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleGenerateVideo()
+                  }}
+                  disabled={videoLoading}
+                  className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-lg bg-black/60 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm transition-all hover:bg-black/80"
+                >
+                  {videoLoading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Play className="h-3.5 w-3.5" />
+                  )}
+                  В движении
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Video view */}
+          {viewMode === "video" && hasVideo && (
+            <div className="overflow-hidden rounded-xl border-2 border-coral/30 shadow-lg">
+              <video
+                src={videoJob!.video_url!}
+                className="w-full rounded-xl"
+                style={{ maxHeight: "65vh" }}
+                controls
+                autoPlay
+                loop
+                playsInline
+                muted
+              />
+            </div>
+          )}
+
+          {/* No image fallback */}
+          {viewMode === "photo" && !job.output_image_url && (
+            <div className="flex aspect-3/4 items-center justify-center rounded-xl bg-muted">
+              <p className="text-xs text-muted-foreground">Изображение недоступно</p>
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Video generation progress bar — shown under content while generating */}
+      {videoGenerating && (
+        <div className="rounded-lg border bg-card p-3">
+          <div className="mb-1.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-coral" />
+              <span className="text-xs font-medium">Создаём видео ~40 сек...</span>
+            </div>
+            <span className="text-xs text-muted-foreground">{videoJob!.progress}%</span>
+          </div>
+          <Progress
+            value={videoJob!.progress}
+            className="h-1.5 w-full"
+            indicatorClassName="bg-coral"
+          />
+        </div>
+      )}
+
       {/* Actions */}
-      <div className="flex gap-3">
-        <Button variant="coral" className="flex-1">
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Добавить в корзину
-        </Button>
-        <Button variant="outline" className="flex-1" onClick={onBuildOutfit}>
-          <Sparkles className="mr-2 h-4 w-4" />
-          Собрать образ
-        </Button>
+      <div className="flex flex-col gap-2">
+        <div className="flex gap-3">
+          <Button variant="coral" className="flex-1">
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            В корзину
+          </Button>
+          <Button variant="outline" className="flex-1" onClick={onBuildOutfit}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            Собрать образ
+          </Button>
+        </div>
+
+        {/* Video action — only if no video yet and no floating button wasn't clicked */}
+        {job.output_image_url && !hasVideo && !videoGenerating && (
+          <Button
+            variant="secondary"
+            className="w-full"
+            disabled={videoLoading}
+            onClick={handleGenerateVideo}
+          >
+            {videoLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="mr-2 h-4 w-4" />
+            )}
+            Показать в движении
+          </Button>
+        )}
+
+        {/* Regenerate video */}
+        {hasVideo && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-xs"
+            disabled={!!videoGenerating || videoLoading}
+            onClick={handleGenerateVideo}
+          >
+            <RotateCw className="mr-1.5 h-3.5 w-3.5" />
+            Перегенерировать видео
+          </Button>
+        )}
       </div>
 
       {/* Fullscreen zoom modal */}

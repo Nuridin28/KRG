@@ -3,7 +3,30 @@ import { Bot, User, ShoppingCart, Shirt, Check } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/store/cart"
-import type { ChatMessage as ChatMessageType, ProductBrief, Outfit } from "@/api/types"
+import type { ChatMessage as ChatMessageType, ProductBrief, Outfit, CategoryType } from "@/api/types"
+
+const CATEGORY_LABELS: Record<CategoryType, string> = {
+  tops: "Верх",
+  bottoms: "Низ",
+  outerwear: "Верхняя одежда",
+  dresses: "Платья",
+  shoes: "Обувь",
+  accessories: "Аксессуары",
+}
+
+const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories"]
+
+function groupByCategory(products: ProductBrief[]): { category: CategoryType; label: string; items: ProductBrief[] }[] {
+  const map = new Map<CategoryType, ProductBrief[]>()
+  for (const p of products) {
+    const cat = p.category
+    if (!map.has(cat)) map.set(cat, [])
+    map.get(cat)!.push(p)
+  }
+  return CATEGORY_ORDER
+    .filter((cat) => map.has(cat))
+    .map((cat) => ({ category: cat, label: CATEGORY_LABELS[cat], items: map.get(cat)! }))
+}
 
 interface ChatMessageProps {
   message: ChatMessageType
@@ -204,13 +227,22 @@ export function ChatMessageComponent({
         </div>
 
         {products.length > 0 && (
-          <div className="space-y-1.5">
-            {products.slice(0, 6).map((product) => (
-              <MiniProductCard
-                key={product.id}
-                product={product}
-                onTryOn={onTryOnProduct}
-              />
+          <div className="space-y-3">
+            {groupByCategory(products.slice(0, 12)).map((group) => (
+              <div key={group.category}>
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {group.label}
+                </p>
+                <div className="space-y-1.5">
+                  {group.items.map((product) => (
+                    <MiniProductCard
+                      key={product.id}
+                      product={product}
+                      onTryOn={onTryOnProduct}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}

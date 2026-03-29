@@ -14,6 +14,7 @@ import type {
   TokenResponse,
   TryOnJob,
   UserPhoto,
+  VideoJob,
   UserPreferences,
   WardrobeItem,
 } from "./types"
@@ -158,6 +159,15 @@ export const api = {
       })
     },
     getJob: (jobId: string) => request<TryOnJob>(`/tryon/jobs/${jobId}`),
+  },
+
+  video: {
+    generate: (sourceImageUrl: string) =>
+      request<VideoJob>("/video/generate", {
+        method: "POST",
+        body: JSON.stringify({ source_image_url: sourceImageUrl }),
+      }),
+    getJob: (jobId: string) => request<VideoJob>(`/video/jobs/${jobId}`),
   },
 
   chat: {

@@ -137,6 +137,19 @@ export interface AdminStats {
   active_rules: number
 }
 
+// Video generation (Veo)
+export type VideoJobStatus = "queued" | "processing" | "completed" | "failed"
+
+export interface VideoJob {
+  job_id: string
+  status: VideoJobStatus
+  progress: number
+  video_url?: string
+  failure_reason?: string
+  created_at: string
+  completed_at?: string
+}
+
 // Profile & Photos (Feature 1)
 export interface UserPhoto {
   id: number

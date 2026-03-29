@@ -13,7 +13,7 @@ from app.core.config import settings
 from app.core.database import Base, engine
 from app.routers import (
     admin, auth, catalog, daily_outfit, outfits, profile,
-    saved_outfits, stylist_chat, tracking, tryon, wardrobe,
+    saved_outfits, stylist_chat, tracking, tryon, video, wardrobe,
 )
 
 
@@ -68,6 +68,7 @@ app.include_router(saved_outfits.router, prefix=settings.API_V1_PREFIX)
 app.include_router(profile.router, prefix=settings.API_V1_PREFIX)
 app.include_router(wardrobe.router, prefix=settings.API_V1_PREFIX)
 app.include_router(daily_outfit.router, prefix=settings.API_V1_PREFIX)
+app.include_router(video.router, prefix=settings.API_V1_PREFIX)
 
 # Admin routes (protected by admin role dependency inside the router)
 app.include_router(admin.router, prefix=settings.API_V1_PREFIX)

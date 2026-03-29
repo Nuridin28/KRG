@@ -53,7 +53,7 @@ class TryOnService:
         if self._use_vertex:
             logger.info(f"Vertex AI VTO enabled for project: {settings.VERTEX_AI_PROJECT}")
         else:
-            logger.info("Vertex AI VTO not configured, using mock mode")
+            logger.info("Vertex AI VTO not configured or no credentials, using mock mode")
 
     async def create_job(
         self,
