@@ -243,9 +243,11 @@ html {
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-background text-foreground font-sans antialiased;
+        @apply bg-background text-foreground font-sans antialiased overflow-x-hidden;
+        max-width: 100dvw;
     }
     html {
-        @apply font-sans scroll-smooth;
+        @apply font-sans scroll-smooth overflow-x-hidden;
+        max-width: 100dvw;
     }
 }

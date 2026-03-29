@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { ShoppingCart, Sparkles, Shirt, Loader2 } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { ShoppingCart, Sparkles, Shirt, Loader2, Check } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -33,9 +33,11 @@ export function ProductDetail({
   const addItem = useCart((s) => s.addItem)
   const [recommendations, setRecommendations] = useState<ProductBrief[]>([])
   const [loadingRecs, setLoadingRecs] = useState(false)
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
     if (product && open) {
+      setAdded(false)
       setLoadingRecs(true)
       api.outfits
         .recommend(product.id)
@@ -140,8 +142,9 @@ export function ProductDetail({
 
         <div className="space-y-2">
           <Button
-            variant="coral"
-            className="w-full"
+            variant={added ? "outline" : "coral"}
+            className={`w-full transition-all ${added ? "border-green-500 text-green-600" : ""}`}
+            disabled={added}
             onClick={() => {
               addItem({
                 id: product.id,
@@ -155,10 +158,21 @@ export function ProductDetail({
                 image_url: product.image_url,
                 in_stock: product.in_stock,
               })
+              setAdded(true)
+              setTimeout(() => onOpenChange(false), 800)
             }}
           >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            В корзину
+            {added ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Добавлено!
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                В корзину
+              </>
+            )}
           </Button>
           <div className="flex gap-3">
             <Button

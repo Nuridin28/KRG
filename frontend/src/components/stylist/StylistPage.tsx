@@ -1,20 +1,21 @@
 import { useState, useCallback } from "react"
 import { Sparkles } from "lucide-react"
 import { api } from "@/api/client"
-import type { Outfit, OutfitGenerateRequest, Product } from "@/api/types"
+import type { Outfit, OutfitGenerateRequest } from "@/api/types"
 import { OutfitForm } from "./OutfitForm"
 import { OutfitCard } from "./OutfitCard"
 import { OutfitComparison, FloatingCompareButton } from "./OutfitComparison"
 import { OutfitCardSkeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { useCart } from "@/store/cart"
+import { useNavigation } from "@/store/navigation"
 
 interface StylistPageProps {
-  anchorProduct?: Product | null
-  onTryOn: (productId: string) => void
+  onTryOnOutfit: (outfit: Outfit) => void
 }
 
-export function StylistPage({ anchorProduct, onTryOn }: StylistPageProps) {
+export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
+  const anchorProduct = useNavigation((s) => s.anchorProduct)
   const [outfits, setOutfits] = useState<Outfit[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -82,8 +83,8 @@ export function StylistPage({ anchorProduct, onTryOn }: StylistPageProps) {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-        <aside>
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[320px_1fr]">
+        <aside className="min-w-0">
           <OutfitForm
             loading={loading}
             onSubmit={handleGenerate}
@@ -91,7 +92,7 @@ export function StylistPage({ anchorProduct, onTryOn }: StylistPageProps) {
           />
         </aside>
 
-        <main className="space-y-4">
+        <main className="min-w-0 space-y-4">
           {loading && (
             <div className="space-y-4">
               <div className="space-y-3 rounded-xl border bg-card p-6 text-center shadow-sm">
@@ -128,7 +129,7 @@ export function StylistPage({ anchorProduct, onTryOn }: StylistPageProps) {
               <OutfitCard
                 key={outfit.id}
                 outfit={outfit}
-                onTryOn={onTryOn}
+                onTryOnOutfit={() => onTryOnOutfit(outfit)}
                 compareSelected={compareSet.has(outfit.id)}
                 onToggleCompare={toggleCompare}
               />
@@ -152,7 +153,7 @@ export function StylistPage({ anchorProduct, onTryOn }: StylistPageProps) {
             setCompareSet(new Set())
           }}
           onBuyAll={(items) => addOutfit(items)}
-          onTryOn={onTryOn}
+          onTryOnOutfit={onTryOnOutfit}
         />
       )}
     </div>

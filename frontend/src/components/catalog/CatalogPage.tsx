@@ -89,7 +89,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-6">
         <aside className="hidden lg:block">
           <ProductFilters filters={filters} onFilterChange={setFilters} brands={brands} />
         </aside>
@@ -128,7 +128,6 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
                     product={product}
                     onSelect={handleSelectProduct}
                     onTryOn={onTryOn}
-                    onBuildOutfit={onBuildOutfit}
                   />
                 ))}
               </div>

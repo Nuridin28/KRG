@@ -11,7 +11,7 @@ import type { Outfit } from "@/api/types"
 
 interface OutfitCardProps {
   outfit: Outfit
-  onTryOn: (productId: string) => void
+  onTryOnOutfit: () => void
   compareSelected?: boolean
   onToggleCompare?: (outfit: Outfit) => void
 }
@@ -28,12 +28,12 @@ function getScoreLabel(score: number): string {
   return "Низкая совместимость"
 }
 
-export function OutfitCard({ outfit, onTryOn, compareSelected, onToggleCompare }: OutfitCardProps) {
+export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCompare }: OutfitCardProps) {
   const addOutfit = useCart((s) => s.addOutfit)
   const [shareOpen, setShareOpen] = useState(false)
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="max-w-full overflow-hidden">
       <CardContent className="space-y-4 p-5">
         <div className="flex items-center justify-between">
           <div className="flex gap-1.5">
@@ -50,7 +50,7 @@ export function OutfitCard({ outfit, onTryOn, compareSelected, onToggleCompare }
           {outfit.items.map((item, idx) => (
             <div
               key={idx}
-              className="group/item relative flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg border p-3 transition-colors hover:bg-muted/50"
+              className="group/item relative flex min-w-25 flex-col items-center gap-1.5 rounded-lg border p-3 transition-colors hover:bg-muted/50"
             >
               <div className="h-14 w-14 overflow-hidden rounded-lg shadow-sm">
                 <img
@@ -71,14 +71,6 @@ export function OutfitCard({ outfit, onTryOn, compareSelected, onToggleCompare }
               <p className="text-[10px] text-muted-foreground">{item.product.brand}</p>
               <p className="text-[11px] font-semibold">{formatPrice(item.product.price)}</p>
               <span className="text-[9px] text-muted-foreground">{item.role}</span>
-
-              <button
-                onClick={() => onTryOn(item.product.id)}
-                className="absolute right-1 top-1 rounded-full bg-coral p-1 text-white opacity-0 transition-opacity group-hover/item:opacity-100"
-                title="Примерить"
-              >
-                <Shirt className="h-3 w-3" />
-              </button>
 
               {item.replaceable && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-muted px-1.5 text-[8px] text-muted-foreground opacity-0 transition-opacity group-hover/item:opacity-100">
@@ -105,43 +97,40 @@ export function OutfitCard({ outfit, onTryOn, compareSelected, onToggleCompare }
       </CardContent>
 
       <CardFooter className="flex-col gap-2 border-t p-4">
-        <div className="flex w-full gap-3">
-          <Button variant="coral" className="flex-1" onClick={() => addOutfit(outfit.items.map((i) => i.product))}>
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Купить всё
+        <div className="flex w-full gap-2">
+          <Button variant="coral" size="sm" className="min-w-0 flex-1 text-xs" onClick={() => addOutfit(outfit.items.map((i) => i.product))}>
+            <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
+            <span className="truncate">Купить всё</span>
           </Button>
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => {
-              if (outfit.items.length > 0) {
-                onTryOn(outfit.items[0].product.id)
-              }
-            }}
-          >
-            <Shirt className="mr-2 h-4 w-4" />
-            Примерить
-          </Button>
-        </div>
-        <div className="flex w-full gap-3">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs"
+            className="min-w-0 flex-1 text-xs"
+            onClick={onTryOnOutfit}
+          >
+            <Shirt className="mr-1.5 h-3.5 w-3.5" />
+            <span className="truncate">Примерить ({outfit.items.length})</span>
+          </Button>
+        </div>
+        <div className="flex w-full gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-w-0 flex-1 text-xs"
             onClick={() => setShareOpen(true)}
           >
             <Share2 className="mr-1.5 h-3.5 w-3.5" />
-            Поделиться
+            <span className="truncate">Поделиться</span>
           </Button>
           {onToggleCompare && (
             <Button
               variant={compareSelected ? "coral" : "outline"}
               size="sm"
-              className="flex-1 text-xs"
+              className="min-w-0 flex-1 text-xs"
               onClick={() => onToggleCompare(outfit)}
             >
               <GitCompareArrows className="mr-1.5 h-3.5 w-3.5" />
-              {compareSelected ? "В сравнении" : "Сравнить"}
+              <span className="truncate">{compareSelected ? "В сравнении" : "Сравнить"}</span>
             </Button>
           )}
         </div>

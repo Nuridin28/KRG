@@ -73,7 +73,7 @@ export function ChatPage() {
       </div>
 
       <div className="flex flex-col rounded-xl border bg-card shadow-sm">
-        <ScrollArea className="h-[500px]">
+        <ScrollArea className="h-125">
           <div className="space-y-4 p-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in-up">

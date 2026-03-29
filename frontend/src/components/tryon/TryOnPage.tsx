@@ -9,19 +9,15 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
 import { ImageUpload } from "./ImageUpload"
 import { TryOnResult } from "./TryOnResult"
+import { useNavigation } from "@/store/navigation"
 
 const MAX_ITEMS = 5
 
-interface TryOnPageProps {
-  selectedProduct?: Product | null
-}
-
-export function TryOnPage({ selectedProduct }: TryOnPageProps) {
+export function TryOnPage() {
+  const tryOnProducts = useNavigation((s) => s.tryOnProducts)
   const [personImage, setPersonImage] = useState<File | null>(null)
   const [personPreview, setPersonPreview] = useState<string | null>(null)
-  const [chosenProducts, setChosenProducts] = useState<Product[]>(
-    selectedProduct ? [selectedProduct] : []
-  )
+  const [chosenProducts, setChosenProducts] = useState<Product[]>(tryOnProducts)
   const [job, setJob] = useState<TryOnJob | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,13 +29,10 @@ export function TryOnPage({ selectedProduct }: TryOnPageProps) {
   const [loadingProducts, setLoadingProducts] = useState(false)
 
   useEffect(() => {
-    if (selectedProduct) {
-      setChosenProducts((prev) => {
-        if (prev.some((p) => p.id === selectedProduct.id)) return prev
-        return [...prev, selectedProduct].slice(0, MAX_ITEMS)
-      })
+    if (tryOnProducts.length > 0) {
+      setChosenProducts(tryOnProducts.slice(0, MAX_ITEMS))
     }
-  }, [selectedProduct])
+  }, [tryOnProducts])
 
   // Load products for selection
   useEffect(() => {
@@ -148,7 +141,7 @@ export function TryOnPage({ selectedProduct }: TryOnPageProps) {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
         <div className="space-y-5">
           {/* Photo upload */}
           <div className="rounded-lg border bg-card p-5">

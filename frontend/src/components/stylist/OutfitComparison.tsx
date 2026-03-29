@@ -18,7 +18,7 @@ interface OutfitComparisonProps {
   outfits: Outfit[]
   onClose: () => void
   onBuyAll: (items: ProductBrief[]) => void
-  onTryOn: (productId: string) => void
+  onTryOnOutfit: (outfit: Outfit) => void
 }
 
 function getScoreColor(score: number): string {
@@ -37,7 +37,7 @@ export function OutfitComparison({
   outfits: initialOutfits,
   onClose,
   onBuyAll,
-  onTryOn,
+  onTryOnOutfit,
 }: OutfitComparisonProps) {
   const [outfits, setOutfits] = useState<Outfit[]>(initialOutfits)
 
@@ -78,7 +78,7 @@ export function OutfitComparison({
   if (outfits.length < 2) return null
 
   return (
-    <div className="fade-in-up fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm">
       {/* Header */}
       <div className="flex items-center justify-between border-b px-6 py-4">
         <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export function OutfitComparison({
             return (
               <div
                 key={outfit.id}
-                className="fade-in-up relative flex flex-col rounded-xl border bg-card shadow-sm"
+                className="animate-fade-in-up relative flex flex-col rounded-xl border bg-card shadow-sm"
                 style={{ animationDelay: `${colIdx * 80}ms` }}
               >
                 {/* Winner badges */}
@@ -208,13 +208,11 @@ export function OutfitComparison({
                             )}
                           </div>
                         </div>
-                        <button
-                          onClick={() => onTryOn(item.product.id)}
-                          className="shrink-0 rounded-full bg-coral p-1.5 text-white opacity-0 transition-opacity group-hover/item:opacity-100"
-                          title="Примерить"
-                        >
-                          <Shirt className="h-3.5 w-3.5" />
-                        </button>
+                        <div
+                          className="h-5 w-5 shrink-0 rounded-full"
+                          style={{ backgroundColor: item.product.color_hex || "#ccc" }}
+                          title={item.product.color_name}
+                        />
                       </div>
                     ))}
                   </div>
@@ -252,8 +250,8 @@ export function OutfitComparison({
                   </div>
                 </div>
 
-                {/* Buy all button */}
-                <div className="border-t p-4">
+                {/* Action buttons */}
+                <div className="space-y-2 border-t p-4">
                   <Button
                     variant="coral"
                     className="w-full"
@@ -264,6 +262,14 @@ export function OutfitComparison({
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Купить всё
                   </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => onTryOnOutfit(outfit)}
+                  >
+                    <Shirt className="mr-2 h-4 w-4" />
+                    Примерить ({outfit.items.length})
+                  </Button>
                 </div>
               </div>
             )
@@ -272,7 +278,7 @@ export function OutfitComparison({
 
         {/* Comparison summary row */}
         {summary && (
-          <div className="fade-in-up mx-auto mt-8 max-w-[1100px] rounded-xl border bg-muted/30 p-5">
+          <div className="animate-fade-in-up mx-auto mt-8 max-w-275 rounded-xl border bg-muted/30 p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
               <Star className="h-4 w-4 text-coral" />
               Сводка сравнения
@@ -355,7 +361,7 @@ export function FloatingCompareButton({
   if (selectedCount < 2) return null
 
   return (
-    <div className="fade-in-up fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
+    <div className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
       <Button
         variant="coral"
         size="lg"
