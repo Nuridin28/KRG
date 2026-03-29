@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { ShoppingCart, Sparkles, Shirt, Loader2, Check } from "lucide-react"
 import {
   Dialog,

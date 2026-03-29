@@ -32,7 +32,7 @@ function tempColor(t: number): string {
   return "text-red-500"
 }
 
-function weatherTip(summary: string, temp: number | null | undefined): string {
+function weatherTip(_summary: string, temp: number | null | undefined): string {
   if (temp == null) return ""
   if (temp <= 0) return "Морозно — рекомендуем тёплую верхнюю одежду и многослойность"
   if (temp <= 10) return "Прохладно — лёгкая куртка или свитер будут кстати"
@@ -97,13 +97,7 @@ export function DailyOutfitPage() {
   const handleBuyAll = useCallback(() => {
     if (!data) return
     for (const item of data.outfit.items) {
-      addToCart({
-        id: item.product.id,
-        name: item.product.name,
-        price: item.product.promo_price || item.product.price,
-        image_url: item.product.image_url,
-        color_hex: item.product.color_hex,
-      })
+      addToCart(item.product)
     }
     toast({ title: "Все товары добавлены в корзину" })
   }, [data, addToCart, toast])

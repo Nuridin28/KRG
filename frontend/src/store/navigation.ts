@@ -66,6 +66,13 @@ export const useNavigation = create<NavigationStore>()((set, get) => ({
         }
       } catch {
         get().stopPolling()
+        set({
+          tryOnJob: {
+            ...(get().tryOnJob || { job_id: jobId, progress: 0, total_items: 0, completed_items: 0, created_at: "" }),
+            status: "failed" as const,
+            failure_reason: "Сессия примерки потеряна. Попробуйте снова.",
+          },
+        })
       }
     }, 2000)
   },

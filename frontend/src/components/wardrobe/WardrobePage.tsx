@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { Shirt, Trash2, Sparkles, Loader2, Upload, Camera, TrendingUp } from "lucide-react"
+import { Shirt, Trash2, Sparkles, Loader2, Upload, Camera } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"

@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import { Shirt, X, Search, ShoppingCart, Sparkles, GripVertical, Trash2, Save } from "lucide-react"
+import { Shirt, X, Search, ShoppingCart, Sparkles, GripVertical, Trash2, Save, Check } from "lucide-react"
 import { api } from "@/api/client"
 import { useAuth } from "@/store/auth"
 import { useCart } from "@/store/cart"
 import { useNavigation } from "@/store/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { formatPrice } from "@/lib/utils"
 import type { Product, ProductBrief } from "@/api/types"
@@ -33,7 +33,7 @@ export function OutfitBuilderPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [filterCat, setFilterCat] = useState("")
-  const [loading, setLoading] = useState(true)
+  const [_loading, setLoading] = useState(true)
   const [draggedProduct, setDraggedProduct] = useState<Product | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)

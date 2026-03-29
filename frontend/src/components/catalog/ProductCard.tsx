@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 import { Shirt, Check, Heart, Zap, Plus, Loader2 } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -18,10 +19,10 @@ interface ProductCardProps {
   onTryOn: (product: Product) => void
   tryOnSelected?: boolean
   onToggleTryOn?: (product: Product) => void
-  onQuickTryOn?: (jobId: string) => void
 }
 
-export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggleTryOn, onQuickTryOn }: ProductCardProps) {
+export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggleTryOn }: ProductCardProps) {
+  const navigate = useNavigate()
   const wishlist = useWishlist()
   const isWished = wishlist.has(product.id)
   const hasPhotos = useProfile((s) => s.hasPhotos)
@@ -37,14 +38,14 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
     setQuickLoading(true)
     try {
       const job = await api.profile.quickTryOn(product.id)
-      onQuickTryOn?.(job.job_id)
       toast({ title: "Примерка запущена", description: product.name })
+      navigate(`/tryon?job=${job.job_id}`)
     } catch (err: any) {
       toast({ title: "Ошибка", description: err.message })
     } finally {
       setQuickLoading(false)
     }
-  }, [product, onQuickTryOn, toast])
+  }, [product, navigate, toast])
 
   const handleAddToWardrobe = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()

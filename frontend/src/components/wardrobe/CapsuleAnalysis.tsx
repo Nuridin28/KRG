@@ -1,4 +1,4 @@
-import { Sparkles, ShoppingBag, AlertTriangle, TrendingUp, Lightbulb, ArrowRight, Plus, Zap } from "lucide-react"
+import { Sparkles, ShoppingBag, AlertTriangle, Lightbulb, ArrowRight, Zap } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -20,14 +20,8 @@ export function CapsuleAnalysis({ analysis }: Props) {
   const addToCart = useCart((s) => s.addItem)
   const { toast } = useToast()
 
-  const handleAddToCart = (product: any) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.promo_price || product.price,
-      image_url: product.image_url,
-      color_hex: product.color_hex,
-    })
+  const handleAddToCart = (product: CapsuleAnalysisType["gap_recommendations"][0]) => {
+    addToCart(product)
     toast({ title: "Добавлено в корзину", description: product.name })
   }
 

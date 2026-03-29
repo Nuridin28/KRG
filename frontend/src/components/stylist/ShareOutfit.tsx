@@ -235,7 +235,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
 
   const showToast = useCallback((message: string) => {
     setToast(message)
-    clearTimeout(toastTimer.current)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setToast(null), 2500)
   }, [])
 

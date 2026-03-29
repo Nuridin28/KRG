@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import json
 import logging
 import uuid
 from datetime import datetime, timezone
@@ -23,8 +24,13 @@ VERTEX_VTO_URL = (
     f"publishers/google/models/virtual-try-on-001:predict"
 )
 
-IMAGE_DIR = Path(settings.IMAGE_STORAGE_PATH)
+IMAGE_DIR = Path(settings.IMAGE_STORAGE_PATH).resolve()
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+# Store jobs file outside the watched directory to prevent uvicorn --reload loops
+_JOBS_DIR = Path("/tmp/krg_tryon")
+_JOBS_DIR.mkdir(parents=True, exist_ok=True)
+JOBS_FILE = _JOBS_DIR / "_jobs.json"
 
 
 def _get_gcp_access_token() -> Optional[str]:
@@ -50,10 +56,37 @@ class TryOnService:
         self._rate_limit = 20
         self._use_vertex = bool(settings.VERTEX_AI_PROJECT)
 
+        self._load_jobs()
+
         if self._use_vertex:
             logger.info(f"Vertex AI VTO enabled for project: {settings.VERTEX_AI_PROJECT}")
         else:
             logger.info("Vertex AI VTO not configured or no credentials, using mock mode")
+
+    def _save_jobs(self) -> None:
+        """Persist all jobs to disk so they survive restarts."""
+        try:
+            data = {jid: job.model_dump(mode="json") for jid, job in self._jobs.items()}
+            JOBS_FILE.write_text(json.dumps(data, default=str))
+        except Exception as e:
+            logger.warning(f"Failed to save jobs: {e}")
+
+    def _load_jobs(self) -> None:
+        """Load persisted jobs from disk on startup. Mark incomplete jobs as failed."""
+        if not JOBS_FILE.exists():
+            return
+        try:
+            data = json.loads(JOBS_FILE.read_text())
+            for jid, raw in data.items():
+                job = TryOnJobResponse(**raw)
+                if job.status in (TryOnJobStatus.QUEUED, TryOnJobStatus.PROCESSING):
+                    job.status = TryOnJobStatus.FAILED
+                    job.failure_reason = "Сервер был перезапущен. Попробуйте снова."
+                    job.completed_at = datetime.now(timezone.utc)
+                self._jobs[jid] = job
+            logger.info(f"Loaded {len(data)} persisted try-on jobs")
+        except Exception as e:
+            logger.warning(f"Failed to load jobs: {e}")
 
     async def create_job(
         self,
@@ -83,6 +116,7 @@ class TryOnService:
         )
         self._jobs[job_id] = job
         self._user_counts[user_id] = count + 1
+        self._save_jobs()
 
         if self._use_vertex:
             asyncio.create_task(
@@ -186,12 +220,14 @@ class TryOnService:
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Try-on job {job_id} completed via Vertex AI VTO")
+            self._save_jobs()
 
         except Exception as e:
             logger.error(f"Vertex AI VTO failed for job {job_id}: {e}")
             job.status = TryOnJobStatus.FAILED
             job.failure_reason = str(e)
             job.completed_at = datetime.now(timezone.utc)
+            self._save_jobs()
 
     # ------------------------------------------------------------------
     # Mock fallback (dev mode)
@@ -214,6 +250,7 @@ class TryOnService:
         job.progress = 100
         job.output_image_url = product_image_url
         job.completed_at = datetime.now(timezone.utc)
+        self._save_jobs()
 
     # ------------------------------------------------------------------
     # Chained outfit try-on
@@ -249,6 +286,7 @@ class TryOnService:
         )
         self._jobs[job_id] = job
         self._user_counts[user_id] = count + 1
+        self._save_jobs()
 
         if self._use_vertex:
             asyncio.create_task(
@@ -370,12 +408,14 @@ class TryOnService:
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Outfit try-on job {job_id} completed via Vertex AI VTO ({total} items)")
+            self._save_jobs()
 
         except Exception as e:
             logger.error(f"Outfit try-on failed for job {job_id}: {e}")
             job.status = TryOnJobStatus.FAILED
             job.failure_reason = str(e)
             job.completed_at = datetime.now(timezone.utc)
+            self._save_jobs()
 
     async def _simulate_outfit_chain(
         self,
@@ -413,6 +453,20 @@ class TryOnService:
         job.status = TryOnJobStatus.COMPLETED
         job.output_image_url = last_image_url
         job.completed_at = datetime.now(timezone.utc)
+        self._save_jobs()
 
     async def get_job(self, job_id: str) -> Optional[TryOnJobResponse]:
-        return self._jobs.get(job_id)
+        job = self._jobs.get(job_id)
+        if job:
+            return job
+        # Fallback: check persisted file (job may have been saved by a previous process)
+        if JOBS_FILE.exists():
+            try:
+                data = json.loads(JOBS_FILE.read_text())
+                if job_id in data:
+                    job = TryOnJobResponse(**data[job_id])
+                    self._jobs[job_id] = job
+                    return job
+            except Exception:
+                pass
+        return None
