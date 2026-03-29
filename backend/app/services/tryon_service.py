@@ -457,16 +457,23 @@ class TryOnService:
 
     async def get_job(self, job_id: str) -> Optional[TryOnJobResponse]:
         job = self._jobs.get(job_id)
-        if job:
-            return job
         # Fallback: check persisted file (job may have been saved by a previous process)
-        if JOBS_FILE.exists():
+        if not job and JOBS_FILE.exists():
             try:
                 data = json.loads(JOBS_FILE.read_text())
                 if job_id in data:
                     job = TryOnJobResponse(**data[job_id])
                     self._jobs[job_id] = job
-                    return job
             except Exception:
                 pass
-        return None
+        if not job:
+            return None
+        # Mark stale queued/processing jobs as failed (orphaned after server restart)
+        if job.status in (TryOnJobStatus.QUEUED, TryOnJobStatus.PROCESSING):
+            age = (datetime.now(timezone.utc) - job.created_at).total_seconds()
+            if age > 60:  # 1 minute — likely orphaned after restart
+                job.status = TryOnJobStatus.FAILED
+                job.failure_reason = "Сервер был перезапущен. Попробуйте снова."
+                job.completed_at = datetime.now(timezone.utc)
+                self._save_jobs()
+        return job
