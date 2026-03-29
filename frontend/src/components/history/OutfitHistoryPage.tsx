@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { History, Trash2, Share2, ShoppingCart, Copy, Check } from "lucide-react"
+import { History, Trash2, Share2, ShoppingCart, Check } from "lucide-react"
 import { api } from "@/api/client"
 import { useCart } from "@/store/cart"
 import { useAuth } from "@/store/auth"
@@ -101,7 +101,7 @@ export function OutfitHistoryPage() {
 
               <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
                 {outfit.items.map((item: any, idx: number) => (
-                  <div key={idx} className="flex min-w-[90px] flex-col items-center gap-1 rounded-lg border p-2">
+                  <div key={idx} className="flex min-w-22.5 flex-col items-center gap-1 rounded-lg border p-2">
                     <div className="h-14 w-14 overflow-hidden rounded-lg">
                       <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" loading="lazy"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />

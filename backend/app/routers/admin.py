@@ -6,7 +6,9 @@ import uuid
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -287,6 +289,35 @@ async def list_users(
     result = await db.execute(select(User))
     users = result.scalars().all()
     return [UserResponse.model_validate(u) for u in users]
+
+
+# ---------------------------------------------------------------------------
+# Image upload for products
+# ---------------------------------------------------------------------------
+
+@router.post("/upload-image")
+async def upload_product_image(
+    image: UploadFile = File(...),
+    _: User = Depends(get_admin_user),
+):
+    """Upload a product image and return its URL."""
+    from app.core.config import settings
+
+    content = await image.read()
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(400, "Файл слишком большой (макс. 10 МБ)")
+
+    img_dir = Path(settings.IMAGE_STORAGE_PATH) / "products"
+    img_dir.mkdir(parents=True, exist_ok=True)
+
+    ext = (image.filename or "img.jpg").rsplit(".", 1)[-1].lower()
+    if ext not in ("jpg", "jpeg", "png", "webp"):
+        ext = "jpg"
+    filename = f"{uuid.uuid4().hex[:12]}.{ext}"
+    filepath = img_dir / filename
+    filepath.write_bytes(content)
+
+    return {"image_url": f"/storage/images/products/{filename}"}
 
 
 # ---------------------------------------------------------------------------

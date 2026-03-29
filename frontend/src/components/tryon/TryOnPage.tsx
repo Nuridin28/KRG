@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useSearchParams } from "react-router-dom"
-import { Loader2, Shirt, Search, X, Check } from "lucide-react"
+import { Loader2, Shirt, Search, X, Check, User, Upload, Star } from "lucide-react"
 import { api } from "@/api/client"
-import type { Product, CategoryType } from "@/api/types"
+import type { Product, CategoryType, UserPhoto } from "@/api/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,8 @@ import { Progress } from "@/components/ui/progress"
 import { ImageUpload } from "./ImageUpload"
 import { TryOnResult } from "./TryOnResult"
 import { useNavigation } from "@/store/navigation"
+import { useAuth } from "@/store/auth"
+import { useProfile } from "@/store/profile"
 
 const MAX_ITEMS = 5
 
@@ -25,6 +27,8 @@ const CATEGORY_LABELS: Record<CategoryType, string> = {
 
 const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories"]
 
+const API_HOST = import.meta.env.VITE_API_BASE?.replace("/api/v1", "") || "http://localhost:8000"
+
 export function TryOnPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tryOnProducts = useNavigation((s) => s.tryOnProducts)
@@ -32,7 +36,12 @@ export function TryOnPage() {
   const personPreview = useNavigation((s) => s.tryOnPersonPreview)
   const { setTryOnJob, setTryOnPersonPreview, startPolling } = useNavigation()
 
+  const isLoggedIn = useAuth((s) => s.isLoggedIn)
+  const { photos, setPhotos } = useProfile()
+
   const [personImage, setPersonImage] = useState<File | null>(null)
+  const [selectedSavedPhoto, setSelectedSavedPhoto] = useState<UserPhoto | null>(null)
+  const [photoMode, setPhotoMode] = useState<"saved" | "upload">("upload")
   const [chosenProducts, setChosenProducts] = useState<Product[]>(tryOnProducts)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -41,6 +50,21 @@ export function TryOnPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(false)
+
+  // Load saved photos
+  useEffect(() => {
+    if (isLoggedIn()) {
+      api.profile.getPhotos().then((p) => {
+        setPhotos(p)
+        if (p.length > 0) {
+          setPhotoMode("saved")
+          const def = p.find((ph) => ph.is_default) || p[0]
+          setSelectedSavedPhoto(def)
+          setTryOnPersonPreview(`${API_HOST}${def.image_url}`)
+        }
+      }).catch(() => {})
+    }
+  }, [isLoggedIn, setPhotos, setTryOnPersonPreview])
 
   // Restore job from URL on page refresh
   useEffect(() => {
@@ -75,8 +99,17 @@ export function TryOnPage() {
 
   const handleImageSelected = (file: File) => {
     setPersonImage(file)
+    setSelectedSavedPhoto(null)
+    setPhotoMode("upload")
     setTryOnPersonPreview(URL.createObjectURL(file))
   }
+
+  const handleSelectSavedPhoto = useCallback((photo: UserPhoto) => {
+    setSelectedSavedPhoto(photo)
+    setPersonImage(null)
+    setPhotoMode("saved")
+    setTryOnPersonPreview(`${API_HOST}${photo.image_url}`)
+  }, [setTryOnPersonPreview])
 
   const handleToggleProduct = (product: Product) => {
     setChosenProducts((prev) => {
@@ -91,21 +124,44 @@ export function TryOnPage() {
     setChosenProducts((prev) => prev.filter((p) => p.id !== productId))
   }
 
+  const hasPhoto = photoMode === "saved" ? !!selectedSavedPhoto : !!personImage
+
   const handleSubmit = async () => {
-    if (!personImage || chosenProducts.length === 0) return
+    if (chosenProducts.length === 0) return
     setSubmitting(true)
     setError(null)
     setTryOnJob(null)
 
     try {
       const productIds = chosenProducts.map((p) => p.id)
-      const newJob =
-        productIds.length === 1
-          ? await api.tryon.createJob(personImage, productIds[0])
-          : await api.tryon.createOutfitJob(personImage, productIds)
-      setTryOnJob(newJob)
-      setSearchParams({ job: newJob.job_id })
-      startPolling(newJob.job_id)
+
+      // Use saved photo (quick try-on) or uploaded file
+      if (photoMode === "saved" && selectedSavedPhoto) {
+        // Quick try-on via saved photo — only supports single product for now
+        if (productIds.length === 1) {
+          const newJob = await api.profile.quickTryOn(productIds[0], selectedSavedPhoto.id)
+          setTryOnJob(newJob)
+          setSearchParams({ job: newJob.job_id })
+          startPolling(newJob.job_id)
+        } else {
+          // For multiple products, download saved photo and use regular endpoint
+          const resp = await fetch(`${API_HOST}${selectedSavedPhoto.image_url}`)
+          const blob = await resp.blob()
+          const file = new File([blob], "saved-photo.jpg", { type: blob.type })
+          const newJob = await api.tryon.createOutfitJob(file, productIds)
+          setTryOnJob(newJob)
+          setSearchParams({ job: newJob.job_id })
+          startPolling(newJob.job_id)
+        }
+      } else if (personImage) {
+        const newJob =
+          productIds.length === 1
+            ? await api.tryon.createJob(personImage, productIds[0])
+            : await api.tryon.createOutfitJob(personImage, productIds)
+        setTryOnJob(newJob)
+        setSearchParams({ job: newJob.job_id })
+        startPolling(newJob.job_id)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка запуска примерки")
     } finally {
@@ -150,10 +206,75 @@ export function TryOnPage() {
 
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
         <div className="space-y-5">
-          {/* Photo upload */}
+          {/* Photo selection — saved or upload */}
           <div className="rounded-lg border bg-card p-5">
-            <Label className="mb-3 block text-sm font-semibold">1. Загрузите фото</Label>
-            <ImageUpload onImageSelected={handleImageSelected} selectedImage={personImage} />
+            <Label className="mb-3 block text-sm font-semibold">1. Выберите фото</Label>
+
+            {/* Mode tabs — only show if user has saved photos */}
+            {isLoggedIn() && photos.length > 0 && (
+              <div className="mb-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhotoMode("saved")
+                    const def = photos.find((p) => p.is_default) || photos[0]
+                    if (def) handleSelectSavedPhoto(def)
+                  }}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    photoMode === "saved" ? "bg-foreground text-background" : "bg-accent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <User className="h-3.5 w-3.5" />
+                  Моё фото
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhotoMode("upload")}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    photoMode === "upload" ? "bg-foreground text-background" : "bg-accent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  Загрузить новое
+                </button>
+              </div>
+            )}
+
+            {/* Saved photos grid */}
+            {photoMode === "saved" && photos.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {photos.map((photo) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    onClick={() => handleSelectSavedPhoto(photo)}
+                    className={`relative aspect-3/4 overflow-hidden rounded-lg border-2 transition-all ${
+                      selectedSavedPhoto?.id === photo.id
+                        ? "border-foreground ring-1 ring-foreground/20"
+                        : "border-transparent hover:border-foreground/30"
+                    }`}
+                  >
+                    <img
+                      src={`${API_HOST}${photo.image_url}`}
+                      alt="Сохранённое фото"
+                      className="h-full w-full object-cover"
+                    />
+                    {selectedSavedPhoto?.id === photo.id && (
+                      <div className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background">
+                        <Check className="h-3 w-3" />
+                      </div>
+                    )}
+                    {photo.is_default && (
+                      <div className="absolute left-1.5 top-1.5">
+                        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400 drop-shadow" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <ImageUpload onImageSelected={handleImageSelected} selectedImage={personImage} />
+            )}
           </div>
 
           {/* Product selection */}
@@ -175,7 +296,7 @@ export function TryOnPage() {
                   >
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
                       <img
-                        src={product.image_url}
+                        src={product.image_url || undefined}
                         alt={product.name}
                         className="h-full w-full object-cover"
                       />
@@ -240,7 +361,7 @@ export function TryOnPage() {
                               )}
                               <div className="aspect-square w-full overflow-hidden rounded-md bg-muted/50">
                                 <img
-                                  src={product.image_url}
+                                  src={product.image_url || undefined}
                                   alt={product.name}
                                   className="h-full w-full object-cover"
                                   loading="lazy"
@@ -264,7 +385,7 @@ export function TryOnPage() {
           <Button
             variant="coral"
             className="w-full"
-            disabled={!personImage || chosenProducts.length === 0 || submitting}
+            disabled={!hasPhoto || chosenProducts.length === 0 || submitting}
             onClick={handleSubmit}
           >
             {submitting ? (

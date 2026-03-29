@@ -116,7 +116,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
                     {/* Product image */}
                     <div className="w-24 shrink-0 bg-muted/30 sm:w-32">
                       <img
-                        src={product.image_url}
+                        src={product.image_url || undefined}
                         alt={product.name}
                         className="h-full w-full object-cover"
                         onError={(e) => {

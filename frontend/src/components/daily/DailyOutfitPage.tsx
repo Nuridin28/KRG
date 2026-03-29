@@ -279,7 +279,7 @@ export function DailyOutfitPage() {
               <Card key={item.product.id} className="overflow-hidden">
                 <div className="aspect-square bg-muted/50">
                   <img
-                    src={item.product.image_url}
+                    src={item.product.image_url || undefined}
                     alt={item.product.name}
                     className="h-full w-full object-cover"
                     onError={(e) => {

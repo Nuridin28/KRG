@@ -60,7 +60,7 @@ export function ProductDetail({
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="aspect-square overflow-hidden rounded-lg bg-muted/50">
             <img
-              src={product.image_url}
+              src={product.image_url || undefined}
               alt={product.name}
               className="h-full w-full object-cover"
               onError={(e) => {
@@ -214,7 +214,7 @@ export function ProductDetail({
                 <div key={rec.id} className="space-y-1 text-center">
                   <div className="aspect-square overflow-hidden rounded-md bg-muted/50">
                     <img
-                      src={rec.image_url}
+                      src={rec.image_url || undefined}
                       alt={rec.name}
                       className="h-full w-full object-cover"
                       loading="lazy"

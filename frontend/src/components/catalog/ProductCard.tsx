@@ -68,7 +68,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
       <div className="relative shrink-0" onClick={() => onSelect(product)}>
         <div className="aspect-square overflow-hidden bg-muted/50">
           <img
-            src={product.image_url}
+            src={product.image_url || undefined}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"

@@ -70,7 +70,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 <div key={item.product.id} className="flex gap-3">
                   <div className="h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                     <img
-                      src={item.product.image_url}
+                      src={item.product.image_url || undefined}
                       alt={item.product.name}
                       className="h-full w-full object-cover"
                     />

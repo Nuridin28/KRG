@@ -57,7 +57,7 @@ function MiniProductCard({
     <div className="flex items-center gap-3 rounded-lg border bg-background p-2.5">
       <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
         <img
-          src={product.image_url}
+          src={product.image_url || undefined}
           alt={product.name}
           className="h-full w-full object-cover"
           loading="lazy"
@@ -133,7 +133,7 @@ function MiniOutfitCard({
           <div key={i} className="flex flex-col items-center">
             <div className="h-10 w-10 overflow-hidden rounded-lg">
               <img
-                src={item.product.image_url}
+                src={item.product.image_url || undefined}
                 alt={item.product.name}
                 className="h-full w-full object-cover"
                 loading="lazy"

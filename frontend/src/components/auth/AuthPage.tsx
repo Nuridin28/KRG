@@ -116,7 +116,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-foreground py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="w-full rounded-lg bg-foreground py-2.5 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {loading ? "Загрузка..." : isLogin ? "Войти" : "Зарегистрироваться"}
             </button>

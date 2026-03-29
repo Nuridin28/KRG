@@ -333,7 +333,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
                 style={{ animationDelay: `${idx * 60}ms` }}
               >
                 <img
-                  src={item.product.image_url}
+                  src={item.product.image_url || undefined}
                   alt={item.product.name}
                   className="h-full w-full object-cover"
                   loading="lazy"

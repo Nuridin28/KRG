@@ -157,7 +157,7 @@ export function OutfitBuilderPage() {
                   className="group cursor-grab rounded-lg border bg-card p-2 transition-all hover:shadow-md active:cursor-grabbing"
                 >
                   <div className="relative aspect-square overflow-hidden rounded-md bg-muted/50">
-                    <img src={product.image_url} alt={product.name}
+                    <img src={product.image_url || undefined} alt={product.name}
                       className="h-full w-full object-cover" loading="lazy"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/20 group-hover:opacity-100">
@@ -206,7 +206,7 @@ export function OutfitBuilderPage() {
                     {product ? (
                       <>
                         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
-                          <img src={product.image_url} alt={product.name}
+                          <img src={product.image_url || undefined} alt={product.name}
                             className="h-full w-full object-cover"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
                         </div>

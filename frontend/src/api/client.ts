@@ -248,6 +248,11 @@ export const api = {
       }),
     deleteProduct: (id: string) =>
       request<{ deleted: string }>(`/admin/products/${id}`, { method: "DELETE" }),
+    uploadImage: (file: File) => {
+      const formData = new FormData()
+      formData.append("image", file)
+      return request<{ image_url: string }>("/admin/upload-image", { method: "POST", body: formData })
+    },
     getUsers: () => request<AuthUser[]>("/admin/users"),
     getFeatureFlags: () => request<Record<string, boolean>>("/admin/feature-flags"),
     updateFeatureFlags: (flags: Record<string, boolean>) =>

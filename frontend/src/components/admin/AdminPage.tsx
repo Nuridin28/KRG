@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { api } from "@/api/client"
+import { formatPrice } from "@/lib/utils"
 import type { AdminStats, Product } from "@/api/types"
 import type { AuthUser } from "@/store/auth"
 import {
@@ -125,7 +126,7 @@ function ProductsPanel() {
         <p className="text-sm text-muted-foreground">{products.length} товаров</p>
         <button
           onClick={() => { setShowForm(true); setEditId(null) }}
-          className="flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90"
         >
           <Plus className="h-4 w-4" /> Добавить товар
         </button>
@@ -160,7 +161,7 @@ function ProductsPanel() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={p.image_url}
+                        src={p.image_url || undefined}
                         alt={p.name}
                         className="h-10 w-10 rounded-lg object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).src = "https://placehold.co/40x40?text=?" }}
@@ -173,7 +174,7 @@ function ProductsPanel() {
                   </td>
                   <td className="px-4 py-3 capitalize">{p.category}</td>
                   <td className="px-4 py-3">{p.brand}</td>
-                  <td className="px-4 py-3">${p.price}</td>
+                  <td className="px-4 py-3">{formatPrice(p.price, p.currency)}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                       p.in_stock ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
@@ -245,6 +246,26 @@ function ProductForm({
   })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [imageMode, setImageMode] = useState<"url" | "upload">(editProduct?.image_url ? "url" : "upload")
+  const [uploading, setUploading] = useState(false)
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null)
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    setUploadPreview(URL.createObjectURL(file))
+    try {
+      const result = await api.admin.uploadImage(file)
+      set("image_url", result.image_url)
+    } catch (err: any) {
+      setError("Ошибка загрузки изображения: " + err.message)
+      setUploadPreview(null)
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -273,6 +294,8 @@ function ProductForm({
   }
 
   const set = (key: string, value: any) => setForm((prev) => ({ ...prev, [key]: value }))
+
+  const imagePreviewSrc = uploadPreview || form.image_url || null
 
   return (
     <div className="mb-6 rounded-xl border bg-card p-6">
@@ -323,7 +346,80 @@ function ProductForm({
           </div>
         </div>
 
-        <Input label="URL изображения" value={form.image_url} onChange={(v) => set("image_url", v)} />
+        {/* Image — URL or Upload */}
+        <div className="col-span-full sm:col-span-2 lg:col-span-3">
+          <label className="mb-1 block text-xs font-medium">Изображение</label>
+          <div className="mb-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setImageMode("url")}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                imageMode === "url" ? "bg-foreground text-background" : "bg-accent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              По ссылке
+            </button>
+            <button
+              type="button"
+              onClick={() => setImageMode("upload")}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                imageMode === "upload" ? "bg-foreground text-background" : "bg-accent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Загрузить файл
+            </button>
+          </div>
+
+          {imageMode === "url" ? (
+            <input
+              type="text"
+              value={form.image_url}
+              onChange={(e) => { set("image_url", e.target.value); setUploadPreview(null) }}
+              placeholder="https://example.com/image.jpg"
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+            />
+          ) : (
+            <div className="flex items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-sm transition-colors hover:bg-accent">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+                {uploading ? (
+                  <>
+                    <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+                    Загрузка...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    {form.image_url && imageMode === "upload" ? "Заменить" : "Выбрать файл"}
+                  </>
+                )}
+              </label>
+              {form.image_url && imageMode === "upload" && (
+                <span className="text-xs text-emerald-600">Загружено</span>
+              )}
+            </div>
+          )}
+
+          {/* Preview */}
+          {imagePreviewSrc && (
+            <div className="mt-2 flex items-center gap-3">
+              <img
+                src={imagePreviewSrc.startsWith("/") ? `http://localhost:8000${imagePreviewSrc}` : imagePreviewSrc}
+                alt="Preview"
+                className="h-16 w-16 rounded-lg border object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
+              />
+              <span className="max-w-xs truncate text-xs text-muted-foreground">{form.image_url}</span>
+            </div>
+          )}
+        </div>
+
         <Input label="Материал" value={form.material} onChange={(v) => set("material", v)} />
         <Input label="Размеры (через запятую)" value={form.sizes} onChange={(v) => set("sizes", v)} />
         <Input label="Стиль-теги (через запятую)" value={form.style_tags} onChange={(v) => set("style_tags", v)} />
@@ -331,7 +427,7 @@ function ProductForm({
 
         <div className="flex items-center gap-2">
           <input type="checkbox" checked={form.in_stock} onChange={(e) => set("in_stock", e.target.checked)}
-            className="h-4 w-4 rounded border accent-coral" />
+            className="h-4 w-4 rounded border" />
           <label className="text-sm">В наличии</label>
         </div>
 
@@ -349,7 +445,7 @@ function ProductForm({
 
         <div className="col-span-full flex gap-3">
           <button type="submit" disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50">
+            className="flex items-center gap-1.5 rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50">
             <Check className="h-4 w-4" />
             {loading ? "Сохранение..." : editProduct ? "Сохранить" : "Создать"}
           </button>

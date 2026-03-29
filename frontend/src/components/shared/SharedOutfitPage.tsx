@@ -72,7 +72,7 @@ export function SharedOutfitPage() {
           {outfit.items?.map((item: any, idx: number) => (
             <div key={idx} className="flex flex-col items-center rounded-lg border p-3">
               <div className="h-20 w-20 overflow-hidden rounded-lg">
-                <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" loading="lazy"
+                <img src={item.image_url || undefined} alt={item.name} className="h-full w-full object-cover" loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
               </div>
               <p className="mt-2 line-clamp-1 text-center text-xs font-medium">{item.name}</p>

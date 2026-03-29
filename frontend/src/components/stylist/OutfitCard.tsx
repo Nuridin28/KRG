@@ -77,7 +77,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
             >
               <div className="h-14 w-14 overflow-hidden rounded-lg shadow-sm">
                 <img
-                  src={item.product.image_url}
+                  src={item.product.image_url || undefined}
                   alt={item.product.name}
                   className="h-full w-full object-cover"
                   loading="lazy"

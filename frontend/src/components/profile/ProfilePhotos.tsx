@@ -110,18 +110,18 @@ export function ProfilePhotos() {
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo) => (
             <Card key={photo.id} className={`overflow-hidden ${photo.is_default ? "ring-2 ring-foreground" : ""}`}>
-              <div className="relative aspect-[3/4]">
+              <div className="relative aspect-3/4">
                 <img
                   src={`${API_HOST}${photo.image_url}`}
                   alt="Моё фото"
                   className="h-full w-full object-cover"
                 />
                 {photo.is_default && (
-                  <div className="absolute left-1.5 top-1.5 rounded bg-foreground px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  <div className="absolute left-1.5 top-1.5 rounded bg-foreground px-1.5 py-0.5 text-[10px] font-bold text-background">
                     Основное
                   </div>
                 )}
-                <div className="absolute bottom-0 left-0 right-0 flex gap-1 bg-gradient-to-t from-black/60 to-transparent p-2">
+                <div className="absolute bottom-0 left-0 right-0 flex gap-1 bg-linear-to-t from-black/60 to-transparent p-2">
                   {!photo.is_default && (
                     <button
                       onClick={() => handleSetDefault(photo)}
