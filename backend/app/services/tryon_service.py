@@ -32,6 +32,10 @@ _JOBS_DIR = Path("/tmp/krg_tryon")
 _JOBS_DIR.mkdir(parents=True, exist_ok=True)
 JOBS_FILE = _JOBS_DIR / "_jobs.json"
 
+# get_job() marks QUEUED/PROCESSING as failed if older than this (orphaned work).
+# Must exceed Vertex httpx timeout (120s) per garment and allow multi-item outfit chains.
+_STALE_JOB_MAX_AGE_SEC = 15 * 60
+
 
 def _get_gcp_access_token() -> Optional[str]:
     """Get GCP access token via Application Default Credentials."""
@@ -468,10 +472,10 @@ class TryOnService:
                 pass
         if not job:
             return None
-        # Mark stale queued/processing jobs as failed (orphaned after server restart)
+        # Mark very old queued/processing jobs as failed (orphaned workers / restart).
         if job.status in (TryOnJobStatus.QUEUED, TryOnJobStatus.PROCESSING):
             age = (datetime.now(timezone.utc) - job.created_at).total_seconds()
-            if age > 60:  # 1 minute — likely orphaned after restart
+            if age > _STALE_JOB_MAX_AGE_SEC:
                 job.status = TryOnJobStatus.FAILED
                 job.failure_reason = "Сервер был перезапущен. Попробуйте снова."
                 job.completed_at = datetime.now(timezone.utc)
