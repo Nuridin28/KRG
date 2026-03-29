@@ -163,6 +163,14 @@ export const api = {
       }),
   },
 
+  savedOutfits: {
+    save: (data: any) =>
+      request<any>("/outfits/save", { method: "POST", body: JSON.stringify(data) }),
+    history: (limit = 20) => request<any[]>(`/outfits/history?limit=${limit}`),
+    delete: (id: string) => request<any>(`/outfits/history/${id}`, { method: "DELETE" }),
+    getShared: (id: string) => request<any>(`/outfits/shared/${id}`),
+  },
+
   admin: {
     getStats: () => request<AdminStats>("/admin/stats"),
     getProducts: (page = 1, pageSize = 50) =>

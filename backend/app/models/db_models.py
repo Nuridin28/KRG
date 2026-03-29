@@ -56,6 +56,23 @@ class Product(Base):
     )
 
 
+class SavedOutfit(Base):
+    __tablename__ = "saved_outfits"
+
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(nullable=True, index=True)
+    items_json: Mapped[list] = mapped_column(JSON, default=list)
+    style: Mapped[str] = mapped_column(String(50), default="")
+    occasion: Mapped[str] = mapped_column(String(50), default="")
+    total_price: Mapped[float] = mapped_column(Float, default=0)
+    compatibility_score: Mapped[float] = mapped_column(Float, default=0)
+    explanation: Mapped[str] = mapped_column(Text, default="")
+    badges: Mapped[list] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 class TrackingEvent(Base):
     __tablename__ = "tracking_events"
 

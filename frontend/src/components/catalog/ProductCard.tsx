@@ -1,8 +1,9 @@
-import { Shirt, Check } from "lucide-react"
+import { Shirt, Check, Heart } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
+import { useWishlist } from "@/store/wishlist"
 import type { Product } from "@/api/types"
 
 interface ProductCardProps {
@@ -14,6 +15,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggleTryOn }: ProductCardProps) {
+  const wishlist = useWishlist()
+  const isWished = wishlist.has(product.id)
+
   return (
     <Card className={`group flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
       tryOnSelected ? "ring-2 ring-coral" : ""
@@ -42,6 +46,28 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
             <span className="text-sm font-medium text-muted-foreground">Нет в наличии</span>
           </div>
         )}
+
+        {/* Wishlist heart */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            wishlist.toggle({
+              id: product.id, name: product.name, brand: product.brand,
+              category: product.category, color_hex: product.color_hex,
+              color_name: product.color_name, price: product.price,
+              promo_price: product.promo_price, currency: product.currency,
+              image_url: product.image_url, in_stock: product.in_stock,
+            })
+          }}
+          className={`absolute left-2 ${product.promo_price ? "top-9" : "top-2"} flex h-7 w-7 items-center justify-center rounded-full transition-all ${
+            isWished
+              ? "bg-red-500 text-white"
+              : "bg-black/30 text-white hover:bg-red-500"
+          }`}
+          title={isWished ? "Убрать из избранного" : "В избранное"}
+        >
+          <Heart className={`h-3.5 w-3.5 ${isWished ? "fill-current" : ""}`} />
+        </button>
 
         {/* Try-on selection checkbox */}
         {onToggleTryOn && (

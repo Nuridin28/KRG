@@ -1,4 +1,5 @@
-import { ShoppingCart, Sparkles, AlertCircle, Loader2 } from "lucide-react"
+import { useState } from "react"
+import { ShoppingCart, Sparkles, AlertCircle, Loader2, ArrowDown, ZoomIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import type { TryOnJob } from "@/api/types"
@@ -25,6 +26,8 @@ function getStatusLabel(status: string): string {
 }
 
 export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultProps) {
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null)
+
   if (!job) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border bg-card py-20 text-center">
@@ -69,33 +72,62 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
   // completed
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        {personPreview && (
-          <div className="space-y-2">
-            <p className="text-center text-xs font-medium text-muted-foreground">До</p>
+      {/* Before */}
+      {personPreview && (
+        <div className="space-y-2">
+          <p className="text-center text-sm font-semibold text-muted-foreground">До</p>
+          <div
+            className="group relative cursor-pointer overflow-hidden rounded-xl border shadow-sm"
+            onClick={() => setZoomedImage(personPreview)}
+          >
             <img
               src={personPreview}
               alt="Оригинальное фото"
-              className="aspect-[3/4] w-full rounded-lg object-cover"
+              className="w-full rounded-xl object-contain"
+              style={{ maxHeight: "60vh" }}
             />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
+              <ZoomIn className="h-8 w-8 text-white drop-shadow-lg" />
+            </div>
           </div>
-        )}
-        <div className="space-y-2">
-          <p className="text-center text-xs font-medium text-muted-foreground">После</p>
-          {job.output_image_url ? (
+        </div>
+      )}
+
+      {/* Arrow */}
+      {personPreview && (
+        <div className="flex justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-coral/10">
+            <ArrowDown className="h-5 w-5 text-coral" />
+          </div>
+        </div>
+      )}
+
+      {/* After */}
+      <div className="space-y-2">
+        <p className="text-center text-sm font-semibold text-coral">После</p>
+        {job.output_image_url ? (
+          <div
+            className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-coral/30 shadow-lg"
+            onClick={() => setZoomedImage(job.output_image_url!)}
+          >
             <img
               src={job.output_image_url}
               alt="Результат примерки"
-              className="aspect-[3/4] w-full rounded-lg object-cover"
+              className="w-full rounded-xl object-contain"
+              style={{ maxHeight: "70vh" }}
             />
-          ) : (
-            <div className="flex aspect-[3/4] items-center justify-center rounded-lg bg-muted">
-              <p className="text-xs text-muted-foreground">Изображение недоступно</p>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
+              <ZoomIn className="h-8 w-8 text-white drop-shadow-lg" />
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="flex aspect-3/4 items-center justify-center rounded-xl bg-muted">
+            <p className="text-xs text-muted-foreground">Изображение недоступно</p>
+          </div>
+        )}
       </div>
 
+      {/* Actions */}
       <div className="flex gap-3">
         <Button variant="coral" className="flex-1">
           <ShoppingCart className="mr-2 h-4 w-4" />
@@ -106,6 +138,26 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           Собрать образ
         </Button>
       </div>
+
+      {/* Fullscreen zoom modal */}
+      {zoomedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          onClick={() => setZoomedImage(null)}
+        >
+          <img
+            src={zoomedImage}
+            alt="Увеличенное фото"
+            className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+          />
+          <button
+            className="absolute right-6 top-6 rounded-full bg-white/20 p-2 text-white transition-colors hover:bg-white/40"
+            onClick={() => setZoomedImage(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   )
 }

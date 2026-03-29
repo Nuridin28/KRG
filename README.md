@@ -287,36 +287,10 @@ API Gateway (FastAPI, CORS, JWT auth, validation)
 
 ---
 
-## Что нужно сделать
-
-### Интеграция внешних AI-сервисов
+## Статус интеграций
 
 | Сервис | Статус | Описание |
 |--------|--------|----------|
-| **OpenAI API** | Готов к подключению | Conversational stylist — NLU, function calling, мультимодальный анализ. Fallback: keyword parser |
-| **Google Vertex AI VTO** | Готов к подключению | Виртуальная примерка — генерация реального изображения. Fallback: FASHN API |
-| **Mapp Fashion API** | Готов к подключению | Production-grade рекомендации. Fallback: внутренняя логика |
-
-### Функциональные доработки
-
-| Приоритет | Задача | Описание |
-|-----------|--------|----------|
-| P0 | Реальные изображения товаров | Сейчас цветовые круги — нужны фото |
-| P0 | Consent flow для примерки | GDPR-совместимое согласие на обработку фото |
-| P1 | Checkout flow | Оформление заказа из корзины |
-| P1 | Wishlist / Saved outfits | Сохранение образов и результатов примерки |
-| P1 | Size profile | Профиль размеров, фильтрация по доступным |
-| P2 | A/B testing | Эксперименты: CTA variants, outfit block |
-| P2 | Персонализация | История → персональные рекомендации |
-| P2 | Mobile app | React Native или adaptive PWA |
-| P3 | CRM hooks | Email/push рекомендации |
-| P3 | Multi-language | i18n (сейчас RU-first) |
-
-### Нефункциональные требования (TODO)
-
-- **Кэширование:** Redis для hot recommendations (P95 < 300ms)
-- **CDN:** для output images виртуальной примерки
-- **Очередь:** Celery/ARQ для try-on jobs вместо asyncio.create_task
-- **Observability:** structured logging, distributed tracing, Prometheus metrics
-- **CI/CD:** GitHub Actions, Docker, staging environment
-- **Безопасность:** audit logging, secrets rotation, encryption at rest
+| **OpenAI API** | Подключён | Conversational stylist (gpt-4o-mini) + vector embeddings (text-embedding-3-small). Fallback: keyword parser |
+| **Google Vertex AI VTO** | Готов к подключению | Виртуальная примерка — генерация реального изображения. Сейчас: mock-симуляция. Fallback: FASHN API |
+| **Mapp Fashion API** | Готов к подключению | Production-grade рекомендации. Сейчас: внутренняя логика (color theory + style coherence) |

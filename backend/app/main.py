@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.database import Base, engine
-from app.routers import admin, auth, catalog, outfits, stylist_chat, tracking, tryon
+from app.routers import admin, auth, catalog, outfits, saved_outfits, stylist_chat, tracking, tryon
 
 
 @asynccontextmanager
@@ -50,6 +50,7 @@ app.include_router(outfits.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tryon.router, prefix=settings.API_V1_PREFIX)
 app.include_router(stylist_chat.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tracking.router, prefix=settings.API_V1_PREFIX)
+app.include_router(saved_outfits.router, prefix=settings.API_V1_PREFIX)
 
 # Admin routes (protected by admin role dependency inside the router)
 app.include_router(admin.router, prefix=settings.API_V1_PREFIX)

@@ -9,6 +9,10 @@ import { TryOnPage } from "@/components/tryon/TryOnPage"
 import { ChatPage } from "@/components/chat/ChatPage"
 import { AuthPage } from "@/components/auth/AuthPage"
 import { AdminPage } from "@/components/admin/AdminPage"
+import { WishlistPage } from "@/components/wishlist/WishlistPage"
+import { OutfitHistoryPage } from "@/components/history/OutfitHistoryPage"
+import { SharedOutfitPage } from "@/components/shared/SharedOutfitPage"
+import { OutfitBuilderPage } from "@/components/builder/OutfitBuilderPage"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/store/auth"
@@ -39,26 +43,19 @@ function AppLayout() {
 
   const toggleTheme = useCallback(() => setDarkMode((prev) => !prev), [])
 
-  // Get active tab from current path
   const pathToTab: Record<string, string> = {
-    "/": "catalog",
-    "/catalog": "catalog",
-    "/stylist": "stylist",
-    "/tryon": "tryon",
-    "/chat": "chat",
-    "/auth": "auth",
-    "/admin": "admin",
+    "/": "catalog", "/catalog": "catalog", "/stylist": "stylist",
+    "/tryon": "tryon", "/chat": "chat", "/builder": "builder",
+    "/wishlist": "wishlist", "/history": "history",
+    "/auth": "auth", "/admin": "admin",
   }
   const activeTab = pathToTab[location.pathname] || "catalog"
 
   const handleTabChange = useCallback((tab: string) => {
     const tabToPath: Record<string, string> = {
-      catalog: "/catalog",
-      stylist: "/stylist",
-      tryon: "/tryon",
-      chat: "/chat",
-      auth: "/auth",
-      admin: "/admin",
+      catalog: "/catalog", stylist: "/stylist", tryon: "/tryon",
+      chat: "/chat", builder: "/builder", wishlist: "/wishlist",
+      history: "/history", auth: "/auth", admin: "/admin",
     }
     navigate(tabToPath[tab] || "/catalog")
   }, [navigate])
@@ -107,6 +104,10 @@ function AppLayout() {
           <Route path="/stylist" element={<StylistPage onTryOnOutfit={handleTryOnOutfit} />} />
           <Route path="/tryon" element={<TryOnPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/builder" element={<OutfitBuilderPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/history" element={<OutfitHistoryPage />} />
+          <Route path="/outfit/:outfitId" element={<SharedOutfitPage />} />
           <Route path="/auth" element={user ? <Navigate to="/catalog" replace /> : <AuthPage onSuccess={() => navigate("/catalog")} />} />
           <Route path="/admin" element={isAdmin() ? <AdminPage /> : <Navigate to="/catalog" replace />} />
           <Route path="*" element={<Navigate to="/catalog" replace />} />

@@ -1,7 +1,9 @@
 import { useState } from "react"
-import { ShoppingCart, Shirt, Share2, GitCompareArrows } from "lucide-react"
+import { ShoppingCart, Shirt, Share2, GitCompareArrows, Save, Check } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { useCart } from "@/store/cart"
+import { useAuth } from "@/store/auth"
+import { api } from "@/api/client"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -30,7 +32,28 @@ function getScoreLabel(score: number): string {
 
 export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCompare }: OutfitCardProps) {
   const addOutfit = useCart((s) => s.addOutfit)
+  const isLoggedIn = useAuth((s) => s.isLoggedIn)
   const [shareOpen, setShareOpen] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  const handleSave = async () => {
+    if (!isLoggedIn()) return
+    try {
+      await api.savedOutfits.save({
+        items: outfit.items.map((i) => ({
+          product_id: i.product.id, name: i.product.name, brand: i.product.brand,
+          category: i.product.category, color_hex: i.product.color_hex,
+          color_name: i.product.color_name, price: i.product.price,
+          promo_price: i.product.promo_price, currency: i.product.currency || "USD",
+          image_url: i.product.image_url, role: i.role,
+        })),
+        style: outfit.style, occasion: outfit.occasion,
+        total_price: outfit.total_price, compatibility_score: outfit.compatibility_score,
+        explanation: outfit.explanation, badges: outfit.badges,
+      })
+      setSaved(true)
+    } catch {}
+  }
 
   return (
     <Card className="max-w-full overflow-hidden">
@@ -131,6 +154,18 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
             >
               <GitCompareArrows className="mr-1.5 h-3.5 w-3.5" />
               <span className="truncate">{compareSelected ? "В сравнении" : "Сравнить"}</span>
+            </Button>
+          )}
+          {isLoggedIn() && (
+            <Button
+              variant={saved ? "outline" : "outline"}
+              size="sm"
+              className={`min-w-0 flex-1 text-xs ${saved ? "border-green-500 text-green-600" : ""}`}
+              onClick={handleSave}
+              disabled={saved}
+            >
+              {saved ? <Check className="mr-1.5 h-3.5 w-3.5" /> : <Save className="mr-1.5 h-3.5 w-3.5" />}
+              <span className="truncate">{saved ? "Сохранено" : "Сохранить"}</span>
             </Button>
           )}
         </div>
