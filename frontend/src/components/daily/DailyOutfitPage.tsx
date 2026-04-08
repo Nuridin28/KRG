@@ -11,6 +11,7 @@ import { useProfile } from "@/store/profile"
 import { useCart } from "@/store/cart"
 import { useToast } from "@/hooks/use-toast"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 import type { DailyOutfit } from "@/api/types"
 
 /* ---------- Weather helpers ---------- */
@@ -53,6 +54,7 @@ function scoreLabel(score: number): { text: string; color: string } {
 /* ---------- Main component ---------- */
 
 export function DailyOutfitPage() {
+  const t = useT()
   const navigate = useNavigate()
   const isLoggedIn = useAuth((s) => s.isLoggedIn)
   const hasPhotos = useProfile((s) => s.hasPhotos)
@@ -70,11 +72,11 @@ export function DailyOutfitPage() {
       const result = await api.dailyOutfit.getToday()
       setData(result)
     } catch (err: any) {
-      setError(err.message || "Не удалось загрузить образ дня")
+      setError(err.message || t.daily.loadError)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     if (isLoggedIn()) fetchToday()
@@ -86,31 +88,30 @@ export function DailyOutfitPage() {
     try {
       const result = await api.dailyOutfit.regenerate()
       setData(result)
-      toast({ title: "Новый образ сгенерирован" })
+      toast({ title: t.daily.newOutfit })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     } finally {
       setRegenerating(false)
     }
-  }, [toast])
+  }, [toast, t])
 
   const handleBuyAll = useCallback(() => {
     if (!data) return
     for (const item of data.outfit.items) {
       addToCart(item.product)
     }
-    toast({ title: "Все товары добавлены в корзину" })
-  }, [data, addToCart, toast])
+    toast({ title: t.daily.allAddedToCart })
+  }, [data, addToCart, toast, t])
 
   const handleQuickTryOn = useCallback(async (productId: string) => {
     try {
       await api.profile.quickTryOn(productId)
       navigate("/tryon")
-      toast({ title: "Примерка запущена" })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     }
-  }, [navigate, toast])
+  }, [navigate, toast, t])
 
   /* ---------- Empty states ---------- */
 
@@ -118,9 +119,9 @@ export function DailyOutfitPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <Sun className="mx-auto mb-4 h-12 w-12 text-amber-500/50" />
-        <h2 className="text-xl font-bold">Образ дня</h2>
-        <p className="mt-2 text-muted-foreground">Войдите в аккаунт, чтобы получать персональные рекомендации</p>
-        <Button variant="coral" className="mt-4" onClick={() => navigate("/auth")}>Войти</Button>
+        <h2 className="text-xl font-bold">{t.daily.title}</h2>
+        <p className="mt-2 text-muted-foreground">{t.daily.loginPrompt}</p>
+        <Button variant="coral" className="mt-4" onClick={() => navigate("/auth")}>{t.nav.login}</Button>
       </div>
     )
   }
@@ -137,12 +138,12 @@ export function DailyOutfitPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <Sparkles className="mx-auto mb-4 h-12 w-12 text-muted-foreground/40" />
-        <h2 className="text-xl font-bold">Настройте предпочтения</h2>
+        <h2 className="text-xl font-bold">{t.daily.setupTitle}</h2>
         <p className="mt-2 text-muted-foreground">
-          Укажите стиль, пол и город в профиле — и мы будем подбирать образ дня с учётом погоды
+          {t.daily.setupHint}
         </p>
         <Button variant="coral" className="mt-4" onClick={() => navigate("/profile")}>
-          <Settings className="mr-1.5 h-4 w-4" /> Настроить профиль
+          <Settings className="mr-1.5 h-4 w-4" /> {t.daily.setupProfile}
         </Button>
       </div>
     )
@@ -165,13 +166,13 @@ export function DailyOutfitPage() {
             <Sun className="h-5 w-5 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Образ дня</h1>
+            <h1 className="text-2xl font-bold">{t.daily.title}</h1>
             <p className="text-sm text-muted-foreground">{date}</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={regenerating}>
           {regenerating ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-1.5 h-4 w-4" />}
-          Обновить
+          {t.daily.refresh}
         </Button>
       </div>
 
@@ -220,7 +221,7 @@ export function DailyOutfitPage() {
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Palette className="h-4 w-4 text-foreground" />
-              <span className="text-sm font-semibold">Как подобран образ</span>
+              <span className="text-sm font-semibold">{t.daily.howSelected}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className={`text-lg font-bold ${sl.color}`}>{score}%</span>
@@ -236,14 +237,14 @@ export function DailyOutfitPage() {
             <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2.5">
               <Palette className="mt-0.5 h-3.5 w-3.5 shrink-0 text-indigo-500" />
               <div>
-                <p className="font-medium">Цветовая сочетаемость</p>
+                <p className="font-medium">{t.daily.colorScore}</p>
                 <p className="text-muted-foreground">Цвета вещей подобраны по теории цвета (HSL-анализ, нейтральные + комплементарные)</p>
               </div>
             </div>
             <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2.5">
               <TrendingUp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
               <div>
-                <p className="font-medium">Стилевая связность</p>
+                <p className="font-medium">{t.daily.styleScore}</p>
                 <p className="text-muted-foreground">Все вещи в образе соответствуют одному стилевому направлению</p>
               </div>
             </div>
@@ -266,7 +267,7 @@ export function DailyOutfitPage() {
       {/* ========== Outfit items ========== */}
       <Card className="overflow-hidden">
         <CardContent className="pt-5">
-          <h3 className="mb-3 text-sm font-semibold">Состав образа</h3>
+          <h3 className="mb-3 text-sm font-semibold">{t.daily.composition}</h3>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {outfit.items.map((item) => (
@@ -295,7 +296,7 @@ export function DailyOutfitPage() {
                       onClick={() => handleQuickTryOn(item.product.id)}
                       className="mt-1.5 flex w-full items-center justify-center gap-1 rounded bg-accent px-2 py-1 text-[10px] font-medium transition-colors hover:bg-foreground hover:text-background"
                     >
-                      <Shirt className="h-3 w-3" /> Примерить
+                      <Shirt className="h-3 w-3" /> {t.common.tryOn}
                     </button>
                   )}
                 </CardContent>
@@ -306,11 +307,11 @@ export function DailyOutfitPage() {
           {/* Total & actions */}
           <div className="mt-5 flex items-center justify-between border-t pt-4">
             <div>
-              <p className="text-xs text-muted-foreground">Итого за образ</p>
+              <p className="text-xs text-muted-foreground">{t.daily.totalForOutfit}</p>
               <p className="text-xl font-bold">{formatPrice(outfit.total_price)}</p>
             </div>
             <Button variant="coral" onClick={handleBuyAll}>
-              <ShoppingBag className="mr-1.5 h-4 w-4" /> Купить весь образ
+              <ShoppingBag className="mr-1.5 h-4 w-4" /> {t.daily.buyWholeOutfit}
             </Button>
           </div>
 

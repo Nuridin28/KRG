@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { formatPrice } from "@/lib/utils"
 import type { Outfit, ProductBrief } from "@/api/types"
+import { useT } from "@/i18n"
 
 interface OutfitComparisonProps {
   outfits: Outfit[]
@@ -27,19 +28,20 @@ function getScoreColor(score: number): string {
   return "bg-red-500"
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 75) return "Отличная"
-  if (score >= 50) return "Хорошая"
-  return "Низкая"
-}
-
 export function OutfitComparison({
   outfits: initialOutfits,
   onClose,
   onBuyAll,
   onTryOnOutfit,
 }: OutfitComparisonProps) {
+  const t = useT()
   const [outfits, setOutfits] = useState<Outfit[]>(initialOutfits)
+
+  const getScoreLabel = (score: number): string => {
+    if (score >= 75) return t.outfit.excellentMatch
+    if (score >= 50) return t.outfit.goodMatch
+    return t.outfit.compatibility
+  }
 
   const removeOutfit = (id: string) => {
     const next = outfits.filter((o) => o.id !== id)
@@ -84,7 +86,7 @@ export function OutfitComparison({
         <div className="flex items-center gap-3">
           <Layers className="h-5 w-5 text-foreground" />
           <h2 className="text-lg font-bold">
-            Сравнение образов{" "}
+            {t.comparison.title}{" "}
             <span className="text-muted-foreground font-normal">
               ({outfits.length})
             </span>
@@ -123,13 +125,13 @@ export function OutfitComparison({
                         className="flex items-center gap-1 text-[10px] shadow-sm"
                       >
                         <DollarSign className="h-3 w-3" />
-                        Выгоднее
+                        {t.comparison.cheaper}
                       </Badge>
                     )}
                     {isBestScore && (
                       <Badge className="flex items-center gap-1 bg-green-500/10 text-[10px] text-green-600 shadow-sm">
                         <Trophy className="h-3 w-3" />
-                        Лучший стиль
+                        {t.comparison.bestStyle}
                       </Badge>
                     )}
                   </div>
@@ -139,7 +141,7 @@ export function OutfitComparison({
                 <button
                   onClick={() => removeOutfit(outfit.id)}
                   className="absolute right-2 top-2 z-10 rounded-full bg-muted p-1 text-muted-foreground transition-colors hover:bg-destructive hover:text-white"
-                  title="Убрать из сравнения"
+                  title={t.comparison.removeFrom}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -221,7 +223,7 @@ export function OutfitComparison({
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">
-                        {getScoreLabel(outfit.compatibility_score)} совместимость
+                        {getScoreLabel(outfit.compatibility_score)}
                       </span>
                       <span className="font-bold">
                         {outfit.compatibility_score}%
@@ -243,7 +245,7 @@ export function OutfitComparison({
 
                   {/* Total price */}
                   <div className="flex items-center justify-between border-t pt-3">
-                    <span className="text-sm text-muted-foreground">Итого</span>
+                    <span className="text-sm text-muted-foreground">{t.common.total}</span>
                     <span className="text-xl font-bold">
                       {formatPrice(outfit.total_price)}
                     </span>
@@ -260,7 +262,7 @@ export function OutfitComparison({
                     }
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
-                    Купить всё
+                    {t.common.buyAll}
                   </Button>
                   <Button
                     variant="outline"
@@ -268,7 +270,7 @@ export function OutfitComparison({
                     onClick={() => onTryOnOutfit(outfit)}
                   >
                     <Shirt className="mr-2 h-4 w-4" />
-                    Примерить ({outfit.items.length})
+                    {t.common.tryOn} ({outfit.items.length})
                   </Button>
                 </div>
               </div>
@@ -281,7 +283,7 @@ export function OutfitComparison({
           <div className="animate-fade-in-up mx-auto mt-8 max-w-275 rounded-xl border bg-muted/30 p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
               <Star className="h-4 w-4 text-foreground" />
-              Сводка сравнения
+              {t.comparison.summary}
             </h3>
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -289,7 +291,7 @@ export function OutfitComparison({
               <div className="rounded-lg border bg-card p-3">
                 <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <DollarSign className="h-3.5 w-3.5 text-foreground" />
-                  Самый выгодный
+                  {t.comparison.cheapest}
                 </div>
                 <p className="text-sm font-semibold">
                   {formatPrice(summary.cheapest.total_price)}
@@ -303,7 +305,7 @@ export function OutfitComparison({
               <div className="rounded-lg border bg-card p-3">
                 <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Trophy className="h-3.5 w-3.5 text-green-500" />
-                  Лучшая совместимость
+                  {t.comparison.bestCompatibility}
                 </div>
                 <p className="text-sm font-semibold">
                   {summary.bestScore.compatibility_score}%
@@ -317,7 +319,7 @@ export function OutfitComparison({
               <div className="rounded-lg border bg-card p-3">
                 <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Layers className="h-3.5 w-3.5 text-blue-500" />
-                  Общие товары
+                  {t.comparison.commonProducts}
                 </div>
                 {summary.commonItems.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
@@ -333,7 +335,7 @@ export function OutfitComparison({
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    Нет совпадающих товаров
+                    {t.comparison.noCommon}
                   </p>
                 )}
               </div>
@@ -358,6 +360,8 @@ export function FloatingCompareButton({
   selectedCount,
   onClick,
 }: FloatingCompareButtonProps) {
+  const t = useT()
+
   if (selectedCount < 2) return null
 
   return (
@@ -369,7 +373,7 @@ export function FloatingCompareButton({
         onClick={onClick}
       >
         <Layers className="h-4 w-4" />
-        Сравнить
+        {t.comparison.compareButton}
         <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-bold">
           {selectedCount}
         </span>

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { api } from "@/api/client"
 import { useAuth } from "@/store/auth"
+import { useT } from "@/i18n"
 import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react"
 
 interface AuthPageProps {
@@ -8,6 +9,7 @@ interface AuthPageProps {
 }
 
 export function AuthPage({ onSuccess }: AuthPageProps) {
+  const t = useT()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -39,7 +41,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
       }
       onSuccess()
     } catch (err: any) {
-      setError(err.message || "Произошла ошибка")
+      setError(err.message || t.common.error)
     } finally {
       setLoading(false)
     }
@@ -53,23 +55,23 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/5">
               {isLogin ? <LogIn className="h-6 w-6 text-foreground" /> : <UserPlus className="h-6 w-6 text-foreground" />}
             </div>
-            <h2 className="text-2xl font-bold">{isLogin ? "Вход" : "Регистрация"}</h2>
+            <h2 className="text-2xl font-bold">{isLogin ? t.auth.login : t.auth.register}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {isLogin ? "Войдите в аккаунт" : "Создайте новый аккаунт"}
+              {isLogin ? t.auth.loginPrompt : t.auth.registerPrompt}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Имя</label>
+                <label className="mb-1.5 block text-sm font-medium">{t.auth.nameLabel}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ваше имя"
+                    placeholder={t.auth.namePlaceholder}
                     className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-foreground focus:ring-1 focus:ring-foreground"
                   />
                 </div>
@@ -77,7 +79,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             )}
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Email</label>
+              <label className="mb-1.5 block text-sm font-medium">{t.auth.emailLabel}</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
@@ -92,7 +94,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Пароль</label>
+              <label className="mb-1.5 block text-sm font-medium">{t.auth.passwordLabel}</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
@@ -118,17 +120,17 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
               disabled={loading}
               className="w-full rounded-lg bg-foreground py-2.5 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {loading ? "Загрузка..." : isLogin ? "Войти" : "Зарегистрироваться"}
+              {loading ? t.common.loading : isLogin ? t.auth.loginButton : t.auth.registerButton}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            {isLogin ? "Нет аккаунта?" : "Уже есть аккаунт?"}{" "}
+            {isLogin ? t.auth.noAccount : t.auth.hasAccount}{" "}
             <button
               onClick={() => { setIsLogin(!isLogin); setError("") }}
               className="font-medium text-foreground hover:underline"
             >
-              {isLogin ? "Зарегистрироваться" : "Войти"}
+              {isLogin ? t.auth.registerButton : t.auth.loginButton}
             </button>
           </div>
         </div>

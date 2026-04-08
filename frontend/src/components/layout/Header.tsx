@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react"
-import { Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X, Heart, Puzzle, History, Shirt, CalendarDays, ChevronDown } from "lucide-react"
+import { Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X, Heart, Puzzle, History, Shirt, CalendarDays, ChevronDown, Globe } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "@/store/cart"
 import { useAuth } from "@/store/auth"
+import { useT, useI18n, LANG_LABELS, type Lang } from "@/i18n"
 
 interface HeaderProps {
   activeTab: string
@@ -12,22 +13,20 @@ interface HeaderProps {
   onOpenCart: () => void
 }
 
-const primaryNav = [
-  { value: "catalog", label: "Каталог", icon: ShoppingBag },
-  { value: "stylist", label: "AI Стилист", icon: Wand2 },
-  { value: "tryon", label: "Примерка", icon: Camera },
-  { value: "chat", label: "AI Чат", icon: MessageCircle },
+const primaryNavDef = [
+  { value: "catalog", key: "catalog" as const, icon: ShoppingBag },
+  { value: "stylist", key: "aiStylist" as const, icon: Wand2 },
+  { value: "tryon", key: "tryOn" as const, icon: Camera },
+  { value: "chat", key: "aiChat" as const, icon: MessageCircle },
 ]
 
-const secondaryNav = [
-  { value: "daily", label: "Образ дня", icon: CalendarDays },
-  { value: "wardrobe", label: "Гардероб", icon: Shirt },
-  { value: "builder", label: "Конструктор", icon: Puzzle },
-  { value: "wishlist", label: "Избранное", icon: Heart },
-  { value: "history", label: "История", icon: History },
+const secondaryNavDef = [
+  { value: "daily", key: "dailyOutfit" as const, icon: CalendarDays },
+  { value: "wardrobe", key: "wardrobe" as const, icon: Shirt },
+  { value: "builder", key: "builder" as const, icon: Puzzle },
+  { value: "wishlist", key: "wishlist" as const, icon: Heart },
+  { value: "history", key: "history" as const, icon: History },
 ]
-
-const allNav = [...primaryNav, ...secondaryNav]
 
 export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpenCart }: HeaderProps) {
   const items = useCart((s) => s.items)
@@ -39,6 +38,13 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
   const [mobileOpen, setMobileOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const moreRef = useRef<HTMLDivElement>(null)
+  const t = useT()
+  const lang = useI18n((s) => s.lang)
+  const setLang = useI18n((s) => s.setLang)
+
+  const primaryNav = primaryNavDef.map((n) => ({ ...n, label: t.nav[n.key] }))
+  const secondaryNav = secondaryNavDef.map((n) => ({ ...n, label: t.nav[n.key] }))
+  const allNav = [...primaryNav, ...secondaryNav]
 
   const isSecondaryActive = secondaryNav.some((item) => item.value === activeTab)
 
@@ -112,7 +118,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span className="hidden lg:inline">Ещё</span>
+              <span className="hidden lg:inline">{t.nav.more}</span>
               <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${moreOpen ? "rotate-180" : ""}`} />
               {isSecondaryActive && (
                 <span className="absolute bottom-0 left-3 right-3 h-px bg-foreground" />
@@ -152,7 +158,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
               }`}
             >
               <Shield className="h-4 w-4" />
-              <span className="hidden lg:inline">Админ</span>
+              <span className="hidden lg:inline">{t.nav.admin}</span>
               {activeTab === "admin" && (
                 <span className="absolute bottom-0 left-3 right-3 h-px bg-foreground" />
               )}
@@ -166,7 +172,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
             <button
               onClick={() => onTabChange("profile")}
               className="hidden items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-all hover:bg-accent sm:flex"
-              title="Мой профиль"
+              title={t.nav.myProfile}
             >
               <User className="h-3.5 w-3.5" />
               <span className="max-w-25 truncate">{user.full_name || user.email}</span>
@@ -177,7 +183,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
             <button
               onClick={() => { logout(); routerNavigate("/catalog") }}
               className="hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground sm:flex"
-              title="Выйти"
+              title={t.nav.logout}
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -187,14 +193,14 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
               className="hidden items-center gap-1.5 rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition-all hover:opacity-90 sm:flex"
             >
               <LogIn className="h-4 w-4" />
-              <span>Войти</span>
+              <span>{t.nav.login}</span>
             </button>
           )}
 
           <button
             onClick={onOpenCart}
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-            title="Корзина"
+            title={t.nav.cart}
           >
             <CartIcon className="h-4 w-4" />
             {totalItems > 0 && (
@@ -204,10 +210,25 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
             )}
           </button>
 
+          {/* Language switcher */}
+          <div className="flex items-center rounded-lg border text-xs font-medium">
+            {(["ru", "en", "kz"] as Lang[]).map((l) => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={`px-1.5 py-1 transition-colors ${
+                  lang === l ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                } ${l === "ru" ? "rounded-l-md" : l === "kz" ? "rounded-r-md" : ""}`}
+              >
+                {LANG_LABELS[l]}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={onToggleTheme}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-            title={darkMode ? "Светлая тема" : "Тёмная тема"}
+            title={darkMode ? t.nav.lightTheme : t.nav.darkTheme}
           >
             {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -216,7 +237,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:hidden"
-            aria-label="Меню"
+            aria-label={t.nav.menu}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -282,7 +303,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                 }`}
               >
                 <Shield className="h-5 w-5" />
-                Админ-панель
+                {t.nav.adminPanel}
               </button>
             )}
           </div>
@@ -295,7 +316,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <LogOut className="h-5 w-5" />
-              Выйти
+              {t.nav.logout}
             </button>
           ) : (
             <button
@@ -303,7 +324,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
               className="flex w-full items-center gap-3 rounded-lg bg-foreground px-3 py-2.5 text-sm font-medium text-background transition-all hover:opacity-90"
             >
               <LogIn className="h-5 w-5" />
-              Войти
+              {t.nav.login}
             </button>
           )}
         </div>

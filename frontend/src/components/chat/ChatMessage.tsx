@@ -3,30 +3,10 @@ import { Bot, User, ShoppingCart, Shirt, Check } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/store/cart"
+import { useT } from "@/i18n"
 import type { ChatMessage as ChatMessageType, ProductBrief, Outfit, CategoryType } from "@/api/types"
 
-const CATEGORY_LABELS: Record<CategoryType, string> = {
-  tops: "Верх",
-  bottoms: "Низ",
-  outerwear: "Верхняя одежда",
-  dresses: "Платья",
-  shoes: "Обувь",
-  accessories: "Аксессуары",
-}
-
-const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories"]
-
-function groupByCategory(products: ProductBrief[]): { category: CategoryType; label: string; items: ProductBrief[] }[] {
-  const map = new Map<CategoryType, ProductBrief[]>()
-  for (const p of products) {
-    const cat = p.category
-    if (!map.has(cat)) map.set(cat, [])
-    map.get(cat)!.push(p)
-  }
-  return CATEGORY_ORDER
-    .filter((cat) => map.has(cat))
-    .map((cat) => ({ category: cat, label: CATEGORY_LABELS[cat], items: map.get(cat)! }))
-}
+const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories", "sets"]
 
 interface ChatMessageProps {
   message: ChatMessageType
@@ -44,6 +24,7 @@ function MiniProductCard({
   product: ProductBrief
   onTryOn?: (product: ProductBrief) => void
 }) {
+  const t = useT()
   const addItem = useCart((s) => s.addItem)
   const [added, setAdded] = useState(false)
 
@@ -78,7 +59,7 @@ function MiniProductCard({
           <button
             onClick={() => onTryOn(product)}
             className="flex h-7 w-7 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
-            title="Примерить"
+            title={t.common.tryOn}
           >
             <Shirt className="h-3.5 w-3.5" />
           </button>
@@ -91,7 +72,7 @@ function MiniProductCard({
               ? "bg-green-500 text-white"
               : "border text-muted-foreground hover:border-foreground hover:bg-foreground hover:text-background"
           }`}
-          title={added ? "Добавлено" : "В корзину"}
+          title={added ? t.common.addedToCart : t.common.addToCart}
         >
           {added ? <Check className="h-3.5 w-3.5" /> : <ShoppingCart className="h-3.5 w-3.5" />}
         </button>
@@ -107,6 +88,7 @@ function MiniOutfitCard({
   outfit: Outfit
   onTryOnOutfit?: (outfit: Outfit) => void
 }) {
+  const t = useT()
   const addOutfit = useCart((s) => s.addOutfit)
   const [added, setAdded] = useState(false)
 
@@ -160,7 +142,7 @@ function MiniOutfitCard({
           }`}
         >
           {added ? <Check className="h-3 w-3" /> : <ShoppingCart className="h-3 w-3" />}
-          {added ? "Добавлено!" : "Купить всё"}
+          {added ? t.chat.added : t.common.buyAll}
         </button>
         {onTryOnOutfit && (
           <button
@@ -168,7 +150,7 @@ function MiniOutfitCard({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border py-1.5 text-[11px] font-medium transition-colors hover:border-foreground hover:text-foreground"
           >
             <Shirt className="h-3 w-3" />
-            Примерить
+            {t.common.tryOn}
           </button>
         )}
       </div>
@@ -184,7 +166,22 @@ export function ChatMessageComponent({
   onTryOnProduct,
   onTryOnOutfit,
 }: ChatMessageProps) {
+  const t = useT()
   const isUser = message.role === "user"
+
+  const categoryLabels: Record<CategoryType, string> = t.categories
+
+  function groupByCategory(items: ProductBrief[]): { category: CategoryType; label: string; items: ProductBrief[] }[] {
+    const map = new Map<CategoryType, ProductBrief[]>()
+    for (const p of items) {
+      const cat = p.category
+      if (!map.has(cat)) map.set(cat, [])
+      map.get(cat)!.push(p)
+    }
+    return CATEGORY_ORDER
+      .filter((cat) => map.has(cat))
+      .map((cat) => ({ category: cat, label: categoryLabels[cat], items: map.get(cat)! }))
+  }
 
   if (isTyping) {
     return (

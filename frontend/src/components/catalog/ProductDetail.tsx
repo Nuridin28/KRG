@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/store/cart"
 import { api } from "@/api/client"
+import { useT } from "@/i18n"
 import type { Product, ProductBrief } from "@/api/types"
 
 interface ProductDetailProps {
@@ -30,6 +31,7 @@ export function ProductDetail({
   onBuildOutfit,
   onTryOn,
 }: ProductDetailProps) {
+  const t = useT()
   const addItem = useCart((s) => s.addItem)
   const [recommendations, setRecommendations] = useState<ProductBrief[]>([])
   const [loadingRecs, setLoadingRecs] = useState(false)
@@ -98,7 +100,7 @@ export function ProductDetail({
             </div>
 
             <div>
-              <p className="mb-1 text-xs font-medium text-muted-foreground">Размеры</p>
+              <p className="mb-1 text-xs font-medium text-muted-foreground">{t.product.sizes}</p>
               <div className="flex flex-wrap gap-1.5">
                 {product.sizes.map((size) => (
                   <span
@@ -113,16 +115,16 @@ export function ProductDetail({
 
             <div className="space-y-1 text-sm">
               <p>
-                <span className="text-muted-foreground">Материал:</span> {product.material}
+                <span className="text-muted-foreground">{t.product.material}</span> {product.material}
               </p>
               <p>
-                <span className="text-muted-foreground">Посадка:</span> {product.fit}
+                <span className="text-muted-foreground">{t.product.fit}</span> {product.fit}
               </p>
               <p>
-                <span className="text-muted-foreground">Паттерн:</span> {product.pattern}
+                <span className="text-muted-foreground">{t.product.pattern}</span> {product.pattern}
               </p>
               <p>
-                <span className="text-muted-foreground">Сезон:</span> {product.season}
+                <span className="text-muted-foreground">{t.product.season}</span> {product.season}
               </p>
             </div>
 
@@ -165,12 +167,12 @@ export function ProductDetail({
             {added ? (
               <>
                 <Check className="mr-2 h-4 w-4" />
-                Добавлено!
+                {t.product.addedToCart}
               </>
             ) : (
               <>
                 <ShoppingCart className="mr-2 h-4 w-4" />
-                В корзину
+                {t.product.addToCart}
               </>
             )}
           </Button>
@@ -184,7 +186,7 @@ export function ProductDetail({
               }}
             >
               <Sparkles className="mr-2 h-4 w-4" />
-              Собрать образ
+              {t.product.buildOutfit}
             </Button>
             <Button
               variant="outline"
@@ -195,7 +197,7 @@ export function ProductDetail({
               }}
             >
               <Shirt className="mr-2 h-4 w-4" />
-              Примерить
+              {t.product.tryOn}
             </Button>
           </div>
         </div>
@@ -203,7 +205,7 @@ export function ProductDetail({
         <Separator />
 
         <div>
-          <h4 className="mb-3 text-sm font-semibold">Похожие товары</h4>
+          <h4 className="mb-3 text-sm font-semibold">{t.product.similarProducts}</h4>
           {loadingRecs ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -232,7 +234,7 @@ export function ProductDetail({
             </div>
           ) : (
             <p className="py-4 text-center text-sm text-muted-foreground">
-              Рекомендации не найдены
+              {t.catalog.noProducts}
             </p>
           )}
         </div>

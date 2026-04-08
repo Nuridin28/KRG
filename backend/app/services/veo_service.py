@@ -72,9 +72,9 @@ class VeoService:
                 self._process_veo(job_id, source_image_url, prompt)
             )
         else:
-            asyncio.create_task(
-                self._simulate_processing(job_id, source_image_url)
-            )
+            job.status = VideoJobStatus.FAILED
+            job.failure_reason = "Генерация видео недоступна (Veo не настроен)"
+            job.completed_at = now
 
         return job
 

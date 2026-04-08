@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCart } from "@/store/cart"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 
 interface CartDrawerProps {
   open: boolean
@@ -11,6 +12,7 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
+  const t = useT()
   const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCart()
 
   // Lock body scroll when cart is open
@@ -39,7 +41,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         <div className="flex items-center justify-between border-b px-5 py-4">
           <div className="flex items-center gap-2.5">
             <ShoppingBag className="h-5 w-5" />
-            <h2 className="text-lg font-semibold">Корзина</h2>
+            <h2 className="text-lg font-semibold">{t.cart.title}</h2>
             <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-xs font-medium text-foreground">
               {items.length}
             </span>
@@ -58,9 +60,9 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
               <ShoppingBag className="h-7 w-7 text-muted-foreground/40" />
             </div>
-            <p className="text-sm font-medium">Корзина пуста</p>
+            <p className="text-sm font-medium">{t.cart.emptyTitle}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Добавьте товары из каталога или образы от AI стилиста
+              {t.cart.emptyHint}
             </p>
           </div>
         ) : (
@@ -113,17 +115,17 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         {items.length > 0 && (
           <div className="border-t px-5 py-4">
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Итого</span>
+              <span className="text-sm text-muted-foreground">{t.cart.total}</span>
               <span className="text-lg font-bold">{formatPrice(totalPrice())}</span>
             </div>
             <Button variant="coral" className="w-full" size="lg">
-              Оформить заказ
+              {t.cart.checkout}
             </Button>
             <button
               onClick={clearCart}
               className="mt-2 w-full py-1.5 text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
-              Очистить корзину
+              {t.cart.clear}
             </button>
           </div>
         )}

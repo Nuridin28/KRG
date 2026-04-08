@@ -33,8 +33,7 @@ _JOBS_DIR.mkdir(parents=True, exist_ok=True)
 JOBS_FILE = _JOBS_DIR / "_jobs.json"
 
 # get_job() marks QUEUED/PROCESSING as failed if older than this (orphaned work).
-# Must exceed Vertex httpx timeout (120s) per garment and allow multi-item outfit chains.
-_STALE_JOB_MAX_AGE_SEC = 15 * 60
+_STALE_JOB_MAX_AGE_SEC = 30  # If job hasn't progressed in 30s, it's likely orphaned
 
 
 def _get_gcp_access_token() -> Optional[str]:
@@ -56,6 +55,7 @@ def _get_gcp_access_token() -> Optional[str]:
 class TryOnService:
     def __init__(self) -> None:
         self._jobs: Dict[str, TryOnJobResponse] = {}
+        self._active_tasks: set[str] = set()  # job IDs with running asyncio tasks
         self._user_counts: Dict[str, int] = {}
         self._rate_limit = 20
         self._use_vertex = bool(settings.VERTEX_AI_PROJECT)
@@ -119,6 +119,7 @@ class TryOnService:
             created_at=now,
         )
         self._jobs[job_id] = job
+        self._active_tasks.add(job_id)
         self._user_counts[user_id] = count + 1
         self._save_jobs()
 
@@ -224,6 +225,7 @@ class TryOnService:
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Try-on job {job_id} completed via Vertex AI VTO")
+            self._active_tasks.discard(job_id)
             self._save_jobs()
 
         except Exception as e:
@@ -231,6 +233,7 @@ class TryOnService:
             job.status = TryOnJobStatus.FAILED
             job.failure_reason = str(e)
             job.completed_at = datetime.now(timezone.utc)
+            self._active_tasks.discard(job_id)
             self._save_jobs()
 
     # ------------------------------------------------------------------
@@ -254,6 +257,7 @@ class TryOnService:
         job.progress = 100
         job.output_image_url = product_image_url
         job.completed_at = datetime.now(timezone.utc)
+        self._active_tasks.discard(job_id)
         self._save_jobs()
 
     # ------------------------------------------------------------------
@@ -289,6 +293,7 @@ class TryOnService:
             completed_items=0,
         )
         self._jobs[job_id] = job
+        self._active_tasks.add(job_id)
         self._user_counts[user_id] = count + 1
         self._save_jobs()
 
@@ -412,6 +417,7 @@ class TryOnService:
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Outfit try-on job {job_id} completed via Vertex AI VTO ({total} items)")
+            self._active_tasks.discard(job_id)
             self._save_jobs()
 
         except Exception as e:
@@ -419,6 +425,7 @@ class TryOnService:
             job.status = TryOnJobStatus.FAILED
             job.failure_reason = str(e)
             job.completed_at = datetime.now(timezone.utc)
+            self._active_tasks.discard(job_id)
             self._save_jobs()
 
     async def _simulate_outfit_chain(
@@ -457,6 +464,7 @@ class TryOnService:
         job.status = TryOnJobStatus.COMPLETED
         job.output_image_url = last_image_url
         job.completed_at = datetime.now(timezone.utc)
+        self._active_tasks.discard(job_id)
         self._save_jobs()
 
     async def get_job(self, job_id: str) -> Optional[TryOnJobResponse]:
@@ -472,10 +480,9 @@ class TryOnService:
                 pass
         if not job:
             return None
-        # Mark very old queued/processing jobs as failed (orphaned workers / restart).
+        # If job is queued/processing but NOT being handled by this process, it's orphaned
         if job.status in (TryOnJobStatus.QUEUED, TryOnJobStatus.PROCESSING):
-            age = (datetime.now(timezone.utc) - job.created_at).total_seconds()
-            if age > _STALE_JOB_MAX_AGE_SEC:
+            if job_id not in self._active_tasks:
                 job.status = TryOnJobStatus.FAILED
                 job.failure_reason = "Сервер был перезапущен. Попробуйте снова."
                 job.completed_at = datetime.now(timezone.utc)

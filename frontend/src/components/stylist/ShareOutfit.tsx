@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { formatPrice, cn } from "@/lib/utils"
 import type { Outfit } from "@/api/types"
+import { useT } from "@/i18n"
 
 interface ShareOutfitProps {
   outfit: Outfit
@@ -108,7 +109,7 @@ async function renderOutfitToCanvas(outfit: Outfit): Promise<HTMLCanvasElement> 
   ctx.fillStyle = "#ffffff"
   ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
   ctx.textBaseline = "middle"
-  ctx.fillText("✨ AI Stylist", padding, headerH / 2 - 2)
+  ctx.fillText("AI Stylist", padding, headerH / 2 - 2)
 
   // Score badge on right
   ctx.font = "bold 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
@@ -125,7 +126,7 @@ async function renderOutfitToCanvas(outfit: Outfit): Promise<HTMLCanvasElement> 
   // Style label
   ctx.font = "12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
   ctx.fillStyle = "rgba(255,255,255,0.8)"
-  const styleLabel = `${outfit.style} • ${outfit.occasion}`
+  const styleLabel = `${outfit.style} \u2022 ${outfit.occasion}`
   ctx.fillText(styleLabel, padding, headerH / 2 + 16)
 
   // Product grid
@@ -216,7 +217,7 @@ async function renderOutfitToCanvas(outfit: Outfit): Promise<HTMLCanvasElement> 
 
   ctx.fillStyle = "#666"
   ctx.font = "12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-  ctx.fillText(`совместимость`, dotX + 12, footerY + footerH / 2 - 4)
+  ctx.fillText(`compatibility`, dotX + 12, footerY + footerH / 2 - 4)
 
   // KRG branding small
   ctx.fillStyle = "#bbb"
@@ -228,6 +229,7 @@ async function renderOutfitToCanvas(outfit: Outfit): Promise<HTMLCanvasElement> 
 }
 
 export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
+  const t = useT()
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -244,12 +246,12 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
-      showToast("Ссылка скопирована!")
+      showToast(t.share.linkCopied)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      showToast("Не удалось скопировать")
+      showToast(t.common.error)
     }
-  }, [outfit, showToast])
+  }, [outfit, showToast, t])
 
   const handleDownload = useCallback(async () => {
     setDownloading(true)
@@ -265,29 +267,29 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
         a.click()
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
-        showToast("Изображение сохранено!")
+        showToast(t.share.imageSaved)
       }, "image/png")
     } catch {
-      showToast("Не удалось создать изображение")
+      showToast(t.common.error)
     } finally {
       setDownloading(false)
     }
-  }, [outfit, showToast])
+  }, [outfit, showToast, t])
 
   const handleWebShare = useCallback(async () => {
     const url = generateShareUrl(outfit)
     try {
       await navigator.share({
-        title: "AI Stylist — Образ",
-        text: `Посмотри этот образ! Совместимость: ${outfit.compatibility_score}%. Цена: ${formatPrice(outfit.total_price)}`,
+        title: "AI Stylist",
+        text: `${outfit.compatibility_score}%. ${formatPrice(outfit.total_price)}`,
         url,
       })
     } catch (err) {
       if ((err as DOMException).name !== "AbortError") {
-        showToast("Не удалось поделиться")
+        showToast(t.common.error)
       }
     }
-  }, [outfit, showToast])
+  }, [outfit, showToast, t])
 
   const canWebShare = typeof navigator !== "undefined" && !!navigator.share
 
@@ -297,10 +299,10 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Share2 className="h-5 w-5 text-foreground" />
-            Поделиться образом
+            {t.share.title}
           </DialogTitle>
           <DialogDescription>
-            Отправьте этот образ друзьям или сохраните как картинку
+            {t.share.subtitle}
           </DialogDescription>
         </DialogHeader>
 
@@ -308,7 +310,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
         <div className="fade-in-up rounded-xl border bg-muted/30 p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-foreground">
-              ✨ AI Stylist
+              AI Stylist
             </span>
             <span
               className={cn(
@@ -369,7 +371,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
             ) : (
               <Copy className="h-4 w-4" />
             )}
-            {copied ? "Скопировано!" : "Скопировать ссылку"}
+            {copied ? t.share.copiedLink : t.share.copyLink}
             <Link className="ml-auto h-3.5 w-3.5 opacity-50" />
           </Button>
 
@@ -380,7 +382,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
             disabled={downloading}
           >
             <Download className="h-4 w-4" />
-            {downloading ? "Создание изображения..." : "Скачать как картинку"}
+            {downloading ? t.share.downloadingImage : t.share.downloadImage}
           </Button>
 
           {canWebShare && (
@@ -390,7 +392,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
               onClick={handleWebShare}
             >
               <ExternalLink className="h-4 w-4" />
-              Поделиться...
+              {t.share.shareButton}
             </Button>
           )}
         </div>

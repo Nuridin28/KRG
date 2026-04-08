@@ -44,6 +44,7 @@ class CategoryType(str, enum.Enum):
     DRESSES = "dresses"
     SHOES = "shoes"
     ACCESSORIES = "accessories"
+    SETS = "sets"
 
 
 class TryOnJobStatus(str, enum.Enum):

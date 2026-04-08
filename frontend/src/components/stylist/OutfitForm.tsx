@@ -11,34 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { StyleType, OccasionType, GenderType, OutfitGenerateRequest } from "@/api/types"
-
-const STYLE_LABELS: Record<StyleType, string> = {
-  casual: "Повседневный",
-  office: "Деловой",
-  sport: "Спортивный",
-  evening: "Вечерний",
-  street: "Уличный",
-  smart_casual: "Smart Casual",
-  date: "Для свидания",
-  travel: "Для путешествий",
-}
-
-const OCCASION_LABELS: Record<OccasionType, string> = {
-  daily: "На каждый день",
-  work: "Работа",
-  date: "Свидание",
-  party: "Вечеринка",
-  workout: "Тренировка",
-  travel: "Путешествие",
-  event: "Мероприятие",
-  casual: "Повседневный",
-}
-
-const GENDER_LABELS: Record<GenderType, string> = {
-  male: "Мужской",
-  female: "Женский",
-  unisex: "Унисекс",
-}
+import { useT } from "@/i18n"
 
 interface OutfitFormProps {
   loading: boolean
@@ -47,11 +20,40 @@ interface OutfitFormProps {
 }
 
 export function OutfitForm({ loading, onSubmit, anchorProductId }: OutfitFormProps) {
+  const t = useT()
   const [style, setStyle] = useState<StyleType>("casual")
   const [occasion, setOccasion] = useState<OccasionType>("daily")
   const [gender, setGender] = useState<GenderType>("female")
   const [budgetMin, setBudgetMin] = useState("")
   const [budgetMax, setBudgetMax] = useState("")
+
+  const STYLE_LABELS: Record<StyleType, string> = {
+    casual: t.styles.casual,
+    office: t.styles.office,
+    sport: t.styles.sport,
+    evening: t.styles.evening,
+    street: t.styles.street,
+    smart_casual: t.styles.smart_casual,
+    date: t.styles.date,
+    travel: t.styles.travel,
+  }
+
+  const OCCASION_LABELS: Record<OccasionType, string> = {
+    daily: t.occasions.daily,
+    work: t.occasions.work,
+    date: t.occasions.date,
+    party: t.occasions.party,
+    workout: t.occasions.workout,
+    travel: t.occasions.travel,
+    event: t.occasions.event,
+    casual: t.occasions.casual,
+  }
+
+  const GENDER_LABELS: Record<GenderType, string> = {
+    male: t.genders.male,
+    female: t.genders.female,
+    unisex: t.genders.unisex,
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,16 +76,16 @@ export function OutfitForm({ loading, onSubmit, anchorProductId }: OutfitFormPro
           className="text-lg font-bold"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Параметры образа
+          {t.stylist.formTitle}
         </h3>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Укажите предпочтения, и AI подберёт идеальный образ
+          {t.stylist.formSubtitle}
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Стиль</Label>
+          <Label>{t.stylist.styleLabel}</Label>
           <Select value={style} onValueChange={(v) => setStyle(v as StyleType)}>
             <SelectTrigger>
               <SelectValue />
@@ -99,7 +101,7 @@ export function OutfitForm({ loading, onSubmit, anchorProductId }: OutfitFormPro
         </div>
 
         <div className="space-y-2">
-          <Label>Повод</Label>
+          <Label>{t.stylist.occasionLabel}</Label>
           <Select value={occasion} onValueChange={(v) => setOccasion(v as OccasionType)}>
             <SelectTrigger>
               <SelectValue />
@@ -115,7 +117,7 @@ export function OutfitForm({ loading, onSubmit, anchorProductId }: OutfitFormPro
         </div>
 
         <div className="space-y-2">
-          <Label>Пол</Label>
+          <Label>{t.stylist.genderLabel}</Label>
           <Select value={gender} onValueChange={(v) => setGender(v as GenderType)}>
             <SelectTrigger>
               <SelectValue />
@@ -131,17 +133,17 @@ export function OutfitForm({ loading, onSubmit, anchorProductId }: OutfitFormPro
         </div>
 
         <div className="space-y-2">
-          <Label>Бюджет</Label>
+          <Label>{t.stylist.budgetLabel}</Label>
           <div className="flex gap-2">
             <Input
               type="number"
-              placeholder="Мин."
+              placeholder={t.stylist.budgetMin}
               value={budgetMin}
               onChange={(e) => setBudgetMin(e.target.value)}
             />
             <Input
               type="number"
-              placeholder="Макс."
+              placeholder={t.stylist.budgetMax}
               value={budgetMax}
               onChange={(e) => setBudgetMax(e.target.value)}
             />
@@ -153,12 +155,12 @@ export function OutfitForm({ loading, onSubmit, anchorProductId }: OutfitFormPro
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Подбираем...
+            {t.stylist.generatingBtn}
           </>
         ) : (
           <>
             <Sparkles className="mr-2 h-4 w-4" />
-            Создать образ
+            {t.stylist.generateButton}
           </>
         )}
       </Button>

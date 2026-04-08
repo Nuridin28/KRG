@@ -1,14 +1,7 @@
 import { useState } from "react"
 import { Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const SUGGESTED_PROMPTS = [
-  "Подбери образ на свидание",
-  "Casual лук до 100 000 ₸",
-  "Офисный стиль",
-  "Спортивный образ",
-  "Что надеть на вечеринку?",
-]
+import { useT } from "@/i18n"
 
 interface ChatInputProps {
   onSend: (message: string) => void
@@ -16,7 +9,16 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSend, disabled }: ChatInputProps) {
+  const t = useT()
   const [value, setValue] = useState("")
+
+  const SUGGESTED_PROMPTS = [
+    t.chat.suggestDate,
+    t.chat.suggestCasual,
+    t.chat.suggestOffice,
+    t.chat.suggestSport,
+    t.chat.suggestParty,
+  ]
 
   const handleSend = () => {
     const trimmed = value.trim()
@@ -52,7 +54,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Спросите AI стилиста..."
+          placeholder={t.chat.inputPlaceholder}
           disabled={disabled}
           className="flex-1 rounded-lg border border-input bg-transparent px-4 py-2.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10 focus-visible:border-foreground/40 disabled:opacity-50 transition-all duration-200"
         />

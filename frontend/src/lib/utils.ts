@@ -7,7 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatPrice(price: number, currency?: string): string {
   const cur = (currency || "USD").toUpperCase()
-  if (cur === "KZT") {
+  // If already in KZT or price looks like KZT (> 1000), display directly
+  if (cur === "KZT" || price >= 1000) {
     return `${Math.round(price).toLocaleString("ru-KZ")} ₸`
   }
   // Convert USD to KZT for display

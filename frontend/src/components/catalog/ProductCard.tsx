@@ -11,6 +11,7 @@ import { useWardrobe } from "@/store/wardrobe"
 import { useAuth } from "@/store/auth"
 import { api } from "@/api/client"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from "@/i18n"
 import type { Product } from "@/api/types"
 
 interface ProductCardProps {
@@ -22,6 +23,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggleTryOn }: ProductCardProps) {
+  const t = useT()
   const navigate = useNavigate()
   const wishlist = useWishlist()
   const isWished = wishlist.has(product.id)
@@ -38,14 +40,14 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
     setQuickLoading(true)
     try {
       const job = await api.profile.quickTryOn(product.id)
-      toast({ title: "Примерка запущена", description: product.name })
+      toast({ title: t.product.selectedForTryOn, description: product.name })
       navigate(`/tryon?job=${job.job_id}`)
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     } finally {
       setQuickLoading(false)
     }
-  }, [product, navigate, toast])
+  }, [product, navigate, toast, t])
 
   const handleAddToWardrobe = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -54,13 +56,13 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
     try {
       const item = await api.wardrobe.addItem({ product_id: product.id })
       wardrobeAdd(item)
-      toast({ title: "Добавлено в гардероб", description: product.name })
+      toast({ title: t.product.addedToWardrobe, description: product.name })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     } finally {
       setWardrobeLoading(false)
     }
-  }, [product, inWardrobe, wardrobeAdd, toast])
+  }, [product, inWardrobe, wardrobeAdd, toast, t])
 
   return (
     <Card className={`group flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
@@ -82,12 +84,12 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
         </div>
         {product.promo_price && (
           <Badge variant="coral" className="absolute left-2 top-2">
-            Скидка
+            {t.catalog.discount}
           </Badge>
         )}
         {!product.in_stock && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/60">
-            <span className="text-sm font-medium text-muted-foreground">Нет в наличии</span>
+            <span className="text-sm font-medium text-muted-foreground">{t.catalog.outOfStock}</span>
           </div>
         )}
 
@@ -108,7 +110,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
               ? "bg-red-500 text-white"
               : "bg-black/30 text-white hover:bg-red-500"
           }`}
-          title={isWished ? "Убрать из избранного" : "В избранное"}
+          title={isWished ? t.product.removeFromWishlist : t.product.addToWishlist}
         >
           <Heart className={`h-3.5 w-3.5 ${isWished ? "fill-current" : ""}`} />
         </button>
@@ -122,7 +124,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
                 ? "border-foreground bg-foreground text-background"
                 : "border-white/80 bg-black/30 text-white hover:bg-foreground/80 hover:border-foreground"
             }`}
-            title={tryOnSelected ? "Убрать из примерки" : "Добавить к примерке"}
+            title={tryOnSelected ? t.product.removeFromTryOn : t.product.addToTryOn}
           >
             {tryOnSelected ? <Check className="h-4 w-4" /> : <Shirt className="h-3.5 w-3.5" />}
           </button>
@@ -179,7 +181,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
               onClick={handleQuickTryOn}
             >
               {quickLoading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Zap className="mr-1.5 h-3.5 w-3.5" />}
-              Примерить на себя
+              {t.common.tryOnSelf}
             </Button>
           ) : (
             <Button
@@ -189,7 +191,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
               onClick={(e) => { e.stopPropagation(); onTryOn(product) }}
             >
               <Shirt className="mr-1.5 h-3.5 w-3.5" />
-              Примерить
+              {t.common.tryOn}
             </Button>
           )}
 
@@ -209,7 +211,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
               ) : (
                 <Plus className="mr-1.5 h-3.5 w-3.5" />
               )}
-              {inWardrobe ? "В гардеробе" : "В гардероб"}
+              {inWardrobe ? t.product.inWardrobe : t.product.toWardrobe}
             </Button>
           )}
         </div>

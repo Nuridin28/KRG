@@ -5,8 +5,10 @@ import { useCart } from "@/store/cart"
 import { useNavigation } from "@/store/navigation"
 import { Button } from "@/components/ui/button"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 
 export function WishlistPage() {
+  const t = useT()
   const navigate = useNavigate()
   const { items, remove } = useWishlist()
   const addItem = useCart((s) => s.addItem)
@@ -15,11 +17,11 @@ export function WishlistPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Избранное</h1>
+        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>{t.wishlist.title}</h1>
         <div className="flex flex-col items-center justify-center rounded-xl border bg-card py-20 text-center">
           <Heart className="mb-4 h-12 w-12 text-muted-foreground/30" />
-          <p className="font-medium">Пока пусто</p>
-          <p className="mt-1 text-sm text-muted-foreground">Нажмите на сердечко на карточке товара чтобы добавить</p>
+          <p className="font-medium">{t.wishlist.emptyTitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t.wishlist.emptyHint}</p>
         </div>
       </div>
     )
@@ -29,7 +31,7 @@ export function WishlistPage() {
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Избранное <span className="text-muted-foreground font-normal text-lg">({items.length})</span>
+          {t.wishlist.title} <span className="text-muted-foreground font-normal text-lg">({items.length})</span>
         </h1>
         <Button
           variant="coral"
@@ -47,7 +49,7 @@ export function WishlistPage() {
           disabled={items.length === 0}
         >
           <Shirt className="mr-1.5 h-3.5 w-3.5" />
-          Примерить всё ({Math.min(items.length, 5)})
+          {t.wishlist.tryOnAll} ({Math.min(items.length, 5)})
         </Button>
       </div>
 
@@ -64,7 +66,7 @@ export function WishlistPage() {
               <p className="text-sm font-semibold">{formatPrice(product.price, product.currency)}</p>
               <div className="flex gap-2 pt-1">
                 <Button size="sm" variant="coral" className="flex-1 text-xs" onClick={() => addItem(product)}>
-                  <ShoppingCart className="mr-1 h-3 w-3" /> В корзину
+                  <ShoppingCart className="mr-1 h-3 w-3" /> {t.common.addToCart}
                 </Button>
                 <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
                   onClick={() => remove(product.id)}>

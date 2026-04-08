@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { formatPrice } from "@/lib/utils"
 import { ShareOutfit } from "./ShareOutfit"
 import type { Outfit } from "@/api/types"
+import { useT } from "@/i18n"
 
 interface OutfitCardProps {
   outfit: Outfit
@@ -24,17 +25,18 @@ function getScoreColor(score: number): string {
   return "bg-red-500"
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 75) return "Отличная совместимость"
-  if (score >= 50) return "Хорошая совместимость"
-  return "Низкая совместимость"
-}
-
 export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCompare }: OutfitCardProps) {
+  const t = useT()
   const addOutfit = useCart((s) => s.addOutfit)
   const isLoggedIn = useAuth((s) => s.isLoggedIn)
   const [shareOpen, setShareOpen] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  const getScoreLabel = (score: number): string => {
+    if (score >= 75) return t.outfit.excellentMatch
+    if (score >= 50) return t.outfit.goodMatch
+    return t.outfit.compatibility
+  }
 
   const handleSave = async () => {
     if (!isLoggedIn()) return
@@ -97,7 +99,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
 
               {item.replaceable && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-muted px-1.5 text-[8px] text-muted-foreground opacity-0 transition-opacity group-hover/item:opacity-100">
-                  Заменить
+                  {t.common.reset}
                 </span>
               )}
             </div>
@@ -123,7 +125,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
         <div className="flex w-full gap-2">
           <Button variant="coral" size="sm" className="min-w-0 flex-1 text-xs" onClick={() => addOutfit(outfit.items.map((i) => i.product))}>
             <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
-            <span className="truncate">Купить всё</span>
+            <span className="truncate">{t.common.buyAll}</span>
           </Button>
           <Button
             variant="outline"
@@ -132,7 +134,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
             onClick={onTryOnOutfit}
           >
             <Shirt className="mr-1.5 h-3.5 w-3.5" />
-            <span className="truncate">Примерить ({outfit.items.length})</span>
+            <span className="truncate">{t.common.tryOn} ({outfit.items.length})</span>
           </Button>
         </div>
         <div className="flex w-full gap-2">
@@ -143,7 +145,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
             onClick={() => setShareOpen(true)}
           >
             <Share2 className="mr-1.5 h-3.5 w-3.5" />
-            <span className="truncate">Поделиться</span>
+            <span className="truncate">{t.common.share}</span>
           </Button>
           {onToggleCompare && (
             <Button
@@ -153,7 +155,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
               onClick={() => onToggleCompare(outfit)}
             >
               <GitCompareArrows className="mr-1.5 h-3.5 w-3.5" />
-              <span className="truncate">{compareSelected ? "В сравнении" : "Сравнить"}</span>
+              <span className="truncate">{compareSelected ? t.outfit.inComparison : t.outfit.compare}</span>
             </Button>
           )}
           {isLoggedIn() && (
@@ -165,7 +167,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
               disabled={saved}
             >
               {saved ? <Check className="mr-1.5 h-3.5 w-3.5" /> : <Save className="mr-1.5 h-3.5 w-3.5" />}
-              <span className="truncate">{saved ? "Сохранено" : "Сохранить"}</span>
+              <span className="truncate">{saved ? t.outfit.saved : t.outfit.save}</span>
             </Button>
           )}
         </div>

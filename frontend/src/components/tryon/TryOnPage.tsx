@@ -13,23 +13,16 @@ import { TryOnResult } from "./TryOnResult"
 import { useNavigation } from "@/store/navigation"
 import { useAuth } from "@/store/auth"
 import { useProfile } from "@/store/profile"
+import { useT } from "@/i18n"
 
 const MAX_ITEMS = 5
 
-const CATEGORY_LABELS: Record<CategoryType, string> = {
-  tops: "Верх",
-  bottoms: "Низ",
-  outerwear: "Верхняя одежда",
-  dresses: "Платья",
-  shoes: "Обувь",
-  accessories: "Аксессуары",
-}
-
-const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories"]
+const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories", "sets"]
 
 const API_HOST = import.meta.env.VITE_API_BASE?.replace("/api/v1", "") || "http://localhost:8000"
 
 export function TryOnPage() {
+  const t = useT()
   const [searchParams, setSearchParams] = useSearchParams()
   const tryOnProducts = useNavigation((s) => s.tryOnProducts)
   const job = useNavigation((s) => s.tryOnJob)
@@ -163,13 +156,15 @@ export function TryOnPage() {
         startPolling(newJob.job_id)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ошибка запуска примерки")
+      setError(err instanceof Error ? err.message : t.tryon.startError)
     } finally {
       setSubmitting(false)
     }
   }
 
   const isProductSelected = (id: string) => chosenProducts.some((p) => p.id === id)
+
+  const categoryLabels: Record<CategoryType, string> = t.categories
 
   const groupedProducts = useMemo(() => {
     const map = new Map<CategoryType, Product[]>()
@@ -180,15 +175,15 @@ export function TryOnPage() {
     }
     return CATEGORY_ORDER.filter((cat) => map.has(cat)).map((cat) => ({
       category: cat,
-      label: CATEGORY_LABELS[cat],
+      label: categoryLabels[cat],
       items: map.get(cat)!,
     }))
-  }, [products])
+  }, [products, categoryLabels])
 
   const buttonLabel =
     chosenProducts.length <= 1
-      ? "Примерить"
-      : `Примерить образ (${chosenProducts.length} ${chosenProducts.length <= 4 ? "вещи" : "вещей"})`
+      ? t.tryon.tryOnButton
+      : `${t.tryon.tryOnButton} (${chosenProducts.length} ${t.common.items})`
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
@@ -197,10 +192,10 @@ export function TryOnPage() {
           className="text-2xl font-bold tracking-tight sm:text-3xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Виртуальная примерка
+          {t.tryon.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Загрузите своё фото и выберите до {MAX_ITEMS} вещей для примерки образа
+          {t.tryon.subtitle.replace("{max}", String(MAX_ITEMS))}
         </p>
       </div>
 
@@ -208,7 +203,7 @@ export function TryOnPage() {
         <div className="space-y-5">
           {/* Photo selection — saved or upload */}
           <div className="rounded-lg border bg-card p-5">
-            <Label className="mb-3 block text-sm font-semibold">1. Выберите фото</Label>
+            <Label className="mb-3 block text-sm font-semibold">{t.tryon.selectPhoto}</Label>
 
             {/* Mode tabs — only show if user has saved photos */}
             {isLoggedIn() && photos.length > 0 && (
@@ -225,7 +220,7 @@ export function TryOnPage() {
                   }`}
                 >
                   <User className="h-3.5 w-3.5" />
-                  Моё фото
+                  {t.tryon.myPhoto}
                 </button>
                 <button
                   type="button"
@@ -235,7 +230,7 @@ export function TryOnPage() {
                   }`}
                 >
                   <Upload className="h-3.5 w-3.5" />
-                  Загрузить новое
+                  {t.tryon.uploadNew}
                 </button>
               </div>
             )}
@@ -256,7 +251,7 @@ export function TryOnPage() {
                   >
                     <img
                       src={`${API_HOST}${photo.image_url}`}
-                      alt="Сохранённое фото"
+                      alt={t.tryon.savedPhoto}
                       className="h-full w-full object-cover"
                     />
                     {selectedSavedPhoto?.id === photo.id && (
@@ -280,7 +275,7 @@ export function TryOnPage() {
           {/* Product selection */}
           <div className="rounded-lg border bg-card p-5">
             <Label className="mb-3 block text-sm font-semibold">
-              2. Выберите вещи для примерки{" "}
+              {t.tryon.selectProducts}{" "}
               <span className="font-normal text-muted-foreground">
                 ({chosenProducts.length}/{MAX_ITEMS})
               </span>
@@ -319,7 +314,7 @@ export function TryOnPage() {
             <div className="relative mb-3">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Поиск по каталогу..."
+                placeholder={t.tryon.searchCatalog}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -391,7 +386,7 @@ export function TryOnPage() {
             {submitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Отправка...
+                {t.common.loading}
               </>
             ) : (
               <>
@@ -412,7 +407,7 @@ export function TryOnPage() {
                 />
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">
-                    {job.current_step || (job.status === "queued" ? "В очереди..." : "Обработка...")}
+                    {job.current_step || (job.status === "queued" ? t.tryon.queued : t.tryon.processing)}
                   </span>
                   <span className="font-medium">{job.progress}%</span>
                 </div>

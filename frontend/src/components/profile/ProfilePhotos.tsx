@@ -6,11 +6,13 @@ import { api } from "@/api/client"
 import { useProfile } from "@/store/profile"
 import { useAuth } from "@/store/auth"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from "@/i18n"
 import type { UserPhoto } from "@/api/types"
 
 const API_HOST = import.meta.env.VITE_API_BASE?.replace("/api/v1", "") || "http://localhost:8000"
 
 export function ProfilePhotos() {
+  const t = useT()
   const { photos, setPhotos, addPhoto, removePhoto } = useProfile()
   const isLoggedIn = useAuth((s) => s.isLoggedIn)
   const { toast } = useToast()
@@ -27,7 +29,7 @@ export function ProfilePhotos() {
     if (!file) return
 
     if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "Файл слишком большой", description: "Максимум 10 МБ" })
+      toast({ title: t.wardrobe.fileTooLarge })
       return
     }
 
@@ -35,14 +37,14 @@ export function ProfilePhotos() {
     try {
       const photo = await api.profile.uploadPhoto(file)
       addPhoto(photo)
-      toast({ title: "Фото загружено" })
+      toast({ title: t.profile.photoUploaded })
     } catch (err: any) {
-      toast({ title: "Ошибка загрузки", description: err.message })
+      toast({ title: t.profile.uploadError, description: err.message })
     } finally {
       setUploading(false)
       e.target.value = ""
     }
-  }, [addPhoto, toast])
+  }, [addPhoto, toast, t])
 
   const handleDelete = useCallback(async (photo: UserPhoto) => {
     try {
@@ -51,30 +53,30 @@ export function ProfilePhotos() {
       // Refresh to get updated defaults
       const updated = await api.profile.getPhotos()
       setPhotos(updated)
-      toast({ title: "Фото удалено" })
+      toast({ title: t.profile.photoDeleted })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     }
-  }, [removePhoto, setPhotos, toast])
+  }, [removePhoto, setPhotos, toast, t])
 
   const handleSetDefault = useCallback(async (photo: UserPhoto) => {
     try {
       await api.profile.setDefault(photo.id)
       const updated = await api.profile.getPhotos()
       setPhotos(updated)
-      toast({ title: "Основное фото обновлено" })
+      toast({ title: t.profile.defaultUpdated })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     }
-  }, [setPhotos, toast])
+  }, [setPhotos, toast, t])
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Мои фото для примерки</h3>
+          <h3 className="text-lg font-semibold">{t.profile.photosTitle}</h3>
           <p className="text-sm text-muted-foreground">
-            Загрузите фото — и примеряйте вещи в один клик
+            {t.profile.photosSubtitle}
           </p>
         </div>
         {photos.length < 3 && (
@@ -89,7 +91,7 @@ export function ProfilePhotos() {
             <Button variant="coral" size="sm" asChild disabled={uploading}>
               <span className="cursor-pointer">
                 {uploading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Upload className="mr-1.5 h-4 w-4" />}
-                Загрузить фото
+                {t.profile.uploadPhoto}
               </span>
             </Button>
           </label>
@@ -100,9 +102,9 @@ export function ProfilePhotos() {
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Camera className="mb-3 h-10 w-10 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">Нет загруженных фото</p>
+            <p className="text-sm text-muted-foreground">{t.profile.noPhotos}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Загрузите фото в полный рост — и примеряйте любую вещь без повторной загрузки
+              {t.profile.noPhotosHint}
             </p>
           </CardContent>
         </Card>
@@ -113,12 +115,12 @@ export function ProfilePhotos() {
               <div className="relative aspect-3/4">
                 <img
                   src={`${API_HOST}${photo.image_url}`}
-                  alt="Моё фото"
+                  alt={t.common.photo}
                   className="h-full w-full object-cover"
                 />
                 {photo.is_default && (
                   <div className="absolute left-1.5 top-1.5 rounded bg-foreground px-1.5 py-0.5 text-[10px] font-bold text-background">
-                    Основное
+                    {t.profile.defaultPhoto}
                   </div>
                 )}
                 <div className="absolute bottom-0 left-0 right-0 flex gap-1 bg-linear-to-t from-black/60 to-transparent p-2">
@@ -126,7 +128,7 @@ export function ProfilePhotos() {
                     <button
                       onClick={() => handleSetDefault(photo)}
                       className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm hover:bg-white/40"
-                      title="Сделать основным"
+                      title={t.profile.makeDefault}
                     >
                       <Star className="h-3.5 w-3.5" />
                     </button>
@@ -134,7 +136,7 @@ export function ProfilePhotos() {
                   <button
                     onClick={() => handleDelete(photo)}
                     className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm hover:bg-red-500/80"
-                    title="Удалить"
+                    title={t.profile.deletePhoto}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>

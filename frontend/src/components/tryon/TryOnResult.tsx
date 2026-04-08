@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress"
 import { api } from "@/api/client"
 import { useToast } from "@/hooks/use-toast"
 import type { TryOnJob, VideoJob } from "@/api/types"
+import { useT } from "@/i18n"
 
 interface TryOnResultProps {
   job: TryOnJob | null
@@ -12,24 +13,26 @@ interface TryOnResultProps {
   onBuildOutfit: () => void
 }
 
-function getStatusLabel(status: string): string {
-  switch (status) {
-    case "queued":
-      return "В очереди..."
-    case "processing":
-      return "Обработка изображения..."
-    case "completed":
-      return "Готово!"
-    case "failed":
-      return "Ошибка"
-    default:
-      return status
-  }
-}
-
 type ViewMode = "photo" | "video"
 
 export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultProps) {
+  const t = useT()
+
+  function getStatusLabel(status: string): string {
+    switch (status) {
+      case "queued":
+        return t.tryon.queued
+      case "processing":
+        return t.tryon.processing
+      case "completed":
+        return t.tryon.completed
+      case "failed":
+        return t.tryon.failed
+      default:
+        return status
+    }
+  }
+
   const [zoomedImage, setZoomedImage] = useState<string | null>(null)
   const [videoJob, setVideoJob] = useState<VideoJob | null>(null)
   const [videoLoading, setVideoLoading] = useState(false)
@@ -67,7 +70,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
             setViewMode("video")
           }
           if (updated.status === "failed") {
-            toast({ title: "Не удалось создать видео", description: updated.failure_reason || "" })
+            toast({ title: t.tryon.videoFailed, description: updated.failure_reason || "" })
           }
         }
       } catch {
@@ -75,7 +78,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
         pollingRef.current = null
       }
     }, 3000)
-  }, [toast])
+  }, [toast, t])
 
   const handleGenerateVideo = useCallback(async () => {
     if (!job?.output_image_url) return
@@ -86,11 +89,11 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
       setVideoJob(vJob)
       startVideoPolling(vJob.job_id)
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     } finally {
       setVideoLoading(false)
     }
-  }, [job, startVideoPolling, toast])
+  }, [job, startVideoPolling, toast, t])
 
   const hasVideo = videoJob?.status === "completed" && videoJob.video_url
   const videoGenerating = videoJob && (videoJob.status === "queued" || videoJob.status === "processing")
@@ -101,9 +104,9 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
         <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
           <Sparkles className="h-8 w-8 text-muted-foreground/40" />
         </div>
-        <p className="text-sm font-medium">Результат примерки</p>
+        <p className="text-sm font-medium">{t.tryon.title}</p>
         <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-          Загрузите фото и выберите товар для виртуальной примерки
+          {t.tryon.subtitle.replace("{max}", "5")}
         </p>
       </div>
     )
@@ -128,9 +131,9 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5 py-20 text-center">
         <AlertCircle className="mb-4 h-10 w-10 text-destructive" />
-        <p className="text-sm font-medium text-destructive">Не удалось выполнить примерку</p>
+        <p className="text-sm font-medium text-destructive">{t.tryon.failedTitle}</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          {job.failure_reason || "Попробуйте загрузить другое фото"}
+          {job.failure_reason || t.tryon.failedHint}
         </p>
       </div>
     )
@@ -143,14 +146,14 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
       {personPreview && (
         <>
           <div className="space-y-2">
-            <p className="text-center text-sm font-semibold text-muted-foreground">До</p>
+            <p className="text-center text-sm font-semibold text-muted-foreground">{t.tryon.before}</p>
             <div
               className="group relative cursor-pointer overflow-hidden rounded-xl border shadow-sm"
               onClick={() => setZoomedImage(personPreview)}
             >
               <img
                 src={personPreview}
-                alt="Оригинальное фото"
+                alt={t.tryon.before}
                 className="w-full rounded-xl object-contain"
                 style={{ maxHeight: "50vh" }}
               />
@@ -181,7 +184,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
               }`}
             >
               <ImageIcon className="h-3.5 w-3.5" />
-              Фото
+              {t.common.photo}
             </button>
             <button
               onClick={() => hasVideo && setViewMode("video")}
@@ -199,7 +202,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
               ) : (
                 <Film className="h-3.5 w-3.5" />
               )}
-              {videoGenerating ? "Генерация..." : "Видео"}
+              {videoGenerating ? t.common.generating : t.common.video}
             </button>
           </div>
         )}
@@ -207,7 +210,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
         {/* Content */}
         <div className="relative">
           <p className="mb-2 text-center text-sm font-semibold text-foreground">
-            {viewMode === "video" ? "В движении" : "После"}
+            {viewMode === "video" ? t.common.inMotion : t.tryon.after}
           </p>
 
           {/* Photo view */}
@@ -218,7 +221,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
             >
               <img
                 src={job.output_image_url}
-                alt="Результат примерки"
+                alt={t.tryon.after}
                 className="w-full rounded-xl object-contain"
                 style={{ maxHeight: "65vh" }}
               />
@@ -241,7 +244,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
                   ) : (
                     <Play className="h-3.5 w-3.5" />
                   )}
-                  В движении
+                  {t.common.inMotion}
                 </button>
               )}
             </div>
@@ -266,7 +269,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           {/* No image fallback */}
           {viewMode === "photo" && !job.output_image_url && (
             <div className="flex aspect-3/4 items-center justify-center rounded-xl bg-muted">
-              <p className="text-xs text-muted-foreground">Изображение недоступно</p>
+              <p className="text-xs text-muted-foreground">{t.tryon.failedHint}</p>
             </div>
           )}
         </div>
@@ -278,7 +281,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           <div className="mb-1.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-              <span className="text-xs font-medium">Создаём видео ~40 сек...</span>
+              <span className="text-xs font-medium">{t.tryon.videoCreating}</span>
             </div>
             <span className="text-xs text-muted-foreground">{videoJob!.progress}%</span>
           </div>
@@ -295,11 +298,11 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
         <div className="flex gap-3">
           <Button variant="coral" className="flex-1">
             <ShoppingCart className="mr-2 h-4 w-4" />
-            В корзину
+            {t.common.addToCart}
           </Button>
           <Button variant="outline" className="flex-1" onClick={onBuildOutfit}>
             <Sparkles className="mr-2 h-4 w-4" />
-            Собрать образ
+            {t.common.buildOutfit}
           </Button>
         </div>
 
@@ -316,7 +319,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
             ) : (
               <Play className="mr-2 h-4 w-4" />
             )}
-            Показать в движении
+            {t.tryon.showInMotion}
           </Button>
         )}
 
@@ -330,7 +333,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
             onClick={handleGenerateVideo}
           >
             <RotateCw className="mr-1.5 h-3.5 w-3.5" />
-            Перегенерировать видео
+            {t.tryon.showInMotion}
           </Button>
         )}
       </div>
@@ -343,7 +346,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
         >
           <img
             src={zoomedImage}
-            alt="Увеличенное фото"
+            alt=""
             className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
           />
           <button

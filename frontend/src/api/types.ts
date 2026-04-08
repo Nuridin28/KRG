@@ -1,4 +1,4 @@
-export type CategoryType = "tops" | "bottoms" | "outerwear" | "dresses" | "shoes" | "accessories"
+export type CategoryType = "tops" | "bottoms" | "outerwear" | "dresses" | "shoes" | "accessories" | "sets"
 export type StyleType = "casual" | "office" | "sport" | "evening" | "street" | "smart_casual" | "date" | "travel"
 export type OccasionType = "daily" | "work" | "date" | "party" | "workout" | "travel" | "event" | "casual"
 export type GenderType = "male" | "female" | "unisex"

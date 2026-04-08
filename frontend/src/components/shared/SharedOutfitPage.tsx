@@ -6,8 +6,10 @@ import { useCart } from "@/store/cart"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 
 export function SharedOutfitPage() {
+  const t = useT()
   const { outfitId } = useParams()
   const [outfit, setOutfit] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -34,8 +36,8 @@ export function SharedOutfitPage() {
   if (error || !outfit) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
-        <p className="text-lg font-medium">Образ не найден</p>
-        <p className="mt-1 text-sm text-muted-foreground">Возможно, ссылка устарела или образ был удалён</p>
+        <p className="text-lg font-medium">{t.shared.notFound}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t.shared.notFoundHint}</p>
       </div>
     )
   }
@@ -50,9 +52,9 @@ export function SharedOutfitPage() {
     <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Подборка образа
+          {t.shared.title}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Кто-то поделился с вами стильным образом</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t.shared.subtitle}</p>
       </div>
 
       <div className="rounded-xl border bg-card p-6 shadow-sm">
@@ -64,7 +66,7 @@ export function SharedOutfitPage() {
           </div>
           <div className="text-right">
             <span className="text-2xl font-bold">{formatPrice(outfit.total_price)}</span>
-            <p className="text-xs text-muted-foreground">Совместимость: {outfit.compatibility_score}%</p>
+            <p className="text-xs text-muted-foreground">{t.shared.compatibility} {outfit.compatibility_score}%</p>
           </div>
         </div>
 
@@ -88,11 +90,11 @@ export function SharedOutfitPage() {
 
         <div className="mt-5 flex gap-3">
           <Button variant="coral" className="flex-1" onClick={() => addOutfit(outfit.items)}>
-            <ShoppingCart className="mr-2 h-4 w-4" /> Купить всё
+            <ShoppingCart className="mr-2 h-4 w-4" /> {t.common.buyAll}
           </Button>
           <Button variant="outline" onClick={handleCopy}>
             {copied ? <Check className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
-            {copied ? "Скопировано!" : "Поделиться"}
+            {copied ? t.common.copied : t.common.share}
           </Button>
         </div>
       </div>

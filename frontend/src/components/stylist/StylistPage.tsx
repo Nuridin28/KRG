@@ -9,12 +9,14 @@ import { OutfitCardSkeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { useCart } from "@/store/cart"
 import { useNavigation } from "@/store/navigation"
+import { useT } from "@/i18n"
 
 interface StylistPageProps {
   onTryOnOutfit: (outfit: Outfit) => void
 }
 
 export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
+  const t = useT()
   const anchorProduct = useNavigation((s) => s.anchorProduct)
   const [outfits, setOutfits] = useState<Outfit[]>([])
   const [loading, setLoading] = useState(false)
@@ -62,7 +64,7 @@ export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
       setProgress(100)
       setOutfits(results)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Не удалось создать образ")
+      setError(err instanceof Error ? err.message : t.stylist.generateError)
     } finally {
       setLoading(false)
       setTimeout(() => setProgress(0), 500)
@@ -76,10 +78,10 @@ export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
           className="text-2xl font-bold tracking-tight sm:text-3xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          AI Стилист
+          {t.stylist.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Искусственный интеллект подберёт идеальный образ под ваши предпочтения
+          {t.stylist.subtitle}
         </p>
       </div>
 
@@ -96,7 +98,7 @@ export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
           {loading && (
             <div className="space-y-4">
               <div className="space-y-3 rounded-xl border bg-card p-6 text-center shadow-sm">
-                <p className="text-sm font-medium">AI подбирает образы...</p>
+                <p className="text-sm font-medium">{t.stylist.generating}</p>
                 <Progress value={progress} className="mx-auto max-w-xs" indicatorClassName="bg-foreground" />
               </div>
               {[1, 2].map((i) => (
@@ -116,10 +118,9 @@ export function StylistPage({ onTryOnOutfit }: StylistPageProps) {
               <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-foreground/5">
                 <Sparkles className="h-9 w-9 text-foreground/40" />
               </div>
-              <p className="text-lg font-medium">Создайте свой первый образ</p>
+              <p className="text-lg font-medium">{t.stylist.emptyTitle}</p>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Заполните параметры слева и нажмите &laquo;Создать образ&raquo;, чтобы AI подобрал
-                стильные сочетания
+                {t.stylist.emptyHint}
               </p>
             </div>
           )}

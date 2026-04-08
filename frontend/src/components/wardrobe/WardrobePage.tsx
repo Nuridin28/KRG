@@ -7,23 +7,25 @@ import { api } from "@/api/client"
 import { useWardrobe } from "@/store/wardrobe"
 import { useAuth } from "@/store/auth"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from "@/i18n"
 import { CapsuleAnalysis } from "./CapsuleAnalysis"
 import type { CapsuleAnalysis as CapsuleAnalysisType } from "@/api/types"
 
 const API_HOST = import.meta.env.VITE_API_BASE?.replace("/api/v1", "") || "http://localhost:8000"
 
-const CAT_LABELS: Record<string, string> = {
-  tops: "Верх", bottoms: "Низ", dresses: "Платья",
-  outerwear: "Верхняя одежда", shoes: "Обувь", accessories: "Аксессуары",
-}
-
 export function WardrobePage() {
+  const t = useT()
   const { items, setItems, removeItem, addItem } = useWardrobe()
   const isLoggedIn = useAuth((s) => s.isLoggedIn)
   const { toast } = useToast()
   const [analysis, setAnalysis] = useState<CapsuleAnalysisType | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [uploading, setUploading] = useState(false)
+
+  const CAT_LABELS: Record<string, string> = {
+    tops: t.categories.tops, bottoms: t.categories.bottoms, dresses: t.categories.dresses,
+    outerwear: t.categories.outerwear, shoes: t.categories.shoes, accessories: t.categories.accessories,
+  }
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -36,7 +38,7 @@ export function WardrobePage() {
     if (!file) return
 
     if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "Файл слишком большой", description: "Максимум 10 МБ" })
+      toast({ title: t.wardrobe.fileTooLarge })
       return
     }
 
@@ -45,14 +47,14 @@ export function WardrobePage() {
       const item = await api.wardrobe.uploadPhoto(file)
       addItem(item)
       setAnalysis(null)
-      toast({ title: "Вещь распознана и добавлена", description: item.name })
+      toast({ title: t.wardrobe.itemRecognized, description: item.name })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     } finally {
       setUploading(false)
       e.target.value = ""
     }
-  }, [addItem, toast])
+  }, [addItem, toast, t])
 
   const handleRemove = useCallback(async (id: number) => {
     try {
@@ -60,9 +62,9 @@ export function WardrobePage() {
       removeItem(id)
       setAnalysis(null)
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     }
-  }, [removeItem, toast])
+  }, [removeItem, toast, t])
 
   const handleAnalyze = useCallback(async () => {
     setAnalyzing(true)
@@ -70,11 +72,11 @@ export function WardrobePage() {
       const result = await api.wardrobe.analyze()
       setAnalysis(result)
     } catch (err: any) {
-      toast({ title: "Ошибка анализа", description: err.message })
+      toast({ title: t.wardrobe.analysisError, description: err.message })
     } finally {
       setAnalyzing(false)
     }
-  }, [toast])
+  }, [toast, t])
 
   // Group by category
   const grouped = items.reduce<Record<string, typeof items>>((acc, it) => {
@@ -88,10 +90,10 @@ export function WardrobePage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Мой гардероб
+          {t.wardrobe.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Загрузите фото своих вещей — AI распознает каждую и подскажет, что купить для новых образов
+          {t.wardrobe.subtitle}
         </p>
       </div>
 
@@ -108,7 +110,7 @@ export function WardrobePage() {
           <Button variant="coral" asChild disabled={uploading}>
             <span className="cursor-pointer">
               {uploading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Camera className="mr-1.5 h-4 w-4" />}
-              {uploading ? "Распознаём..." : "Загрузить фото вещи"}
+              {uploading ? t.wardrobe.recognizing : t.wardrobe.uploadPhoto}
             </span>
           </Button>
         </label>
@@ -116,14 +118,14 @@ export function WardrobePage() {
         {items.length >= 2 && (
           <Button variant="outline" onClick={handleAnalyze} disabled={analyzing}>
             {analyzing ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Sparkles className="mr-1.5 h-4 w-4" />}
-            {analyzing ? "Анализируем..." : "Анализ гардероба"}
+            {analyzing ? t.wardrobe.analyzing : t.wardrobe.analyzeButton}
           </Button>
         )}
 
         {items.length > 0 && (
           <div className="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs text-muted-foreground">
             <Shirt className="h-3.5 w-3.5" />
-            {items.length} {items.length === 1 ? "вещь" : items.length < 5 ? "вещи" : "вещей"}
+            {items.length} {t.common.items}
           </div>
         )}
       </div>
@@ -135,9 +137,9 @@ export function WardrobePage() {
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/20">
               <Upload className="h-7 w-7 text-muted-foreground/40" />
             </div>
-            <p className="text-lg font-semibold">Гардероб пуст</p>
+            <p className="text-lg font-semibold">{t.wardrobe.emptyTitle}</p>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Сфотографируйте свои вещи — AI определит категорию, цвет и стиль каждой, а затем подскажет, что купить для максимума новых образов
+              {t.wardrobe.emptyHint}
             </p>
             <label className="mt-5">
               <input
@@ -150,7 +152,7 @@ export function WardrobePage() {
               <Button variant="coral" size="lg" asChild disabled={uploading}>
                 <span className="cursor-pointer">
                   <Camera className="mr-2 h-4 w-4" />
-                  Загрузить первую вещь
+                  {t.wardrobe.uploadFirst}
                 </span>
               </Button>
             </label>
@@ -184,7 +186,7 @@ export function WardrobePage() {
                       <button
                         onClick={() => handleRemove(item.id)}
                         className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-red-500"
-                        title="Убрать"
+                        title={t.common.remove}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -222,7 +224,7 @@ export function WardrobePage() {
                       ) : (
                         <Upload className="h-5 w-5 text-muted-foreground/40" />
                       )}
-                      <span className="text-[10px] text-muted-foreground">Добавить</span>
+                      <span className="text-[10px] text-muted-foreground">{t.common.add}</span>
                     </CardContent>
                   </Card>
                 </label>

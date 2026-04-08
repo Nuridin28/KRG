@@ -7,6 +7,7 @@ import { ChatMessageComponent } from "./ChatMessage"
 import { ChatInput } from "./ChatInput"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useNavigation } from "@/store/navigation"
+import { useT } from "@/i18n"
 
 interface MessageWithData {
   message: ChatMessage
@@ -15,6 +16,7 @@ interface MessageWithData {
 }
 
 export function ChatPage() {
+  const t = useT()
   const navigate = useNavigate()
   const { setTryOnProducts, setTryOnFromOutfit } = useNavigation()
   const [messages, setMessages] = useState<MessageWithData[]>([])
@@ -51,7 +53,7 @@ export function ChatPage() {
       const errorMsg: MessageWithData = {
         message: {
           role: "assistant",
-          content: `Извините, произошла ошибка: ${err instanceof Error ? err.message : "Попробуйте позже"}`,
+          content: `${t.common.error}: ${err instanceof Error ? err.message : ""}`,
         },
         products: [],
         outfits: [],
@@ -85,10 +87,10 @@ export function ChatPage() {
           className="text-2xl font-bold tracking-tight sm:text-3xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          AI Чат
+          {t.chat.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Общайтесь с AI стилистом и получайте персональные рекомендации
+          {t.chat.subtitle}
         </p>
       </div>
 
@@ -100,10 +102,9 @@ export function ChatPage() {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-foreground/5">
                   <MessageCircle className="h-7 w-7 text-muted-foreground" />
                 </div>
-                <p className="text-sm font-medium">Начните диалог с AI стилистом</p>
+                <p className="text-sm font-medium">{t.chat.emptyTitle}</p>
                 <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                  Задайте вопрос о стиле, попросите подобрать образ или получить рекомендации по
-                  гардеробу
+                  {t.chat.emptyHint}
                 </p>
               </div>
             )}

@@ -10,22 +10,24 @@ import { Input } from "@/components/ui/input"
 // import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 import type { Product, ProductBrief } from "@/api/types"
 
-const SLOTS = [
-  { id: "top", label: "Верх", categories: ["tops"] },
-  { id: "bottom", label: "Низ", categories: ["bottoms"] },
-  { id: "shoes", label: "Обувь", categories: ["shoes"] },
-  { id: "outerwear", label: "Верхняя одежда", categories: ["outerwear"] },
-  { id: "accessory", label: "Аксессуар", categories: ["accessories"] },
-  { id: "dress", label: "Платье", categories: ["dresses"] },
-]
-
 export function OutfitBuilderPage() {
+  const t = useT()
   const navigate = useNavigate()
   const addOutfit = useCart((s) => s.addOutfit)
   const setTryOnProducts = useNavigation((s) => s.setTryOnProducts)
   const isLoggedIn = useAuth((s) => s.isLoggedIn)
+
+  const SLOTS = [
+    { id: "top", label: t.builder.slotTop, categories: ["tops"] },
+    { id: "bottom", label: t.builder.slotBottom, categories: ["bottoms"] },
+    { id: "shoes", label: t.builder.slotShoes, categories: ["shoes"] },
+    { id: "outerwear", label: t.builder.slotOuterwear, categories: ["outerwear"] },
+    { id: "accessory", label: t.builder.slotAccessory, categories: ["accessories"] },
+    { id: "dress", label: t.builder.slotDress, categories: ["dresses"] },
+  ]
 
   const [slots, setSlots] = useState<Record<string, Product | null>>({
     top: null, bottom: null, shoes: null, outerwear: null, accessory: null, dress: null,
@@ -106,8 +108,8 @@ export function OutfitBuilderPage() {
         occasion: "custom",
         total_price: totalPrice,
         compatibility_score: 0,
-        explanation: "Образ собран вручную в конструкторе",
-        badges: ["Ваш образ"],
+        explanation: t.outfit.handmade,
+        badges: [t.outfit.yourOutfit],
       })
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
@@ -119,10 +121,10 @@ export function OutfitBuilderPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Конструктор образа
+          {t.builder.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Перетаскивайте вещи из каталога на слоты справа, чтобы собрать образ
+          {t.builder.subtitle}
         </p>
       </div>
 
@@ -132,18 +134,18 @@ export function OutfitBuilderPage() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Поиск..." className="pl-9" value={searchQuery}
+              <Input placeholder={t.builder.searchPlaceholder} className="pl-9" value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)} />
             </div>
             <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
               className="rounded-lg border bg-background px-3 py-2 text-sm outline-none">
-              <option value="">Все</option>
-              <option value="tops">Верх</option>
-              <option value="bottoms">Низ</option>
-              <option value="dresses">Платья</option>
-              <option value="outerwear">Верхняя одежда</option>
-              <option value="shoes">Обувь</option>
-              <option value="accessories">Аксессуары</option>
+              <option value="">{t.filters.allCategories}</option>
+              <option value="tops">{t.categories.tops}</option>
+              <option value="bottoms">{t.categories.bottoms}</option>
+              <option value="dresses">{t.categories.dresses}</option>
+              <option value="outerwear">{t.categories.outerwear}</option>
+              <option value="shoes">{t.categories.shoes}</option>
+              <option value="accessories">{t.categories.accessories}</option>
             </select>
           </div>
 
@@ -188,7 +190,7 @@ export function OutfitBuilderPage() {
           <div className="rounded-xl border bg-card p-4 shadow-sm">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4 text-foreground" />
-              Ваш образ
+              {t.builder.yourOutfit}
             </h3>
 
             <div className="space-y-2">
@@ -223,7 +225,7 @@ export function OutfitBuilderPage() {
                     ) : (
                       <div className="flex flex-1 items-center justify-center py-2">
                         <span className="text-xs text-muted-foreground">
-                          Перетащите сюда — {slot.label}
+                          {slot.label}
                         </span>
                       </div>
                     )}
@@ -235,30 +237,30 @@ export function OutfitBuilderPage() {
             {filledSlots.length > 0 && (
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between border-t pt-3">
-                  <span className="text-sm text-muted-foreground">Итого</span>
+                  <span className="text-sm text-muted-foreground">{t.common.total}</span>
                   <span className="text-xl font-bold">{formatPrice(totalPrice)}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <Button variant="coral" size="sm" className="flex-1 text-xs" onClick={handleBuyAll}>
-                    <ShoppingCart className="mr-1 h-3 w-3" /> Купить
+                    <ShoppingCart className="mr-1 h-3 w-3" /> {t.builder.buy}
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={handleTryOn}>
-                    <Shirt className="mr-1 h-3 w-3" /> Примерить
+                    <Shirt className="mr-1 h-3 w-3" /> {t.builder.tryOn}
                   </Button>
                 </div>
 
                 {isLoggedIn() && (
                   <Button variant="outline" size="sm" className="w-full text-xs" onClick={handleSave} disabled={saving}>
-                    {saved ? <><Check className="mr-1 h-3 w-3" /> Сохранено!</> :
-                     saving ? "Сохраняю..." :
-                     <><Save className="mr-1 h-3 w-3" /> Сохранить образ</>}
+                    {saved ? <><Check className="mr-1 h-3 w-3" /> {t.builder.savedOutfit}</> :
+                     saving ? t.builder.savingOutfit :
+                     <><Save className="mr-1 h-3 w-3" /> {t.builder.saveOutfit}</>}
                   </Button>
                 )}
 
                 <Button variant="outline" size="sm" className="w-full text-xs text-red-500 hover:text-red-600"
                   onClick={() => setSlots({ top: null, bottom: null, shoes: null, outerwear: null, accessory: null, dress: null })}>
-                  <Trash2 className="mr-1 h-3 w-3" /> Очистить всё
+                  <Trash2 className="mr-1 h-3 w-3" /> {t.builder.clearAll}
                 </Button>
               </div>
             )}

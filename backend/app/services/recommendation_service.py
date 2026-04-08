@@ -82,13 +82,19 @@ class RecommendationService:
         random.shuffle(shuffled)
         return shuffled[:count]
 
+    @staticmethod
+    def _to_kzt(price: float, currency: str) -> float:
+        if currency.upper() == "KZT":
+            return price
+        return price * 480  # USD -> KZT
+
     def _build_outfit(
         self,
         items: List[Product],
         style: str,
         occasion: str,
     ) -> Outfit:
-        total = sum(p.promo_price or p.price for p in items)
+        total = sum(self._to_kzt(p.promo_price or p.price, p.currency) for p in items)
         color_sc = outfit_color_score(items)
         style_sc = style_coherence_score(items, style)
         compat = round((color_sc * 0.6 + style_sc * 0.4), 1)
@@ -200,12 +206,26 @@ class RecommendationService:
 
         return self._build_outfit(items, style, occasion)
 
+    async def _featured_outfit(self) -> Optional[Outfit]:
+        """Hardcoded featured outfit: Футболка ALL.INN + Юбка ALL.INN + Leather Penny Loafers."""
+        ids = ["top-017", "bot-014", "shoe-006"]
+        items = [await self.catalog.get_product(pid) for pid in ids]
+        if all(items):
+            return self._build_outfit(items, "casual", "daily")
+        return None
+
     async def generate_outfits(self, req: OutfitGenerateRequest) -> List[Outfit]:
         anchor = None
         if req.anchor_product_id:
             anchor = await self.catalog.get_product(req.anchor_product_id)
 
         outfits: List[Outfit] = []
+
+        # Always try to include featured outfit first
+        featured = await self._featured_outfit()
+        if featured:
+            outfits.append(featured)
+
         attempts = 0
         max_attempts = req.count * 5
 

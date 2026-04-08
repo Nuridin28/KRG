@@ -6,6 +6,7 @@ import { useAuth } from "@/store/auth"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 
 interface SavedOutfit {
   id: string
@@ -20,6 +21,7 @@ interface SavedOutfit {
 }
 
 export function OutfitHistoryPage() {
+  const t = useT()
   const [outfits, setOutfits] = useState<SavedOutfit[]>([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState<string | null>(null)
@@ -52,10 +54,10 @@ export function OutfitHistoryPage() {
   if (!isLoggedIn()) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>История образов</h1>
+        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>{t.history.title}</h1>
         <div className="flex flex-col items-center justify-center rounded-xl border bg-card py-20 text-center">
           <History className="mb-4 h-12 w-12 text-muted-foreground/30" />
-          <p className="font-medium">Войдите чтобы сохранять образы</p>
+          <p className="font-medium">{t.history.loginPrompt}</p>
         </div>
       </div>
     )
@@ -64,8 +66,8 @@ export function OutfitHistoryPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>История образов</h1>
-        <p className="py-12 text-center text-muted-foreground">Загрузка...</p>
+        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>{t.history.title}</h1>
+        <p className="py-12 text-center text-muted-foreground">{t.common.loading}</p>
       </div>
     )
   }
@@ -73,14 +75,14 @@ export function OutfitHistoryPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
       <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-        История образов <span className="text-muted-foreground font-normal text-lg">({outfits.length})</span>
+        {t.history.title} <span className="text-muted-foreground font-normal text-lg">({outfits.length})</span>
       </h1>
 
       {outfits.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border bg-card py-20 text-center">
           <History className="mb-4 h-12 w-12 text-muted-foreground/30" />
-          <p className="font-medium">Пока нет сохранённых образов</p>
-          <p className="mt-1 text-sm text-muted-foreground">Сгенерируйте образ и нажмите «Сохранить»</p>
+          <p className="font-medium">{t.history.emptyTitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t.history.emptyHint}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -118,14 +120,14 @@ export function OutfitHistoryPage() {
 
               <div className="mt-3 flex gap-2">
                 <Button size="sm" variant="coral" className="text-xs" onClick={() => addOutfit(outfit.items)}>
-                  <ShoppingCart className="mr-1 h-3 w-3" /> Купить всё
+                  <ShoppingCart className="mr-1 h-3 w-3" /> {t.common.buyAll}
                 </Button>
                 <Button size="sm" variant="outline" className="text-xs" onClick={() => handleShare(outfit.id)}>
                   {copiedId === outfit.id ? <Check className="mr-1 h-3 w-3" /> : <Share2 className="mr-1 h-3 w-3" />}
-                  {copiedId === outfit.id ? "Скопировано!" : "Поделиться"}
+                  {copiedId === outfit.id ? t.common.copied : t.common.share}
                 </Button>
                 <Button size="sm" variant="outline" className="text-xs text-red-500 hover:text-red-600" onClick={() => handleDelete(outfit.id)}>
-                  <Trash2 className="mr-1 h-3 w-3" /> Удалить
+                  <Trash2 className="mr-1 h-3 w-3" /> {t.common.delete}
                 </Button>
               </div>
 

@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 import { Upload, X, Image as ImageIcon, Camera, SwitchCamera, CircleDot } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useT } from "@/i18n"
 
 interface ImageUploadProps {
   onImageSelected: (file: File) => void
@@ -11,6 +12,7 @@ const MAX_SIZE = 10 * 1024 * 1024
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"]
 
 export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps) {
+  const t = useT()
   const [preview, setPreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -26,18 +28,18 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
     (file: File) => {
       setError(null)
       if (!ACCEPTED_TYPES.includes(file.type)) {
-        setError("Поддерживаются только форматы JPEG, PNG и WebP")
+        setError(t.imageUpload.onlyFormats)
         return
       }
       if (file.size > MAX_SIZE) {
-        setError("Максимальный размер файла — 10 МБ")
+        setError(t.imageUpload.maxSize)
         return
       }
       const url = URL.createObjectURL(file)
       setPreview(url)
       onImageSelected(file)
     },
-    [onImageSelected]
+    [onImageSelected, t]
   )
 
   const handleDrop = useCallback(
@@ -78,10 +80,10 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
         }
       }
     } catch (err) {
-      setError("Не удалось получить доступ к камере. Проверьте разрешения браузера.")
+      setError(t.imageUpload.cameraError)
       setMode("upload")
     }
-  }, [facingMode])
+  }, [facingMode, t])
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -157,7 +159,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
             }`}
           >
             <Upload className="h-4 w-4" />
-            Загрузить фото
+            {t.imageUpload.uploadPhoto}
           </button>
           <button
             onClick={() => setMode("camera")}
@@ -168,7 +170,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
             }`}
           >
             <Camera className="h-4 w-4" />
-            Камера
+            {t.imageUpload.camera}
           </button>
         </div>
       )}
@@ -178,7 +180,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
         <div className="relative">
           <img
             src={preview}
-            alt="Предпросмотр"
+            alt=""
             className="aspect-3/4 w-full rounded-lg object-cover"
           />
           <Button
@@ -207,21 +209,21 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
               <button
                 onClick={toggleFacingMode}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
-                title="Переключить камеру"
+                title={t.imageUpload.switchCamera}
               >
                 <SwitchCamera className="h-5 w-5" />
               </button>
               <button
                 onClick={capturePhoto}
                 className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-foreground text-background shadow-lg transition-transform active:scale-90"
-                title="Сделать фото"
+                title={t.imageUpload.takePhoto}
               >
                 <CircleDot className="h-7 w-7" />
               </button>
               <button
                 onClick={() => { stopCamera(); setMode("upload") }}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
-                title="Закрыть камеру"
+                title={t.imageUpload.closeCamera}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -249,8 +251,8 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
           onClick={() => inputRef.current?.click()}
         >
           <Upload className="mb-3 h-10 w-10 text-muted-foreground/40" />
-          <p className="text-sm font-medium">Перетащите фото сюда</p>
-          <p className="mt-1 text-xs text-muted-foreground">или нажмите для выбора</p>
+          <p className="text-sm font-medium">{t.imageUpload.dropHere}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t.imageUpload.orClick}</p>
           <input
             ref={inputRef}
             type="file"
@@ -266,7 +268,7 @@ export function ImageUpload({ onImageSelected, selectedImage }: ImageUploadProps
       <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3">
         <ImageIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
         <p className="text-xs text-muted-foreground">
-          Загрузите фото или сделайте снимок с камеры. Фото в полный рост на однотонном фоне даст лучший результат.
+          {t.imageUpload.tip}
         </p>
       </div>
     </div>

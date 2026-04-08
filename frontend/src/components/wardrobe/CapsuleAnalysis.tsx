@@ -5,24 +5,26 @@ import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/store/cart"
 import { useToast } from "@/hooks/use-toast"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 import type { CapsuleAnalysis as CapsuleAnalysisType } from "@/api/types"
-
-const CAT_LABELS: Record<string, string> = {
-  tops: "Верх", bottoms: "Низ", dresses: "Платья",
-  outerwear: "Верхняя одежда", shoes: "Обувь", accessories: "Аксессуары",
-}
 
 interface Props {
   analysis: CapsuleAnalysisType
 }
 
 export function CapsuleAnalysis({ analysis }: Props) {
+  const t = useT()
   const addToCart = useCart((s) => s.addItem)
   const { toast } = useToast()
 
+  const CAT_LABELS: Record<string, string> = {
+    tops: t.categories.tops, bottoms: t.categories.bottoms, dresses: t.categories.dresses,
+    outerwear: t.categories.outerwear, shoes: t.categories.shoes, accessories: t.categories.accessories,
+  }
+
   const handleAddToCart = (product: CapsuleAnalysisType["gap_recommendations"][0]) => {
     addToCart(product)
-    toast({ title: "Добавлено в корзину", description: product.name })
+    toast({ title: t.common.addedToCart, description: product.name })
   }
 
   const totalNewOutfits = analysis.recommendation_insights.reduce(
@@ -38,9 +40,9 @@ export function CapsuleAnalysis({ analysis }: Props) {
         </div>
         <div>
           <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-            Анализ вашего гардероба
+            {t.capsule.title}
           </h2>
-          <p className="text-sm text-muted-foreground">На основе AI-анализа ваших вещей</p>
+          <p className="text-sm text-muted-foreground">{t.capsule.subtitle}</p>
         </div>
       </div>
 
@@ -49,19 +51,19 @@ export function CapsuleAnalysis({ analysis }: Props) {
         <Card>
           <CardContent className="flex flex-col items-center py-5 text-center">
             <span className="text-3xl font-bold">{analysis.total_items}</span>
-            <span className="mt-1 text-xs text-muted-foreground">вещей в гардеробе</span>
+            <span className="mt-1 text-xs text-muted-foreground">{t.capsule.itemsInWardrobe}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex flex-col items-center py-5 text-center">
             <span className="text-3xl font-bold">{analysis.current_outfits_count}</span>
-            <span className="mt-1 text-xs text-muted-foreground">возможных образов</span>
+            <span className="mt-1 text-xs text-muted-foreground">{t.capsule.possibleOutfits}</span>
           </CardContent>
         </Card>
         <Card className="border-foreground/20">
           <CardContent className="flex flex-col items-center py-5 text-center">
             <span className="text-3xl font-bold text-emerald-600">+{totalNewOutfits}</span>
-            <span className="mt-1 text-xs text-muted-foreground">новых с покупками</span>
+            <span className="mt-1 text-xs text-muted-foreground">{t.capsule.newWithPurchases}</span>
           </CardContent>
         </Card>
       </div>
@@ -78,7 +80,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
         <div>
           <div className="mb-3 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
-            <h3 className="text-sm font-semibold">Чего не хватает</h3>
+            <h3 className="text-sm font-semibold">{t.capsule.missingTitle}</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {analysis.missing_categories.map((cat) => (
@@ -95,7 +97,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
         <div>
           <div className="mb-4 flex items-center gap-2">
             <ShoppingBag className="h-4 w-4" />
-            <h3 className="text-sm font-semibold">Рекомендуем купить</h3>
+            <h3 className="text-sm font-semibold">{t.capsule.recommendTitle}</h3>
           </div>
 
           <div className="space-y-3">
@@ -148,7 +150,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
                       {/* Pairs with */}
                       {insight?.pairs_with && insight.pairs_with.length > 0 && (
                         <div className="flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground">
-                          <span>Сочетается с:</span>
+                          <span>{t.capsule.pairsWith}</span>
                           {insight.pairs_with.slice(0, 3).map((name) => (
                             <Badge key={name} variant="secondary" className="text-[9px] px-1.5 py-0">
                               {name}
@@ -169,7 +171,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
                           onClick={() => handleAddToCart(product)}
                         >
                           <ShoppingBag className="mr-1 h-3 w-3" />
-                          В корзину
+                          {t.common.addToCart}
                         </Button>
                       </div>
                     </div>
@@ -186,7 +188,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
         <div>
           <div className="mb-3 flex items-center gap-2">
             <Lightbulb className="h-4 w-4" />
-            <h3 className="text-sm font-semibold">Советы стилиста</h3>
+            <h3 className="text-sm font-semibold">{t.capsule.styleTips}</h3>
           </div>
           <Card>
             <CardContent className="py-4">
@@ -207,7 +209,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
       {analysis.possible_outfits.length > 0 && (
         <div>
           <h3 className="mb-3 text-sm font-semibold">
-            Образы из вашего гардероба ({analysis.current_outfits_count})
+            {t.capsule.outfitsFromWardrobe} ({analysis.current_outfits_count})
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {analysis.possible_outfits.slice(0, 6).map((outfit) => (

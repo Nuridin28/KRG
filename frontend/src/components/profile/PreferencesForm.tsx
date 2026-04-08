@@ -8,25 +8,14 @@ import { Badge } from "@/components/ui/badge"
 import { api } from "@/api/client"
 import { useAuth } from "@/store/auth"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from "@/i18n"
 
-const ALL_STYLES = [
-  { value: "casual", label: "Casual" },
-  { value: "office", label: "Office" },
-  { value: "sport", label: "Sport" },
-  { value: "evening", label: "Evening" },
-  { value: "street", label: "Street" },
-  { value: "smart_casual", label: "Smart Casual" },
-  { value: "date", label: "Date" },
-  { value: "travel", label: "Travel" },
-]
+const STYLE_KEYS = ["casual", "office", "sport", "evening", "street", "smart_casual", "date", "travel"] as const
 
-const GENDERS = [
-  { value: "female", label: "Женский" },
-  { value: "male", label: "Мужской" },
-  { value: "unisex", label: "Унисекс" },
-]
+const GENDER_KEYS = ["female", "male", "unisex"] as const
 
 export function PreferencesForm() {
+  const t = useT()
   const isLoggedIn = useAuth((s) => s.isLoggedIn)
   const { toast } = useToast()
   const [styles, setStyles] = useState<string[]>([])
@@ -60,9 +49,9 @@ export function PreferencesForm() {
         preferred_gender: gender,
         city: city || undefined,
       })
-      toast({ title: "Предпочтения сохранены" })
+      toast({ title: t.profile.preferencesSaved })
     } catch (err: any) {
-      toast({ title: "Ошибка", description: err.message })
+      toast({ title: t.common.error, description: err.message })
     } finally {
       setSaving(false)
     }
@@ -73,9 +62,9 @@ export function PreferencesForm() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold">Предпочтения стиля</h3>
+        <h3 className="text-lg font-semibold">{t.profile.preferencesTitle}</h3>
         <p className="text-sm text-muted-foreground">
-          Используются для персонального «Образа дня»
+          {t.profile.preferencesSubtitle}
         </p>
       </div>
 
@@ -83,16 +72,16 @@ export function PreferencesForm() {
         <CardContent className="space-y-5 pt-5">
           {/* Styles */}
           <div className="space-y-2">
-            <Label>Любимые стили</Label>
+            <Label>{t.profile.favoriteStyles}</Label>
             <div className="flex flex-wrap gap-2">
-              {ALL_STYLES.map((s) => (
+              {STYLE_KEYS.map((key) => (
                 <Badge
-                  key={s.value}
-                  variant={styles.includes(s.value) ? "coral" : "outline"}
+                  key={key}
+                  variant={styles.includes(key) ? "coral" : "outline"}
                   className="cursor-pointer select-none px-3 py-1.5 text-xs"
-                  onClick={() => toggleStyle(s.value)}
+                  onClick={() => toggleStyle(key)}
                 >
-                  {s.label}
+                  {t.styles[key]}
                 </Badge>
               ))}
             </div>
@@ -100,16 +89,16 @@ export function PreferencesForm() {
 
           {/* Gender */}
           <div className="space-y-2">
-            <Label>Пол</Label>
+            <Label>{t.profile.genderLabel}</Label>
             <div className="flex gap-2">
-              {GENDERS.map((g) => (
+              {GENDER_KEYS.map((key) => (
                 <Badge
-                  key={g.value}
-                  variant={gender === g.value ? "coral" : "outline"}
+                  key={key}
+                  variant={gender === key ? "coral" : "outline"}
                   className="cursor-pointer select-none px-3 py-1.5 text-xs"
-                  onClick={() => setGender(g.value)}
+                  onClick={() => setGender(key)}
                 >
-                  {g.label}
+                  {t.genders[key]}
                 </Badge>
               ))}
             </div>
@@ -117,24 +106,24 @@ export function PreferencesForm() {
 
           {/* City */}
           <div className="space-y-2">
-            <Label>Город (для погоды)</Label>
+            <Label>{t.profile.cityLabel}</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="Москва"
+                placeholder={t.profile.cityPlaceholder}
                 className="pl-9"
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              Образ дня будет учитывать погоду в вашем городе
+              {t.profile.cityHint}
             </p>
           </div>
 
           <Button variant="coral" onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Save className="mr-1.5 h-4 w-4" />}
-            Сохранить
+            {t.common.save}
           </Button>
         </CardContent>
       </Card>

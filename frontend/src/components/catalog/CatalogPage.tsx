@@ -9,6 +9,7 @@ import { ProductFilters, type FilterValues } from "./ProductFilters"
 import { ProductDetail } from "./ProductDetail"
 import { Button } from "@/components/ui/button"
 import { useNavigation } from "@/store/navigation"
+import { useT } from "@/i18n"
 
 interface CatalogPageProps {
   onTryOn: (product: Product) => void
@@ -18,6 +19,7 @@ interface CatalogPageProps {
 const MAX_TRYON = 5
 
 export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
+  const t = useT()
   const navigate = useNavigate()
   const setTryOnProducts = useNavigation((s) => s.setTryOnProducts)
   const [products, setProducts] = useState<Product[]>([])
@@ -107,10 +109,10 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
           className="text-2xl font-bold tracking-tight sm:text-3xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Каталог
+          {t.catalog.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Откройте для себя стильные вещи и соберите идеальный образ
+          {t.catalog.subtitle}
         </p>
       </div>
 
@@ -130,22 +132,22 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <p className="text-sm text-destructive">{error}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Убедитесь, что сервер запущен на localhost:8000
+                Make sure the server is running on localhost:8000
               </p>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in-up">
               <PackageOpen className="mb-4 h-12 w-12 text-muted-foreground/30" />
-              <p className="text-sm font-medium">Товары не найдены</p>
+              <p className="text-sm font-medium">{t.catalog.noProducts}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Попробуйте изменить параметры поиска
+                {t.catalog.noProductsHint}
               </p>
             </div>
           ) : (
             <>
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  Найдено: {filteredProducts.length}
+                  {t.catalog.found} {filteredProducts.length}
                 </p>
                 {tryOnSet.size > 0 && (
                   <button
@@ -153,7 +155,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
                     className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-3 w-3" />
-                    Сбросить выбор ({tryOnSet.size})
+                    {t.catalog.resetSelection} ({tryOnSet.size})
                   </button>
                 )}
               </div>
@@ -184,7 +186,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
             onClick={handleGoToTryOn}
           >
             <Shirt className="h-4 w-4" />
-            Примерить
+            {t.common.tryOn}
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-bold">
               {tryOnSet.size}
             </span>

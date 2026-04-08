@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { api } from "@/api/client"
 import { formatPrice } from "@/lib/utils"
+import { useT } from "@/i18n"
 import type { AdminStats, Product } from "@/api/types"
 import type { AuthUser } from "@/store/auth"
 import {
@@ -11,21 +12,22 @@ import {
 type AdminTab = "stats" | "products" | "users" | "flags"
 
 export function AdminPage() {
+  const t = useT()
   const [tab, setTab] = useState<AdminTab>("stats")
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Админ-панель</h1>
-        <p className="text-sm text-muted-foreground">Управление платформой AI Stylist</p>
+        <h1 className="text-2xl font-bold">{t.admin.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.admin.subtitle}</p>
       </div>
 
       <div className="mb-6 flex gap-2">
         {([
-          { id: "stats", label: "Статистика", icon: BarChart3 },
-          { id: "products", label: "Товары", icon: Package },
-          { id: "users", label: "Пользователи", icon: Users },
-          { id: "flags", label: "Feature Flags", icon: Settings },
+          { id: "stats", label: t.admin.tabStats, icon: BarChart3 },
+          { id: "products", label: t.admin.tabProducts, icon: Package },
+          { id: "users", label: t.admin.tabUsers, icon: Users },
+          { id: "flags", label: t.admin.tabFlags, icon: Settings },
         ] as const).map((item) => {
           const Icon = item.icon
           return (
@@ -57,6 +59,7 @@ export function AdminPage() {
 // Stats
 // ---------------------------------------------------------------------------
 function StatsPanel() {
+  const t = useT()
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -64,16 +67,16 @@ function StatsPanel() {
     api.admin.getStats().then(setStats).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="py-12 text-center text-muted-foreground">Загрузка...</div>
+  if (loading) return <div className="py-12 text-center text-muted-foreground">{t.common.loading}</div>
   if (!stats) return null
 
   const cards = [
-    { label: "Товаров", value: stats.total_products, icon: ShoppingBag, color: "text-blue-500" },
-    { label: "Пользователей", value: stats.total_users, icon: Users, color: "text-green-500" },
-    { label: "Аутфитов создано", value: stats.total_outfits_generated, icon: Shirt, color: "text-purple-500" },
-    { label: "Примерок", value: stats.total_tryon_jobs, icon: Eye, color: "text-orange-500" },
-    { label: "Событий", value: stats.total_events, icon: TrendingUp, color: "text-cyan-500" },
-    { label: "Активных правил", value: stats.active_rules, icon: Settings, color: "text-pink-500" },
+    { label: t.admin.statsProducts, value: stats.total_products, icon: ShoppingBag, color: "text-blue-500" },
+    { label: t.admin.statsUsers, value: stats.total_users, icon: Users, color: "text-green-500" },
+    { label: t.admin.statsOutfits, value: stats.total_outfits_generated, icon: Shirt, color: "text-purple-500" },
+    { label: t.admin.statsTryOn, value: stats.total_tryon_jobs, icon: Eye, color: "text-orange-500" },
+    { label: t.admin.statsEvents, value: stats.total_events, icon: TrendingUp, color: "text-cyan-500" },
+    { label: t.admin.statsRules, value: stats.active_rules, icon: Settings, color: "text-pink-500" },
   ]
 
   return (
@@ -102,6 +105,7 @@ function StatsPanel() {
 // Products CRUD
 // ---------------------------------------------------------------------------
 function ProductsPanel() {
+  const t = useT()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -115,7 +119,7 @@ function ProductsPanel() {
   useEffect(() => { load() }, [load])
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Удалить товар?")) return
+    if (!confirm(t.admin.deleteConfirm)) return
     await api.admin.deleteProduct(id)
     load()
   }
@@ -123,12 +127,12 @@ function ProductsPanel() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{products.length} товаров</p>
+        <p className="text-sm text-muted-foreground">{products.length} {t.admin.tabProducts.toLowerCase()}</p>
         <button
           onClick={() => { setShowForm(true); setEditId(null) }}
           className="flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90"
         >
-          <Plus className="h-4 w-4" /> Добавить товар
+          <Plus className="h-4 w-4" /> {t.admin.addProduct}
         </button>
       </div>
 
@@ -141,18 +145,18 @@ function ProductsPanel() {
       )}
 
       {loading ? (
-        <div className="py-12 text-center text-muted-foreground">Загрузка...</div>
+        <div className="py-12 text-center text-muted-foreground">{t.common.loading}</div>
       ) : (
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
             <thead className="bg-accent/50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium">Товар</th>
-                <th className="px-4 py-3 text-left font-medium">Категория</th>
-                <th className="px-4 py-3 text-left font-medium">Бренд</th>
-                <th className="px-4 py-3 text-left font-medium">Цена</th>
-                <th className="px-4 py-3 text-left font-medium">В наличии</th>
-                <th className="px-4 py-3 text-right font-medium">Действия</th>
+                <th className="px-4 py-3 text-left font-medium">{t.admin.tableProduct}</th>
+                <th className="px-4 py-3 text-left font-medium">{t.admin.tableCategory}</th>
+                <th className="px-4 py-3 text-left font-medium">{t.admin.tableBrand}</th>
+                <th className="px-4 py-3 text-left font-medium">{t.admin.tablePrice}</th>
+                <th className="px-4 py-3 text-left font-medium">{t.admin.tableInStock}</th>
+                <th className="px-4 py-3 text-right font-medium">{t.admin.tableActions}</th>
               </tr>
             </thead>
             <tbody>
@@ -172,7 +176,7 @@ function ProductsPanel() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 capitalize">{p.category}</td>
+                  <td className="px-4 py-3">{t.categories[p.category as keyof typeof t.categories] || p.category}</td>
                   <td className="px-4 py-3">{p.brand}</td>
                   <td className="px-4 py-3">{formatPrice(p.price, p.currency)}</td>
                   <td className="px-4 py-3">
@@ -180,7 +184,7 @@ function ProductsPanel() {
                       p.in_stock ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
                                  : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400"
                     }`}>
-                      {p.in_stock ? "Да" : "Нет"}
+                      {p.in_stock ? t.common.yes : t.common.no}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -188,14 +192,14 @@ function ProductsPanel() {
                       <button
                         onClick={() => { setEditId(p.id); setShowForm(true) }}
                         className="rounded-lg p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
-                        title="Редактировать"
+                        title={t.admin.editProduct}
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
                         className="rounded-lg p-1.5 text-muted-foreground hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950"
-                        title="Удалить"
+                        title={t.common.delete}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -223,6 +227,7 @@ function ProductForm({
   onSaved: () => void
   onCancel: () => void
 }) {
+  const t = useT()
   const [form, setForm] = useState({
     sku_id: editProduct?.sku_id ?? "",
     name: editProduct?.name ?? "",
@@ -250,6 +255,22 @@ function ProductForm({
   const [uploading, setUploading] = useState(false)
   const [uploadPreview, setUploadPreview] = useState<string | null>(null)
 
+  const CATEGORY_OPTIONS = [
+    { value: "tops", label: t.categories.tops },
+    { value: "bottoms", label: t.categories.bottoms },
+    { value: "dresses", label: t.categories.dresses },
+    { value: "outerwear", label: t.categories.outerwear },
+    { value: "shoes", label: t.categories.shoes },
+    { value: "accessories", label: t.categories.accessories },
+    { value: "sets", label: t.categories.sets },
+  ]
+
+  const GENDER_OPTIONS = [
+    { value: "male", label: t.genders.male },
+    { value: "female", label: t.genders.female },
+    { value: "unisex", label: t.genders.unisex },
+  ]
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -260,7 +281,7 @@ function ProductForm({
       const result = await api.admin.uploadImage(file)
       set("image_url", result.image_url)
     } catch (err: any) {
-      setError("Ошибка загрузки изображения: " + err.message)
+      setError(t.common.error + ": " + err.message)
       setUploadPreview(null)
     } finally {
       setUploading(false)
@@ -300,44 +321,44 @@ function ProductForm({
   return (
     <div className="mb-6 rounded-xl border bg-card p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold">{editProduct ? "Редактировать товар" : "Новый товар"}</h3>
+        <h3 className="font-semibold">{editProduct ? t.admin.editProduct : t.admin.newProduct}</h3>
         <button onClick={onCancel} className="rounded-lg p-1 hover:bg-accent">
           <X className="h-5 w-5" />
         </button>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Input label="Название" value={form.name} onChange={(v) => set("name", v)} required />
-        <Input label="SKU" value={form.sku_id} onChange={(v) => set("sku_id", v)} required />
-        <Input label="Бренд" value={form.brand} onChange={(v) => set("brand", v)} required />
+        <Input label={t.admin.formName} value={form.name} onChange={(v) => set("name", v)} required />
+        <Input label={t.admin.formSku} value={form.sku_id} onChange={(v) => set("sku_id", v)} required />
+        <Input label={t.admin.formBrand} value={form.brand} onChange={(v) => set("brand", v)} required />
 
         <div>
-          <label className="mb-1 block text-xs font-medium">Категория</label>
+          <label className="mb-1 block text-xs font-medium">{t.admin.formCategory}</label>
           <select value={form.category} onChange={(e) => set("category", e.target.value)}
             className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground">
-            {["tops","bottoms","dresses","outerwear","shoes","accessories"].map((c) => (
-              <option key={c} value={c}>{c}</option>
+            {CATEGORY_OPTIONS.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
             ))}
           </select>
         </div>
 
-        <Input label="Подкатегория" value={form.subcategory} onChange={(v) => set("subcategory", v)} />
+        <Input label={t.admin.formSubcategory} value={form.subcategory} onChange={(v) => set("subcategory", v)} />
 
         <div>
-          <label className="mb-1 block text-xs font-medium">Пол</label>
+          <label className="mb-1 block text-xs font-medium">{t.admin.formGender}</label>
           <select value={form.gender} onChange={(e) => set("gender", e.target.value)}
             className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground">
-            {["male","female","unisex"].map((g) => (
-              <option key={g} value={g}>{g}</option>
+            {GENDER_OPTIONS.map((g) => (
+              <option key={g.value} value={g.value}>{g.label}</option>
             ))}
           </select>
         </div>
 
-        <Input label="Цена" type="number" value={String(form.price)} onChange={(v) => set("price", Number(v))} required />
-        <Input label="Цвет (название)" value={form.color_name} onChange={(v) => set("color_name", v)} />
+        <Input label={t.admin.formPrice} type="number" value={String(form.price)} onChange={(v) => set("price", Number(v))} required />
+        <Input label={t.admin.formColorName} value={form.color_name} onChange={(v) => set("color_name", v)} />
 
         <div>
-          <label className="mb-1 block text-xs font-medium">Цвет (HEX)</label>
+          <label className="mb-1 block text-xs font-medium">{t.admin.formColorHex}</label>
           <div className="flex items-center gap-2">
             <input type="color" value={form.color_hex} onChange={(e) => set("color_hex", e.target.value)}
               className="h-9 w-12 cursor-pointer rounded border" />
@@ -348,7 +369,7 @@ function ProductForm({
 
         {/* Image — URL or Upload */}
         <div className="col-span-full sm:col-span-2 lg:col-span-3">
-          <label className="mb-1 block text-xs font-medium">Изображение</label>
+          <label className="mb-1 block text-xs font-medium">{t.admin.formImage}</label>
           <div className="mb-2 flex gap-2">
             <button
               type="button"
@@ -357,7 +378,7 @@ function ProductForm({
                 imageMode === "url" ? "bg-foreground text-background" : "bg-accent text-muted-foreground hover:text-foreground"
               }`}
             >
-              По ссылке
+              {t.admin.formImageUrl}
             </button>
             <button
               type="button"
@@ -366,7 +387,7 @@ function ProductForm({
                 imageMode === "upload" ? "bg-foreground text-background" : "bg-accent text-muted-foreground hover:text-foreground"
               }`}
             >
-              Загрузить файл
+              {t.admin.formImageUpload}
             </button>
           </div>
 
@@ -391,17 +412,17 @@ function ProductForm({
                 {uploading ? (
                   <>
                     <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-                    Загрузка...
+                    {t.common.loading}
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    {form.image_url && imageMode === "upload" ? "Заменить" : "Выбрать файл"}
+                    {form.image_url && imageMode === "upload" ? t.common.reset : t.admin.formImageUpload}
                   </>
                 )}
               </label>
               {form.image_url && imageMode === "upload" && (
-                <span className="text-xs text-emerald-600">Загружено</span>
+                <span className="text-xs text-emerald-600">{t.common.done}</span>
               )}
             </div>
           )}
@@ -420,19 +441,19 @@ function ProductForm({
           )}
         </div>
 
-        <Input label="Материал" value={form.material} onChange={(v) => set("material", v)} />
-        <Input label="Размеры (через запятую)" value={form.sizes} onChange={(v) => set("sizes", v)} />
-        <Input label="Стиль-теги (через запятую)" value={form.style_tags} onChange={(v) => set("style_tags", v)} />
-        <Input label="Теги поводов (через запятую)" value={form.occasion_tags} onChange={(v) => set("occasion_tags", v)} />
+        <Input label={t.admin.formMaterial} value={form.material} onChange={(v) => set("material", v)} />
+        <Input label={t.admin.formSizes} value={form.sizes} onChange={(v) => set("sizes", v)} />
+        <Input label={t.admin.formStyleTags} value={form.style_tags} onChange={(v) => set("style_tags", v)} />
+        <Input label={t.admin.formOccasionTags} value={form.occasion_tags} onChange={(v) => set("occasion_tags", v)} />
 
         <div className="flex items-center gap-2">
           <input type="checkbox" checked={form.in_stock} onChange={(e) => set("in_stock", e.target.checked)}
             className="h-4 w-4 rounded border" />
-          <label className="text-sm">В наличии</label>
+          <label className="text-sm">{t.admin.formInStock}</label>
         </div>
 
         <div className="col-span-full sm:col-span-2 lg:col-span-3">
-          <label className="mb-1 block text-xs font-medium">Описание</label>
+          <label className="mb-1 block text-xs font-medium">{t.admin.formDescription}</label>
           <textarea value={form.description} onChange={(e) => set("description", e.target.value)}
             rows={2} className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-foreground" />
         </div>
@@ -447,11 +468,11 @@ function ProductForm({
           <button type="submit" disabled={loading}
             className="flex items-center gap-1.5 rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50">
             <Check className="h-4 w-4" />
-            {loading ? "Сохранение..." : editProduct ? "Сохранить" : "Создать"}
+            {loading ? t.common.saving : editProduct ? t.common.save : t.admin.create}
           </button>
           <button type="button" onClick={onCancel}
             className="rounded-lg border px-5 py-2 text-sm font-medium hover:bg-accent">
-            Отмена
+            {t.common.cancel}
           </button>
         </div>
       </form>
@@ -477,6 +498,7 @@ function Input({
 // Users panel
 // ---------------------------------------------------------------------------
 function UsersPanel() {
+  const t = useT()
   const [users, setUsers] = useState<AuthUser[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -484,7 +506,7 @@ function UsersPanel() {
     api.admin.getUsers().then(setUsers).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="py-12 text-center text-muted-foreground">Загрузка...</div>
+  if (loading) return <div className="py-12 text-center text-muted-foreground">{t.common.loading}</div>
 
   return (
     <div className="overflow-x-auto rounded-xl border">
@@ -493,9 +515,9 @@ function UsersPanel() {
           <tr>
             <th className="px-4 py-3 text-left font-medium">ID</th>
             <th className="px-4 py-3 text-left font-medium">Email</th>
-            <th className="px-4 py-3 text-left font-medium">Имя</th>
-            <th className="px-4 py-3 text-left font-medium">Роль</th>
-            <th className="px-4 py-3 text-left font-medium">Статус</th>
+            <th className="px-4 py-3 text-left font-medium">{t.auth.nameLabel}</th>
+            <th className="px-4 py-3 text-left font-medium">Role</th>
+            <th className="px-4 py-3 text-left font-medium">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -518,7 +540,7 @@ function UsersPanel() {
                   u.is_active ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
                               : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400"
                 }`}>
-                  {u.is_active ? "Активен" : "Заблокирован"}
+                  {u.is_active ? t.admin.userActive : t.admin.userBlocked}
                 </span>
               </td>
             </tr>
@@ -533,6 +555,7 @@ function UsersPanel() {
 // Feature Flags panel
 // ---------------------------------------------------------------------------
 function FlagsPanel() {
+  const t = useT()
   const [flags, setFlags] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
 
@@ -546,22 +569,14 @@ function FlagsPanel() {
     await api.admin.updateFeatureFlags({ [key]: updated[key] })
   }
 
-  if (loading) return <div className="py-12 text-center text-muted-foreground">Загрузка...</div>
-
-  const flagLabels: Record<string, string> = {
-    outfit_recommendations: "Рекомендации аутфитов",
-    virtual_tryon: "Виртуальная примерка",
-    conversational_stylist: "AI-стилист чат",
-    show_explanations: "Показывать объяснения",
-    ab_testing: "A/B тестирование",
-  }
+  if (loading) return <div className="py-12 text-center text-muted-foreground">{t.common.loading}</div>
 
   return (
     <div className="max-w-lg space-y-3">
       {Object.entries(flags).map(([key, value]) => (
         <div key={key} className="flex items-center justify-between rounded-xl border bg-card px-5 py-4">
           <div>
-            <p className="font-medium">{flagLabels[key] || key}</p>
+            <p className="font-medium">{key}</p>
             <p className="text-xs text-muted-foreground">{key}</p>
           </div>
           <button

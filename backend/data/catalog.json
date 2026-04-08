@@ -14,13 +14,27 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Cotton",
-    "price": 39.90,
+    "price": 39.9,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "smart_casual", "office"],
-    "occasion_tags": ["daily", "work"],
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "office"
+    ],
+    "occasion_tags": [
+      "daily",
+      "work"
+    ],
     "season": "all",
     "seller_id": "uniqlo-official"
   },
@@ -39,13 +53,27 @@
     "pattern": "solid",
     "fit": "slim",
     "material": "92% Polyester, 8% Elastane",
-    "price": 49.90,
+    "price": 49.9,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=600&h=800&fit=crop",
-    "style_tags": ["evening", "date", "smart_casual"],
-    "occasion_tags": ["date", "party", "event"],
+    "style_tags": [
+      "evening",
+      "date",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "date",
+      "party",
+      "event"
+    ],
     "season": "all",
     "seller_id": "zara-official"
   },
@@ -66,11 +94,26 @@
     "material": "80% Cotton, 20% Polyester",
     "price": 29.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "sport", "travel"],
-    "occasion_tags": ["daily", "travel", "casual"],
+    "style_tags": [
+      "casual",
+      "street",
+      "sport",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
     "season": "autumn_winter",
     "seller_id": "hm-official"
   },
@@ -89,13 +132,25 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Recycled Polyester",
-    "price": 35.00,
+    "price": 35.0,
     "currency": "USD",
-    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&h=800&fit=crop",
-    "style_tags": ["sport", "casual"],
-    "occasion_tags": ["workout", "daily"],
+    "style_tags": [
+      "sport",
+      "casual"
+    ],
+    "occasion_tags": [
+      "workout",
+      "daily"
+    ],
     "season": "all",
     "seller_id": "nike-official"
   },
@@ -114,13 +169,27 @@
     "pattern": "solid",
     "fit": "slim",
     "material": "70% Wool, 30% Polyester",
-    "price": 189.00,
+    "price": 189.0,
     "currency": "USD",
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&h=800&fit=crop",
-    "style_tags": ["office", "smart_casual", "evening", "date"],
-    "occasion_tags": ["work", "event", "date"],
+    "style_tags": [
+      "office",
+      "smart_casual",
+      "evening",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "event",
+      "date"
+    ],
     "season": "all",
     "seller_id": "massimodutti-official"
   },
@@ -139,13 +208,27 @@
     "pattern": "solid",
     "fit": "relaxed",
     "material": "100% Cashmere",
-    "price": 135.00,
+    "price": 135.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "casual", "office", "date"],
-    "occasion_tags": ["daily", "work", "date"],
+    "style_tags": [
+      "smart_casual",
+      "casual",
+      "office",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "work",
+      "date"
+    ],
     "season": "autumn_winter",
     "seller_id": "cos-official"
   },
@@ -164,13 +247,28 @@
     "pattern": "logo",
     "fit": "regular",
     "material": "70% Cotton, 30% Recycled Polyester",
-    "price": 65.00,
+    "price": 65.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1572495532056-8583af1cbae0?w=600&h=800&fit=crop",
-    "style_tags": ["street", "casual", "sport"],
-    "occasion_tags": ["daily", "casual", "travel"],
+    "style_tags": [
+      "street",
+      "casual",
+      "sport"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
     "season": "all",
     "seller_id": "adidas-official"
   },
@@ -191,11 +289,24 @@
     "material": "100% Linen",
     "price": 45.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1598554747436-c9293d6a588f?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "date", "travel"],
-    "occasion_tags": ["daily", "date", "travel"],
+    "style_tags": [
+      "casual",
+      "date",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "travel"
+    ],
     "season": "spring_summer",
     "seller_id": "mango-official"
   },
@@ -214,13 +325,26 @@
     "pattern": "textured",
     "fit": "slim",
     "material": "60% Cotton, 40% Viscose",
-    "price": 35.90,
+    "price": 35.9,
     "currency": "USD",
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "casual", "date"],
-    "occasion_tags": ["daily", "date", "casual"],
+    "style_tags": [
+      "smart_casual",
+      "casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "casual"
+    ],
     "season": "spring_summer",
     "seller_id": "zara-official"
   },
@@ -239,13 +363,29 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Supima Cotton",
-    "price": 14.90,
+    "price": 14.9,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "smart_casual", "travel"],
-    "occasion_tags": ["daily", "casual", "travel"],
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
     "season": "all",
     "seller_id": "uniqlo-official"
   },
@@ -264,13 +404,29 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "99% Cotton, 1% Elastane",
-    "price": 89.50,
+    "price": 89.5,
     "currency": "USD",
-    "sizes": ["28", "30", "32", "34", "36", "38"],
+    "sizes": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36",
+      "38"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "smart_casual", "travel"],
-    "occasion_tags": ["daily", "casual", "travel"],
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
     "season": "all",
     "seller_id": "levis-official"
   },
@@ -289,13 +445,28 @@
     "pattern": "solid",
     "fit": "slim",
     "material": "98% Cotton, 2% Elastane",
-    "price": 69.90,
+    "price": 69.9,
     "currency": "USD",
-    "sizes": ["28", "30", "32", "34", "36"],
+    "sizes": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "office", "casual", "date"],
-    "occasion_tags": ["work", "daily", "date"],
+    "style_tags": [
+      "smart_casual",
+      "office",
+      "casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "daily",
+      "date"
+    ],
     "season": "all",
     "seller_id": "massimodutti-official"
   },
@@ -314,13 +485,28 @@
     "pattern": "solid",
     "fit": "wide",
     "material": "75% Polyester, 20% Viscose, 5% Elastane",
-    "price": 59.90,
+    "price": 59.9,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=800&fit=crop",
-    "style_tags": ["office", "evening", "smart_casual", "date"],
-    "occasion_tags": ["work", "event", "date"],
+    "style_tags": [
+      "office",
+      "evening",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "event",
+      "date"
+    ],
     "season": "all",
     "seller_id": "zara-official"
   },
@@ -341,11 +527,24 @@
     "material": "65% Polyester, 35% Viscose",
     "price": 24.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "casual", "date"],
-    "occasion_tags": ["daily", "date", "casual"],
+    "style_tags": [
+      "smart_casual",
+      "casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "casual"
+    ],
     "season": "autumn_winter",
     "seller_id": "hm-official"
   },
@@ -364,13 +563,28 @@
     "pattern": "solid",
     "fit": "tapered",
     "material": "66% Cotton, 34% Polyester",
-    "price": 110.00,
+    "price": 110.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=600&h=800&fit=crop",
-    "style_tags": ["sport", "street", "casual"],
-    "occasion_tags": ["workout", "daily", "travel"],
+    "style_tags": [
+      "sport",
+      "street",
+      "casual"
+    ],
+    "occasion_tags": [
+      "workout",
+      "daily",
+      "travel"
+    ],
     "season": "all",
     "seller_id": "nike-official"
   },
@@ -389,13 +603,27 @@
     "pattern": "solid",
     "fit": "relaxed",
     "material": "100% Cotton",
-    "price": 49.90,
+    "price": 49.9,
     "currency": "USD",
-    "sizes": ["28", "30", "32", "34", "36"],
+    "sizes": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=600&h=800&fit=crop",
-    "style_tags": ["street", "casual", "travel"],
-    "occasion_tags": ["daily", "travel", "casual"],
+    "style_tags": [
+      "street",
+      "casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
     "season": "spring_summer",
     "seller_id": "zara-official"
   },
@@ -414,13 +642,27 @@
     "pattern": "solid",
     "fit": "slim",
     "material": "80% Wool, 20% Polyamide",
-    "price": 115.00,
+    "price": 115.0,
     "currency": "USD",
-    "sizes": ["28", "30", "32", "34", "36"],
+    "sizes": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1507680434567-5739c80be1ac?w=600&h=800&fit=crop",
-    "style_tags": ["office", "smart_casual", "evening"],
-    "occasion_tags": ["work", "event", "date"],
+    "style_tags": [
+      "office",
+      "smart_casual",
+      "evening"
+    ],
+    "occasion_tags": [
+      "work",
+      "event",
+      "date"
+    ],
     "season": "all",
     "seller_id": "cos-official"
   },
@@ -441,11 +683,24 @@
     "material": "100% Cotton",
     "price": 19.99,
     "currency": "USD",
-    "sizes": ["28", "30", "32", "34", "36"],
+    "sizes": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "travel"],
-    "occasion_tags": ["daily", "travel", "casual"],
+    "style_tags": [
+      "casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
     "season": "spring_summer",
     "seller_id": "hm-official"
   },
@@ -464,13 +719,27 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "99% Cotton, 1% Elastane",
-    "price": 98.00,
+    "price": 98.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "travel"],
-    "occasion_tags": ["daily", "travel", "casual"],
+    "style_tags": [
+      "casual",
+      "street",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
     "season": "spring_summer",
     "seller_id": "levis-official"
   },
@@ -489,13 +758,28 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "60% Wool, 40% Polyester",
-    "price": 149.00,
+    "price": 149.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "office", "evening", "date"],
-    "occasion_tags": ["work", "date", "event"],
+    "style_tags": [
+      "smart_casual",
+      "office",
+      "evening",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "date",
+      "event"
+    ],
     "season": "autumn_winter",
     "seller_id": "zara-official"
   },
@@ -514,13 +798,29 @@
     "pattern": "colorblock",
     "fit": "regular",
     "material": "100% Nylon",
-    "price": 100.00,
+    "price": 100.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1544923246-77307dd270b9?w=600&h=800&fit=crop",
-    "style_tags": ["sport", "street", "casual", "travel"],
-    "occasion_tags": ["workout", "daily", "travel"],
+    "style_tags": [
+      "sport",
+      "street",
+      "casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "workout",
+      "daily",
+      "travel"
+    ],
     "season": "spring_summer",
     "seller_id": "nike-official"
   },
@@ -539,13 +839,27 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Cotton",
-    "price": 199.00,
+    "price": 199.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=800&fit=crop",
-    "style_tags": ["office", "smart_casual", "date", "evening"],
-    "occasion_tags": ["work", "date", "event"],
+    "style_tags": [
+      "office",
+      "smart_casual",
+      "date",
+      "evening"
+    ],
+    "occasion_tags": [
+      "work",
+      "date",
+      "event"
+    ],
     "season": "spring_summer",
     "seller_id": "massimodutti-official"
   },
@@ -566,11 +880,23 @@
     "material": "100% Recycled Nylon, Recycled Down",
     "price": 59.99,
     "currency": "USD",
-    "sizes": ["S", "M", "L", "XL"],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1544923246-77307dd270b9?w=600&h=800&fit=crop&q=80",
-    "style_tags": ["casual", "street", "travel"],
-    "occasion_tags": ["daily", "travel"],
+    "style_tags": [
+      "casual",
+      "street",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel"
+    ],
     "season": "autumn_winter",
     "seller_id": "hm-official"
   },
@@ -591,11 +917,24 @@
     "material": "65% Viscose, 35% Polyamide",
     "price": 59.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=800&fit=crop",
-    "style_tags": ["evening", "date", "smart_casual"],
-    "occasion_tags": ["date", "party", "event"],
+    "style_tags": [
+      "evening",
+      "date",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "date",
+      "party",
+      "event"
+    ],
     "season": "all",
     "seller_id": "mango-official"
   },
@@ -614,13 +953,27 @@
     "pattern": "floral",
     "fit": "regular",
     "material": "100% Viscose",
-    "price": 69.90,
+    "price": 69.9,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&h=800&fit=crop",
-    "style_tags": ["date", "casual", "evening"],
-    "occasion_tags": ["date", "event", "daily"],
+    "style_tags": [
+      "date",
+      "casual",
+      "evening"
+    ],
+    "occasion_tags": [
+      "date",
+      "event",
+      "daily"
+    ],
     "season": "spring_summer",
     "seller_id": "zara-official"
   },
@@ -639,13 +992,26 @@
     "pattern": "solid",
     "fit": "relaxed",
     "material": "100% Organic Cotton",
-    "price": 99.00,
+    "price": 99.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d44?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "casual", "office"],
-    "occasion_tags": ["work", "daily", "travel"],
+    "style_tags": [
+      "smart_casual",
+      "casual",
+      "office"
+    ],
+    "occasion_tags": [
+      "work",
+      "daily",
+      "travel"
+    ],
     "season": "spring_summer",
     "seller_id": "cos-official"
   },
@@ -666,11 +1032,24 @@
     "material": "100% Recycled Polyester",
     "price": 34.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600&h=800&fit=crop",
-    "style_tags": ["evening", "date"],
-    "occasion_tags": ["party", "date", "event"],
+    "style_tags": [
+      "evening",
+      "date"
+    ],
+    "occasion_tags": [
+      "party",
+      "date",
+      "event"
+    ],
     "season": "all",
     "seller_id": "hm-official"
   },
@@ -691,11 +1070,31 @@
     "material": "Suede, Mesh",
     "price": 89.99,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "smart_casual", "travel"],
-    "occasion_tags": ["daily", "travel", "casual"],
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
     "season": "all",
     "seller_id": "newbalance-official"
   },
@@ -714,13 +1113,32 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "Canvas, Rubber",
-    "price": 65.00,
+    "price": 65.0,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "travel"],
-    "occasion_tags": ["daily", "casual", "travel"],
+    "style_tags": [
+      "casual",
+      "street",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
     "season": "all",
     "seller_id": "converse-official"
   },
@@ -739,13 +1157,30 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Leather",
-    "price": 149.00,
+    "price": 149.0,
     "currency": "USD",
-    "sizes": ["39", "40", "41", "42", "43", "44", "45"],
+    "sizes": [
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&h=800&fit=crop",
-    "style_tags": ["office", "evening", "smart_casual", "date"],
-    "occasion_tags": ["work", "event", "date"],
+    "style_tags": [
+      "office",
+      "evening",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "event",
+      "date"
+    ],
     "season": "all",
     "seller_id": "massimodutti-official"
   },
@@ -764,13 +1199,29 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "Synthetic Patent Leather",
-    "price": 59.90,
+    "price": 59.9,
     "currency": "USD",
-    "sizes": ["35", "36", "37", "38", "39", "40"],
+    "sizes": [
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=800&fit=crop",
-    "style_tags": ["evening", "office", "date"],
-    "occasion_tags": ["party", "event", "date", "work"],
+    "style_tags": [
+      "evening",
+      "office",
+      "date"
+    ],
+    "occasion_tags": [
+      "party",
+      "event",
+      "date",
+      "work"
+    ],
     "season": "all",
     "seller_id": "zara-official"
   },
@@ -789,13 +1240,32 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "Full-Grain Leather, Rubber",
-    "price": 110.00,
+    "price": 110.0,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45",
+      "46"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&h=800&fit=crop",
-    "style_tags": ["street", "casual", "sport"],
-    "occasion_tags": ["daily", "casual"],
+    "style_tags": [
+      "street",
+      "casual",
+      "sport"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual"
+    ],
     "season": "all",
     "seller_id": "nike-official"
   },
@@ -814,13 +1284,29 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Leather",
-    "price": 135.00,
+    "price": 135.0,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40", "41"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1582897085656-c636d006a246?w=600&h=800&fit=crop",
-    "style_tags": ["office", "smart_casual", "casual", "date"],
-    "occasion_tags": ["work", "daily", "date"],
+    "style_tags": [
+      "office",
+      "smart_casual",
+      "casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "daily",
+      "date"
+    ],
     "season": "all",
     "seller_id": "cos-official"
   },
@@ -841,11 +1327,26 @@
     "material": "100% Leather",
     "price": 89.99,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "smart_casual", "date", "street"],
-    "occasion_tags": ["daily", "date", "casual"],
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "date",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "casual"
+    ],
     "season": "autumn_winter",
     "seller_id": "mango-official"
   },
@@ -864,13 +1365,33 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "Leather, Suede, Gum Rubber",
-    "price": 100.00,
+    "price": 100.0,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1520256862855-398228c41684?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "smart_casual", "date"],
-    "occasion_tags": ["daily", "casual", "date"],
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "date"
+    ],
     "season": "all",
     "seller_id": "adidas-official"
   },
@@ -889,13 +1410,26 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "Stainless Steel",
-    "price": 89.00,
+    "price": 89.0,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "office", "casual", "date", "evening"],
-    "occasion_tags": ["daily", "work", "date", "event"],
+    "style_tags": [
+      "smart_casual",
+      "office",
+      "casual",
+      "date",
+      "evening"
+    ],
+    "occasion_tags": [
+      "daily",
+      "work",
+      "date",
+      "event"
+    ],
     "season": "all",
     "seller_id": "cos-official"
   },
@@ -914,13 +1448,24 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Leather",
-    "price": 49.90,
+    "price": 49.9,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "smart_casual", "date", "street"],
-    "occasion_tags": ["daily", "date", "casual"],
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "date",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "casual"
+    ],
     "season": "all",
     "seller_id": "zara-official"
   },
@@ -939,13 +1484,28 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Leather",
-    "price": 49.90,
+    "price": 49.9,
     "currency": "USD",
-    "sizes": ["80", "85", "90", "95", "100"],
+    "sizes": [
+      "80",
+      "85",
+      "90",
+      "95",
+      "100"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=800&fit=crop",
-    "style_tags": ["office", "smart_casual", "date", "evening"],
-    "occasion_tags": ["work", "date", "event"],
+    "style_tags": [
+      "office",
+      "smart_casual",
+      "date",
+      "evening"
+    ],
+    "occasion_tags": [
+      "work",
+      "date",
+      "event"
+    ],
     "season": "all",
     "seller_id": "massimodutti-official"
   },
@@ -964,13 +1524,24 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "50% Wool, 50% Acrylic",
-    "price": 35.90,
+    "price": 35.9,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "evening", "date", "casual"],
-    "occasion_tags": ["daily", "date", "event"],
+    "style_tags": [
+      "smart_casual",
+      "evening",
+      "date",
+      "casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "event"
+    ],
     "season": "autumn_winter",
     "seller_id": "zara-official"
   },
@@ -989,13 +1560,25 @@
     "pattern": "logo",
     "fit": "adjustable",
     "material": "100% Polyester",
-    "price": 24.00,
+    "price": 24.0,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1588850561407-ed78c334e67a?w=600&h=800&fit=crop",
-    "style_tags": ["sport", "street", "casual", "travel"],
-    "occasion_tags": ["daily", "workout", "travel", "casual"],
+    "style_tags": [
+      "sport",
+      "street",
+      "casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "workout",
+      "travel",
+      "casual"
+    ],
     "season": "all",
     "seller_id": "nike-official"
   },
@@ -1016,11 +1599,22 @@
     "material": "Acetate, Polycarbonate Lenses",
     "price": 25.99,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "date", "travel", "street"],
-    "occasion_tags": ["daily", "travel", "date"],
+    "style_tags": [
+      "casual",
+      "date",
+      "travel",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "date"
+    ],
     "season": "spring_summer",
     "seller_id": "mango-official"
   },
@@ -1041,11 +1635,23 @@
     "material": "Gold-Plated Brass",
     "price": 12.99,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop",
-    "style_tags": ["evening", "date", "casual", "smart_casual"],
-    "occasion_tags": ["date", "party", "event", "daily"],
+    "style_tags": [
+      "evening",
+      "date",
+      "casual",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "date",
+      "party",
+      "event",
+      "daily"
+    ],
     "season": "all",
     "seller_id": "hm-official"
   },
@@ -1067,11 +1673,25 @@
     "price": 79.99,
     "promo_price": 59.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=600&h=800&fit=crop",
-    "style_tags": ["smart_casual", "office", "date", "casual"],
-    "occasion_tags": ["work", "date", "daily"],
+    "style_tags": [
+      "smart_casual",
+      "office",
+      "date",
+      "casual"
+    ],
+    "occasion_tags": [
+      "work",
+      "date",
+      "daily"
+    ],
     "season": "spring_summer",
     "seller_id": "mango-official"
   },
@@ -1090,13 +1710,25 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Recycled Polyester",
-    "price": 30.00,
+    "price": 30.0,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L", "XL"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=800&fit=crop",
-    "style_tags": ["sport", "casual"],
-    "occasion_tags": ["workout", "daily"],
+    "style_tags": [
+      "sport",
+      "casual"
+    ],
+    "occasion_tags": [
+      "workout",
+      "daily"
+    ],
     "season": "spring_summer",
     "seller_id": "adidas-official"
   },
@@ -1117,11 +1749,24 @@
     "material": "72% Polyester, 24% Viscose, 4% Elastane",
     "price": 39.99,
     "currency": "USD",
-    "sizes": ["XS", "S", "M", "L"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1577900232427-18219b9166a0?w=600&h=800&fit=crop",
-    "style_tags": ["office", "smart_casual", "date"],
-    "occasion_tags": ["work", "date", "event"],
+    "style_tags": [
+      "office",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "date",
+      "event"
+    ],
     "season": "all",
     "seller_id": "mango-official"
   },
@@ -1140,14 +1785,31 @@
     "pattern": "solid",
     "fit": "wide",
     "material": "99% Cotton, 1% Elastane",
-    "price": 98.00,
-    "promo_price": 78.00,
+    "price": 98.0,
+    "promo_price": 78.0,
     "currency": "USD",
-    "sizes": ["24", "25", "26", "27", "28", "29", "30", "31", "32"],
+    "sizes": [
+      "24",
+      "25",
+      "26",
+      "27",
+      "28",
+      "29",
+      "30",
+      "31",
+      "32"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "street", "smart_casual"],
-    "occasion_tags": ["daily", "casual"],
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual"
+    ],
     "season": "all",
     "seller_id": "levis-official"
   },
@@ -1166,13 +1828,30 @@
     "pattern": "colorblock",
     "fit": "regular",
     "material": "Mesh, Synthetic, Rubber",
-    "price": 65.00,
+    "price": 65.0,
     "currency": "USD",
-    "sizes": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
+    "sizes": [
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop",
-    "style_tags": ["sport", "casual"],
-    "occasion_tags": ["workout", "daily"],
+    "style_tags": [
+      "sport",
+      "casual"
+    ],
+    "occasion_tags": [
+      "workout",
+      "daily"
+    ],
     "season": "all",
     "seller_id": "nike-official"
   },
@@ -1191,14 +1870,702 @@
     "pattern": "solid",
     "fit": "regular",
     "material": "100% Cotton Canvas",
-    "price": 19.90,
+    "price": 19.9,
     "currency": "USD",
-    "sizes": ["one_size"],
+    "sizes": [
+      "one_size"
+    ],
     "in_stock": true,
     "image_url": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&h=800&fit=crop",
-    "style_tags": ["casual", "travel", "street"],
-    "occasion_tags": ["daily", "travel", "casual"],
+    "style_tags": [
+      "casual",
+      "travel",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
     "season": "all",
     "seller_id": "uniqlo-official"
+  },
+  {
+    "id": "bot-011",
+    "sku_id": "AVI-SKIRT-ADDICT-F",
+    "name": "Юбка ADDICT",
+    "brand": "Avishu",
+    "category": "bottoms",
+    "subcategory": "skirt",
+    "gender": "female",
+    "description": "Идеальная зимняя база. Плотный корейский трикотаж с микро-начёсом. Французская длина + разрез сзади подчёркивают женственность.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "slim",
+    "material": "Корейский трикотаж с микро-начёсом",
+    "price": 31000,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1I1CbYMW9QD35zzAVZbgXpfJXsNK5_vVT",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "office",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "work",
+      "date"
+    ],
+    "season": "autumn_winter",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "bot-012",
+    "sku_id": "AVI-SKIRT-URBAN-F",
+    "name": "Юбка URBAN",
+    "brand": "Avishu",
+    "category": "bottoms",
+    "subcategory": "skirt",
+    "gender": "female",
+    "description": "Про свободу движения и городской ритм. Мягкий трикотажный хлопок, две ростовки для идеальной посадки.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "Трикотажный хлопок",
+    "price": 28400,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1CP0pmAfHKGMUnZRiwrKGv3cNbuV9sO0k",
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "bot-013",
+    "sku_id": "AVI-SKIRT-NOBLE-F",
+    "name": "Юбка NOBLE",
+    "brand": "Avishu",
+    "category": "bottoms",
+    "subcategory": "skirt",
+    "gender": "female",
+    "description": "Минималистичный крой и мягкий трикотаж. Идеальна с базовой футболкой или свитшотом.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "Мягкий трикотаж",
+    "price": 17800,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/18_LUR-avF5RIkxupsjyY0m5-DQCk_ssi",
+    "style_tags": [
+      "casual",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "bot-014",
+    "sku_id": "AVI-SKIRT-ALLINN-F",
+    "name": "Юбка ALL.INN",
+    "brand": "Avishu",
+    "category": "bottoms",
+    "subcategory": "skirt",
+    "gender": "female",
+    "description": "Универсальный комфорт от повседневной базы до мероприятия. MODAL: хлопок, неопрен, вискоза. Чёрный и белый.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "MODAL (хлопок, неопрен, вискоза)",
+    "price": 23500,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1flY1vgS5eDw5kVV85TkXgMhxOQTS7WpH",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "evening"
+    ],
+    "occasion_tags": [
+      "daily",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "top-013",
+    "sku_id": "AVI-TEE-AVI-F",
+    "name": "Футболка AVI",
+    "brand": "Avishu",
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "gender": "female",
+    "description": "Базовая или oversize. Минимализм, комфорт и универсальность. Цвета: чёрный, кофе, молоко.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "Хлопок",
+    "price": 15200,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1NZXKXeJtZUIuSdsgQa0eqKLw11XLMDM7",
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "top-014",
+    "sku_id": "AVI-TEE-BRIGHT-F",
+    "name": "Футболка BRIGHT Oversize",
+    "brand": "Avishu",
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "gender": "female",
+    "description": "100% хлопок. Палитра: манджента, терракот, мята, электрик, айвори, чёрный, графит, хаки.",
+    "color": "pink",
+    "color_name": "Magenta",
+    "color_hex": "#FF00FF",
+    "pattern": "solid",
+    "fit": "relaxed",
+    "material": "100% Хлопок",
+    "price": 15200,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1Asqz2kNJ32rhP6e6eL0dNlkZQ0IX4Yja",
+    "style_tags": [
+      "casual",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
+    "season": "spring_summer",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "top-015",
+    "sku_id": "AVI-TEE-TWIN-F",
+    "name": "Футболка TWIN",
+    "brand": "Avishu",
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "gender": "female",
+    "description": "100% хлопок. Белый, беж, чёрный.",
+    "color": "white",
+    "color_name": "White",
+    "color_hex": "#FFFFFF",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "100% Хлопок",
+    "price": 19800,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1vzNdAfNm-L153oVKk5vbErpzTsNXQmFa",
+    "style_tags": [
+      "casual",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "top-016",
+    "sku_id": "AVI-TEE-LIGHT-F",
+    "name": "Футболка LIGHT",
+    "brand": "Avishu",
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "gender": "female",
+    "description": "Корейская лапша. Белый, чёрный, изумруд, горчица, голубой, бордо.",
+    "color": "white",
+    "color_name": "White",
+    "color_hex": "#FFFFFF",
+    "pattern": "solid",
+    "fit": "slim",
+    "material": "Корейская лапша (трикотаж)",
+    "price": 15200,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1IUDQYVEXy8OADCCvnGVJs4G6ldmJT9dH",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "casual"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "top-017",
+    "sku_id": "AVI-TEE-ALLINN-F",
+    "name": "Футболка ALL.INN",
+    "brand": "Avishu",
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "gender": "female",
+    "description": "MODAL CUPRA вискозный трикотаж, oversize. Айвори, чёрный.",
+    "color": "beige",
+    "color_name": "Ivory",
+    "color_hex": "#FFFFF0",
+    "pattern": "solid",
+    "fit": "relaxed",
+    "material": "MODAL CUPRA",
+    "price": 24500,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1k_k1lC6feut-qTxr-Vlg9vHyV643p1il",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "set-001",
+    "sku_id": "AVI-SET-JOGGER-F",
+    "name": "Двойка Олимпийка + Джоггеры",
+    "brand": "Avishu",
+    "category": "sets",
+    "subcategory": "tracksuit",
+    "gender": "female",
+    "description": "Олимпийка-трансформер + свободные джоггеры. Трикотажный хлопок высокой плотности. Меланж, красный, шоколад, чёрный.",
+    "color": "grey",
+    "color_name": "Melange",
+    "color_hex": "#B0B0B0",
+    "pattern": "solid",
+    "fit": "relaxed",
+    "material": "Трикотажный хлопок высокой плотности",
+    "price": 52500,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1d14TDKbsFtM76seu_1cH69xQKZlK2zj6",
+    "style_tags": [
+      "casual",
+      "sport",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel",
+      "casual"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "set-002",
+    "sku_id": "AVI-SET-FURY-F",
+    "name": "Двойка FURY (термофлис)",
+    "brand": "Avishu",
+    "category": "sets",
+    "subcategory": "fleece_set",
+    "gender": "female",
+    "description": "Бестселлер из премиального термофлиса. Стройнит и подчёркивает фигуру. Четвёртый сезон.",
+    "color": "brown",
+    "color_name": "Chocolate",
+    "color_hex": "#5C3317",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "Премиальный термофлис",
+    "price": 51800,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1yXXtnSzYO8UGLMPXekX0sgSgIFJzXKi6",
+    "style_tags": [
+      "casual",
+      "sport",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel"
+    ],
+    "season": "autumn_winter",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "set-003",
+    "sku_id": "AVI-SET-ATTN-F",
+    "name": "Двойка ATTN FLEECE (Teddy)",
+    "brand": "Avishu",
+    "category": "sets",
+    "subcategory": "fleece_set",
+    "gender": "female",
+    "description": "Двусторонний Teddy-костюм. Толстовка-трансформер + джоггеры с высокой посадкой. Мокко, графит, чёрный.",
+    "color": "brown",
+    "color_name": "Mocha",
+    "color_hex": "#6B4226",
+    "pattern": "solid",
+    "fit": "relaxed",
+    "material": "Двусторонний Teddy-флис",
+    "price": 54500,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1CiGLwIlzsvoeX_Ra3OAiOyvFCOvH_28K",
+    "style_tags": [
+      "casual",
+      "street",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "travel"
+    ],
+    "season": "autumn_winter",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "set-004",
+    "sku_id": "AVI-SET-SHELBI-F",
+    "name": "Костюм SHELBI (пиджак + брюки)",
+    "brand": "Avishu",
+    "category": "sets",
+    "subcategory": "suit",
+    "gender": "female",
+    "description": "Высококачественный материал + подкладка из шёлкового жаккарда. Пиджак держит форму, брюки подчёркивают силуэт. Чёрный, графит, мокко.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "slim",
+    "material": "Костюмная ткань + шёлковый жаккард",
+    "price": 90600,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1sMRM10huHTnQ11CyCIgLvKSiS0HOA8fG",
+    "style_tags": [
+      "office",
+      "evening",
+      "smart_casual",
+      "date"
+    ],
+    "occasion_tags": [
+      "work",
+      "event",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "set-005",
+    "sku_id": "AVI-SET-HUSTLE-F",
+    "name": "Двойка HUSTLE",
+    "brand": "Avishu",
+    "category": "sets",
+    "subcategory": "tracksuit",
+    "gender": "female",
+    "description": "Динамика дня и комфорт. Лёгкое приталивание, аккуратный силуэт. Изумруд, чёрный, графит, гранат.",
+    "color": "green",
+    "color_name": "Emerald",
+    "color_hex": "#046307",
+    "pattern": "solid",
+    "fit": "slim",
+    "material": "Трикотаж",
+    "price": 58600,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1hxrU8FTRCcgyLGmFWD6BVZVHwcJNnOCl",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "street"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "dress-005",
+    "sku_id": "AVI-DRESS-SOHO-F",
+    "name": "Платье SOHO (лён)",
+    "brand": "Avishu",
+    "category": "dresses",
+    "subcategory": "midi_dress",
+    "gender": "female",
+    "description": "100% лён + хлопковый подклад. Mini 90 см или maxi 130 см. Беж, чёрный, шоколад, оливка, голубой, фуксия.",
+    "color": "beige",
+    "color_name": "Beige",
+    "color_hex": "#D4C5A9",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "100% Лён + хлопковый подклад",
+    "price": 40200,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/10KbE8lQG4Sayd3fazSF23wK_hTd85ImX",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "date",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "travel",
+      "event"
+    ],
+    "season": "spring_summer",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "dress-006",
+    "sku_id": "AVI-DRESS-LILU-F",
+    "name": "Платье LILU",
+    "brand": "Avishu",
+    "category": "dresses",
+    "subcategory": "mini_dress",
+    "gender": "female",
+    "description": "Mini и maxi варианты. Чёрный, лимон, розовый, голубой.",
+    "color": "black",
+    "color_name": "Black",
+    "color_hex": "#1A1A1A",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "Трикотаж",
+    "price": 36200,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1Gs25vtBVLJvdapWLVTwa64dzo6r-uQgK",
+    "style_tags": [
+      "casual",
+      "date",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "party"
+    ],
+    "season": "spring_summer",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "dress-007",
+    "sku_id": "AVI-DRESS-ALLINN-F",
+    "name": "Платье-футболка ALL.INN",
+    "brand": "Avishu",
+    "category": "dresses",
+    "subcategory": "t-shirt_dress",
+    "gender": "female",
+    "description": "Стиль и минимализм. Тауп, чёрный. Две ростовки: 160 и 170 см.",
+    "color": "brown",
+    "color_name": "Taupe",
+    "color_hex": "#8B7D6B",
+    "pattern": "solid",
+    "fit": "relaxed",
+    "material": "MODAL трикотаж",
+    "price": 29500,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1OCL5jPfPPUbMXIdsav6PmGXYa0dreMt-",
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
+  },
+  {
+    "id": "dress-008",
+    "sku_id": "AVI-DRESS-CLASSIC-F",
+    "name": "Платье Classic",
+    "brand": "Avishu",
+    "category": "dresses",
+    "subcategory": "midi_dress",
+    "gender": "female",
+    "description": "Классическое платье. Оливка, чёрный, бордо.",
+    "color": "green",
+    "color_name": "Olive",
+    "color_hex": "#556B2F",
+    "pattern": "solid",
+    "fit": "regular",
+    "material": "Трикотаж",
+    "price": 29500,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "https://lh3.googleusercontent.com/d/1bZpTMbEnA08jV8L8riH278ajW6U89j9-",
+    "style_tags": [
+      "casual",
+      "smart_casual",
+      "office"
+    ],
+    "occasion_tags": [
+      "daily",
+      "work",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "avishu-official"
   }
 ]
