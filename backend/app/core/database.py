@@ -8,9 +8,24 @@ from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
 
+def _normalize_database_url(url: str) -> str:
+    """Render/Heroku-style URLs use postgresql://; SQLAlchemy async needs postgresql+asyncpg://."""
+    if url.startswith("postgresql+asyncpg://"):
+        return url
+    if url.startswith("postgresql://"):
+        return "postgresql+asyncpg://" + url[len("postgresql://") :]
+    if url.startswith("postgres://"):
+        return "postgresql+asyncpg://" + url[len("postgres://") :]
+    return url
+
+
+def _database_url() -> str:
+    return _normalize_database_url(settings.DATABASE_URL)
+
+
 def _asyncpg_connect_args() -> dict:
     """Cloud Postgres (e.g. Render) requires TLS; asyncpg needs explicit ssl=True."""
-    url = settings.DATABASE_URL
+    url = _database_url()
     if os.environ.get("DATABASE_SSL", "").lower() in ("0", "false", "no"):
         return {}
     if os.environ.get("DATABASE_SSL", "").lower() in ("1", "true", "require"):
@@ -24,7 +39,7 @@ def _asyncpg_connect_args() -> dict:
 
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _database_url(),
     echo=settings.DEBUG,
     connect_args=_asyncpg_connect_args(),
 )
