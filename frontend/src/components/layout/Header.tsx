@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X, Heart, Puzzle, History, Shirt, CalendarDays, ChevronDown, Globe } from "lucide-react"
+import { Sun, Moon, ShoppingBag, Wand2, Camera, MessageCircle, ShoppingBag as CartIcon, Shield, LogIn, LogOut, User, Menu, X, Heart, Puzzle, History, Shirt, CalendarDays, ChevronDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "@/store/cart"
 import { useAuth } from "@/store/auth"
