@@ -14,8 +14,21 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     API_V1_PREFIX: str = "/api/v1"
 
-    # Database
+    # Database (async SQLAlchemy needs postgresql+asyncpg://; Render's UI gives postgresql:// — we normalize)
     DATABASE_URL: str = "postgresql+asyncpg://nuridinnurman@localhost:5432/krg_stylist"
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def normalize_database_url_for_asyncpg(cls, v: Any) -> Any:
+        if not isinstance(v, str):
+            return v
+        if v.startswith("postgresql+asyncpg://"):
+            return v
+        if v.startswith("postgresql://"):
+            return "postgresql+asyncpg://" + v[len("postgresql://") :]
+        if v.startswith("postgres://"):
+            return "postgresql+asyncpg://" + v[len("postgres://") :]
+        return v
 
     # JWT Auth
     SECRET_KEY: str = "change-me-in-production-use-openssl-rand-hex-32"
