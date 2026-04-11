@@ -3,9 +3,10 @@
 const DEFAULT_API_ORIGIN = "http://localhost:8000"
 const DEFAULT_API_BASE = `${DEFAULT_API_ORIGIN}/api/v1`
 
-/** Full API prefix including `/api/v1`. */
+/** Full API prefix including `/api/v1`. Trailing slashes stripped to avoid `//catalog` URLs. */
 export function getViteApiBase(): string {
-  return import.meta.env.VITE_API_BASE || DEFAULT_API_BASE
+  const raw = import.meta.env.VITE_API_BASE || DEFAULT_API_BASE
+  return raw.replace(/\/+$/, "")
 }
 
 /** Public origin of the backend (no `/api/v1`) — for `/storage/...` and absolute image URLs. */

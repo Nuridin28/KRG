@@ -1,7 +1,7 @@
 """Application configuration using pydantic-settings."""
 
 import json
-from typing import Any, List, Union
+from typing import Any, List, Optional, Union
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
@@ -68,6 +68,17 @@ class Settings(BaseSettings):
     OPENWEATHER_API_KEY: str = ""
 
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
+
+    # Extra allowed Origin header (browser). Matches any *.vercel.app HTTPS URL so preview deploys work.
+    # Set to empty string in env to disable. Custom domains must still be listed in CORS_ORIGINS.
+    CORS_ORIGIN_REGEX: Optional[str] = r"https://.*\.vercel\.app"
+
+    @field_validator("CORS_ORIGIN_REGEX", mode="before")
+    @classmethod
+    def empty_cors_regex_to_none(cls, v: Any) -> Any:
+        if v == "":
+            return None
+        return v
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

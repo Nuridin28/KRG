@@ -44,13 +44,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+_cors: dict = {
+    "allow_origins": settings.CORS_ORIGINS,
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
+if settings.CORS_ORIGIN_REGEX:
+    _cors["allow_origin_regex"] = settings.CORS_ORIGIN_REGEX
+app.add_middleware(CORSMiddleware, **_cors)
 
 # Serve generated try-on images
 storage_path = Path(settings.IMAGE_STORAGE_PATH)
