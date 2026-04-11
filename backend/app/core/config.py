@@ -1,7 +1,9 @@
 """Application configuration using pydantic-settings."""
 
-from typing import List
+import json
+from typing import Any, List, Union
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -49,6 +51,18 @@ class Settings(BaseSettings):
     OPENWEATHER_API_KEY: str = ""
 
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: Any) -> Union[List[str], Any]:
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            s = v.strip()
+            if s.startswith("["):
+                return json.loads(s)
+            return [x.strip() for x in s.split(",") if x.strip()]
+        return v
 
     class Config:
         env_file = ".env"
