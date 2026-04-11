@@ -221,7 +221,8 @@ class TryOnService:
 
             job.progress = 100
             job.status = TryOnJobStatus.COMPLETED
-            job.output_image_url = f"http://localhost:8000/storage/images/{output_filename}"
+            base = settings.PUBLIC_BASE_URL.rstrip("/")
+            job.output_image_url = f"{base}/storage/images/{output_filename}"
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Try-on job {job_id} completed via Vertex AI VTO")
@@ -413,7 +414,8 @@ class TryOnService:
             job.completed_items = total
             job.current_step = None
             job.status = TryOnJobStatus.COMPLETED
-            job.output_image_url = f"http://localhost:8000/storage/images/{output_filename}"
+            base = settings.PUBLIC_BASE_URL.rstrip("/")
+            job.output_image_url = f"{base}/storage/images/{output_filename}"
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Outfit try-on job {job_id} completed via Vertex AI VTO ({total} items)")

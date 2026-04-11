@@ -14,12 +14,11 @@ import { useNavigation } from "@/store/navigation"
 import { useAuth } from "@/store/auth"
 import { useProfile } from "@/store/profile"
 import { useT } from "@/i18n"
+import { getApiOrigin } from "@/lib/apiEnv"
 
 const MAX_ITEMS = 5
 
 const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories", "sets"]
-
-const API_HOST = import.meta.env.VITE_API_BASE?.replace("/api/v1", "") || "http://localhost:8000"
 
 export function TryOnPage() {
   const t = useT()
@@ -53,7 +52,7 @@ export function TryOnPage() {
           setPhotoMode("saved")
           const def = p.find((ph) => ph.is_default) || p[0]
           setSelectedSavedPhoto(def)
-          setTryOnPersonPreview(`${API_HOST}${def.image_url}`)
+          setTryOnPersonPreview(`${getApiOrigin()}${def.image_url}`)
         }
       }).catch(() => {})
     }
@@ -101,7 +100,7 @@ export function TryOnPage() {
     setSelectedSavedPhoto(photo)
     setPersonImage(null)
     setPhotoMode("saved")
-    setTryOnPersonPreview(`${API_HOST}${photo.image_url}`)
+    setTryOnPersonPreview(`${getApiOrigin()}${photo.image_url}`)
   }, [setTryOnPersonPreview])
 
   const handleToggleProduct = (product: Product) => {
@@ -138,7 +137,7 @@ export function TryOnPage() {
           startPolling(newJob.job_id)
         } else {
           // For multiple products, download saved photo and use regular endpoint
-          const resp = await fetch(`${API_HOST}${selectedSavedPhoto.image_url}`)
+          const resp = await fetch(`${getApiOrigin()}${selectedSavedPhoto.image_url}`)
           const blob = await resp.blob()
           const file = new File([blob], "saved-photo.jpg", { type: blob.type })
           const newJob = await api.tryon.createOutfitJob(file, productIds)
@@ -250,7 +249,7 @@ export function TryOnPage() {
                     }`}
                   >
                     <img
-                      src={`${API_HOST}${photo.image_url}`}
+                      src={`${getApiOrigin()}${photo.image_url}`}
                       alt={t.tryon.savedPhoto}
                       className="h-full w-full object-cover"
                     />

@@ -78,6 +78,8 @@ export const en: Translations = {
     resetSelection: "Reset selection",
     discount: "Sale",
     outOfStock: "Out of stock",
+    apiErrorHint:
+      "Make sure the API is reachable and VITE_API_BASE is set in the build (backend URL including /api/v1).",
   },
   filters: {
     title: "Filters",

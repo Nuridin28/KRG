@@ -132,7 +132,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <p className="text-sm text-destructive">{error}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Make sure the server is running on localhost:8000
+                {t.catalog.apiErrorHint}
               </p>
             </div>
           ) : filteredProducts.length === 0 ? (

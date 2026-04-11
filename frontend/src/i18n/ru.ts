@@ -76,6 +76,8 @@ export const ru = {
     resetSelection: "Сбросить выбор",
     discount: "Скидка",
     outOfStock: "Нет в наличии",
+    apiErrorHint:
+      "Проверьте, что бэкенд доступен и в сборке задан VITE_API_BASE (URL API с /api/v1).",
   },
   filters: {
     title: "Фильтры",

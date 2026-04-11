@@ -78,6 +78,8 @@ export const kz: Translations = {
     resetSelection: "Таңдауды тазалау",
     discount: "Жеңілдік",
     outOfStock: "Қоймада жоқ",
+    apiErrorHint:
+      "API қолжетімді екенін және жинақта VITE_API_BASE орнатылғанын тексеріңіз (/api/v1 қоса).",
   },
   filters: {
     title: "Сүзгілер",

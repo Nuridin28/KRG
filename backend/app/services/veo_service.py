@@ -191,7 +191,8 @@ class VeoService:
 
             job.progress = 100
             job.status = VideoJobStatus.COMPLETED
-            job.video_url = f"http://localhost:8000/storage/images/videos/{output_filename}"
+            base = settings.PUBLIC_BASE_URL.rstrip("/")
+            job.video_url = f"{base}/storage/images/videos/{output_filename}"
             job.completed_at = datetime.now(timezone.utc)
 
             logger.info(f"Veo video job {job_id} completed")

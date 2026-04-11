@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { api } from "@/api/client"
+import { getApiOrigin } from "@/lib/apiEnv"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
 import type { AdminStats, Product } from "@/api/types"
@@ -431,7 +432,7 @@ function ProductForm({
           {imagePreviewSrc && (
             <div className="mt-2 flex items-center gap-3">
               <img
-                src={imagePreviewSrc.startsWith("/") ? `http://localhost:8000${imagePreviewSrc}` : imagePreviewSrc}
+                src={imagePreviewSrc.startsWith("/") ? `${getApiOrigin()}${imagePreviewSrc}` : imagePreviewSrc}
                 alt="Preview"
                 className="h-16 w-16 rounded-lg border object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}

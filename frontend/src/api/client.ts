@@ -1,3 +1,4 @@
+import { getViteApiBase } from "@/lib/apiEnv"
 import { useAuth } from "@/store/auth"
 import type {
   AdminStats,
@@ -19,7 +20,7 @@ import type {
   WardrobeItem,
 } from "./types"
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api/v1"
+const API_BASE = getViteApiBase()
 
 // ---------------------------------------------------------------------------
 // Simple in-memory cache with TTL

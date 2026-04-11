@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     API_V1_PREFIX: str = "/api/v1"
 
+    # Public URL of this API (no trailing slash). Used for absolute /storage/... links returned to clients.
+    # On Render: https://your-service.onrender.com
+    PUBLIC_BASE_URL: str = "http://localhost:8000"
+
     # Database (async SQLAlchemy needs postgresql+asyncpg://; Render's UI gives postgresql:// — we normalize)
     DATABASE_URL: str = "postgresql+asyncpg://nuridinnurman@localhost:5432/krg_stylist"
 
