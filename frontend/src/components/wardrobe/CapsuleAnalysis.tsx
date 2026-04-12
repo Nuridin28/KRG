@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
 import type { CapsuleAnalysis as CapsuleAnalysisType } from "@/api/types"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface Props {
   analysis: CapsuleAnalysisType
@@ -112,7 +113,7 @@ export function CapsuleAnalysis({ analysis }: Props) {
                     {/* Product image */}
                     <div className="w-24 shrink-0 bg-muted/30 sm:w-32">
                       <img
-                        src={product.image_url || undefined}
+                        src={resolveMediaUrl(product.image_url)}
                         alt={product.name}
                         className="h-full w-full object-cover"
                         onError={(e) => {

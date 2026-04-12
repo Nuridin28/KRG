@@ -15,6 +15,7 @@ import { useCart } from "@/store/cart"
 import { api } from "@/api/client"
 import { useT } from "@/i18n"
 import type { Product, ProductBrief } from "@/api/types"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface ProductDetailProps {
   product: Product | null
@@ -62,7 +63,7 @@ export function ProductDetail({
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="aspect-square overflow-hidden rounded-lg bg-muted/50">
             <img
-              src={product.image_url || undefined}
+              src={resolveMediaUrl(product.image_url)}
               alt={product.name}
               className="h-full w-full object-cover"
               onError={(e) => {
@@ -216,7 +217,7 @@ export function ProductDetail({
                 <div key={rec.id} className="space-y-1 text-center">
                   <div className="aspect-square overflow-hidden rounded-md bg-muted/50">
                     <img
-                      src={rec.image_url || undefined}
+                      src={resolveMediaUrl(rec.image_url)}
                       alt={rec.name}
                       className="h-full w-full object-cover"
                       loading="lazy"

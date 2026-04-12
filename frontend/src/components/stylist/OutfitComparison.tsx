@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress"
 import { formatPrice } from "@/lib/utils"
 import type { Outfit, ProductBrief } from "@/api/types"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface OutfitComparisonProps {
   outfits: Outfit[]
@@ -175,7 +176,7 @@ export function OutfitComparison({
                       >
                         <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg shadow-sm">
                           <img
-                            src={item.product.image_url || undefined}
+                            src={resolveMediaUrl(item.product.image_url)}
                             alt={item.product.name}
                             className="h-full w-full object-cover"
                             loading="lazy"

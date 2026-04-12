@@ -8,7 +8,7 @@ import { useAuth } from "@/store/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from "@/i18n"
 import type { UserPhoto } from "@/api/types"
-import { getApiOrigin } from "@/lib/apiEnv"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 export function ProfilePhotos() {
   const t = useT()
@@ -113,7 +113,7 @@ export function ProfilePhotos() {
             <Card key={photo.id} className={`overflow-hidden ${photo.is_default ? "ring-2 ring-foreground" : ""}`}>
               <div className="relative aspect-3/4">
                 <img
-                  src={`${getApiOrigin()}${photo.image_url}`}
+                  src={resolveMediaUrl(photo.image_url)}
                   alt={t.common.photo}
                   className="h-full w-full object-cover"
                 />

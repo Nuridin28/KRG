@@ -13,6 +13,7 @@ import { api } from "@/api/client"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from "@/i18n"
 import type { Product } from "@/api/types"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface ProductCardProps {
   product: Product
@@ -71,7 +72,7 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
       <div className="relative shrink-0" onClick={() => onSelect(product)}>
         <div className="aspect-square overflow-hidden bg-muted/50">
           <img
-            src={product.image_url || undefined}
+            src={resolveMediaUrl(product.image_url)}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"

@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useT } from "@/i18n"
 import { CapsuleAnalysis } from "./CapsuleAnalysis"
 import type { CapsuleAnalysis as CapsuleAnalysisType } from "@/api/types"
-import { getApiOrigin } from "@/lib/apiEnv"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 export function WardrobePage() {
   const t = useT()
@@ -173,7 +173,7 @@ export function WardrobePage() {
                   <Card key={item.id} className="group overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
                     <div className="relative aspect-square bg-muted/30">
                       <img
-                        src={item.image_url.startsWith("http") ? item.image_url : `${getApiOrigin()}${item.image_url}`}
+                        src={resolveMediaUrl(item.image_url)}
                         alt={item.name}
                         className="h-full w-full object-cover"
                         onError={(e) => {

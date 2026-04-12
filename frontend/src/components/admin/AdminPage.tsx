@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { api } from "@/api/client"
-import { getApiOrigin } from "@/lib/apiEnv"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
 import type { AdminStats, Product } from "@/api/types"
@@ -166,7 +166,7 @@ function ProductsPanel() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={p.image_url || undefined}
+                        src={resolveMediaUrl(p.image_url)}
                         alt={p.name}
                         className="h-10 w-10 rounded-lg object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).src = "https://placehold.co/40x40?text=?" }}
@@ -432,7 +432,7 @@ function ProductForm({
           {imagePreviewSrc && (
             <div className="mt-2 flex items-center gap-3">
               <img
-                src={imagePreviewSrc.startsWith("/") ? `${getApiOrigin()}${imagePreviewSrc}` : imagePreviewSrc}
+                src={resolveMediaUrl(imagePreviewSrc)}
                 alt="Preview"
                 className="h-16 w-16 rounded-lg border object-cover"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}

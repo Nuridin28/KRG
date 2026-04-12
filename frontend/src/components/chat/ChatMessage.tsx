@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/store/cart"
 import { useT } from "@/i18n"
 import type { ChatMessage as ChatMessageType, ProductBrief, Outfit, CategoryType } from "@/api/types"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 const CATEGORY_ORDER: CategoryType[] = ["tops", "outerwear", "bottoms", "dresses", "shoes", "accessories", "sets"]
 
@@ -38,7 +39,7 @@ function MiniProductCard({
     <div className="flex items-center gap-3 rounded-lg border bg-background p-2.5">
       <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
         <img
-          src={product.image_url || undefined}
+          src={resolveMediaUrl(product.image_url)}
           alt={product.name}
           className="h-full w-full object-cover"
           loading="lazy"
@@ -115,7 +116,7 @@ function MiniOutfitCard({
           <div key={i} className="flex flex-col items-center">
             <div className="h-10 w-10 overflow-hidden rounded-lg">
               <img
-                src={item.product.image_url || undefined}
+                src={resolveMediaUrl(item.product.image_url)}
                 alt={item.product.name}
                 className="h-full w-full object-cover"
                 loading="lazy"

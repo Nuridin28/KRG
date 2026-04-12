@@ -6,6 +6,7 @@ import { useNavigation } from "@/store/navigation"
 import { Button } from "@/components/ui/button"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 export function WishlistPage() {
   const t = useT()
@@ -57,7 +58,7 @@ export function WishlistPage() {
         {items.map((product) => (
           <div key={product.id} className="group overflow-hidden rounded-xl border bg-card shadow-sm">
             <div className="aspect-square overflow-hidden bg-muted/50">
-              <img src={product.image_url || undefined} alt={product.name} className="h-full w-full object-cover" loading="lazy"
+              <img src={resolveMediaUrl(product.image_url)} alt={product.name} className="h-full w-full object-cover" loading="lazy"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
             </div>
             <div className="p-3 space-y-1">

@@ -1,6 +1,9 @@
 """Application configuration using pydantic-settings."""
 
 import json
+import logging
+import os
+import tempfile
 from typing import Any, List, Optional, Union
 
 from pydantic import field_validator
@@ -41,8 +44,11 @@ class Settings(BaseSettings):
 
     # External API keys (loaded from env)
     OPENAI_API_KEY: str = ""
-    VERTEX_AI_PROJECT: str = "krghack"
+    # Empty = try-on / Veo use mock paths (no GCP). Set project + credentials for real Vertex VTO.
+    VERTEX_AI_PROJECT: str = ""
     VERTEX_AI_LOCATION: str = "us-central1"
+    # Full JSON of GCP service account key (Render: add as Secret). See _materialize_gcp_sa_json below.
+    GCP_SERVICE_ACCOUNT_JSON: str = ""
     MAPP_FASHION_API_KEY: str = ""
     MAPP_FASHION_BASE_URL: str = ""
     FASHN_API_KEY: str = ""
@@ -67,7 +73,15 @@ class Settings(BaseSettings):
     # Weather API (Feature 3: style of the day)
     OPENWEATHER_API_KEY: str = ""
 
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
+    # Include 127.0.0.1 and localhost — browsers treat them as different origins for CORS.
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:3000",
+    ]
 
     # Extra allowed Origin header (browser). Matches any *.vercel.app HTTPS URL so preview deploys work.
     # Set to empty string in env to disable. Custom domains must still be listed in CORS_ORIGINS.
@@ -98,3 +112,44 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Temp file path if we created it from GCP_SERVICE_ACCOUNT_JSON (removed on app shutdown).
+_gcp_sa_tempfile: Optional[str] = None
+
+
+def _materialize_gcp_sa_json() -> None:
+    """So google.auth.default() and google-genai work before any router import uses them."""
+    global _gcp_sa_tempfile
+    log = logging.getLogger(__name__)
+    raw = (settings.GCP_SERVICE_ACCOUNT_JSON or "").strip()
+    if not raw or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+        return
+    try:
+        info = json.loads(raw)
+        if not isinstance(info, dict) or info.get("type") != "service_account":
+            log.warning("GCP_SERVICE_ACCOUNT_JSON must be a service_account key JSON")
+            return
+        fd, path = tempfile.mkstemp(suffix=".json", text=True)
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(info, fh)
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path
+        _gcp_sa_tempfile = path
+        log.info("GOOGLE_APPLICATION_CREDENTIALS set from GCP_SERVICE_ACCOUNT_JSON")
+    except json.JSONDecodeError as e:
+        log.warning("GCP_SERVICE_ACCOUNT_JSON is not valid JSON: %s", e)
+    except OSError as e:
+        log.warning("Could not write GCP service account temp file: %s", e)
+
+
+def cleanup_gcp_sa_tempfile() -> None:
+    global _gcp_sa_tempfile
+    p = _gcp_sa_tempfile
+    _gcp_sa_tempfile = None
+    if p:
+        try:
+            os.unlink(p)
+        except OSError:
+            pass
+
+
+_materialize_gcp_sa_json()

@@ -58,7 +58,7 @@ class TryOnService:
         self._active_tasks: set[str] = set()  # job IDs with running asyncio tasks
         self._user_counts: Dict[str, int] = {}
         self._rate_limit = 20
-        self._use_vertex = bool(settings.VERTEX_AI_PROJECT)
+        self._use_vertex = bool((settings.VERTEX_AI_PROJECT or "").strip())
 
         self._load_jobs()
 

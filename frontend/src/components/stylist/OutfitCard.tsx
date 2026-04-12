@@ -11,6 +11,7 @@ import { formatPrice } from "@/lib/utils"
 import { ShareOutfit } from "./ShareOutfit"
 import type { Outfit } from "@/api/types"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface OutfitCardProps {
   outfit: Outfit
@@ -79,7 +80,7 @@ export function OutfitCard({ outfit, onTryOnOutfit, compareSelected, onToggleCom
             >
               <div className="h-14 w-14 overflow-hidden rounded-lg shadow-sm">
                 <img
-                  src={item.product.image_url || undefined}
+                  src={resolveMediaUrl(item.product.image_url)}
                   alt={item.product.name}
                   className="h-full w-full object-cover"
                   loading="lazy"

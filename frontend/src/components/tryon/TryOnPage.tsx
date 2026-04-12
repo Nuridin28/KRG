@@ -14,7 +14,7 @@ import { useNavigation } from "@/store/navigation"
 import { useAuth } from "@/store/auth"
 import { useProfile } from "@/store/profile"
 import { useT } from "@/i18n"
-import { getApiOrigin } from "@/lib/apiEnv"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 const MAX_ITEMS = 5
 
@@ -52,7 +52,7 @@ export function TryOnPage() {
           setPhotoMode("saved")
           const def = p.find((ph) => ph.is_default) || p[0]
           setSelectedSavedPhoto(def)
-          setTryOnPersonPreview(`${getApiOrigin()}${def.image_url}`)
+          setTryOnPersonPreview(resolveMediaUrl(def.image_url) ?? "")
         }
       }).catch(() => {})
     }
@@ -100,7 +100,7 @@ export function TryOnPage() {
     setSelectedSavedPhoto(photo)
     setPersonImage(null)
     setPhotoMode("saved")
-    setTryOnPersonPreview(`${getApiOrigin()}${photo.image_url}`)
+    setTryOnPersonPreview(resolveMediaUrl(photo.image_url) ?? "")
   }, [setTryOnPersonPreview])
 
   const handleToggleProduct = (product: Product) => {
@@ -137,7 +137,9 @@ export function TryOnPage() {
           startPolling(newJob.job_id)
         } else {
           // For multiple products, download saved photo and use regular endpoint
-          const resp = await fetch(`${getApiOrigin()}${selectedSavedPhoto.image_url}`)
+          const photoUrl = resolveMediaUrl(selectedSavedPhoto.image_url)
+          if (!photoUrl) throw new Error("Photo URL missing")
+          const resp = await fetch(photoUrl)
           const blob = await resp.blob()
           const file = new File([blob], "saved-photo.jpg", { type: blob.type })
           const newJob = await api.tryon.createOutfitJob(file, productIds)
@@ -249,7 +251,7 @@ export function TryOnPage() {
                     }`}
                   >
                     <img
-                      src={`${getApiOrigin()}${photo.image_url}`}
+                      src={resolveMediaUrl(photo.image_url)}
                       alt={t.tryon.savedPhoto}
                       className="h-full w-full object-cover"
                     />
@@ -290,7 +292,7 @@ export function TryOnPage() {
                   >
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
                       <img
-                        src={product.image_url || undefined}
+                        src={resolveMediaUrl(product.image_url)}
                         alt={product.name}
                         className="h-full w-full object-cover"
                       />
@@ -355,7 +357,7 @@ export function TryOnPage() {
                               )}
                               <div className="aspect-square w-full overflow-hidden rounded-md bg-muted/50">
                                 <img
-                                  src={product.image_url || undefined}
+                                  src={resolveMediaUrl(product.image_url)}
                                   alt={product.name}
                                   className="h-full w-full object-cover"
                                   loading="lazy"

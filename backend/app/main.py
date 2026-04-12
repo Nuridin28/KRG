@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.core.config import settings
+from app.core.config import cleanup_gcp_sa_tempfile, settings
 from app.core.database import Base, engine
 from app.routers import (
     admin, auth, catalog, daily_outfit, outfits, profile,
@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI):
             )
     yield
     await engine.dispose()
+    cleanup_gcp_sa_tempfile()
 
 
 app = FastAPI(

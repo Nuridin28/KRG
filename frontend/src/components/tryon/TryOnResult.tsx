@@ -6,6 +6,7 @@ import { api } from "@/api/client"
 import { useToast } from "@/hooks/use-toast"
 import type { TryOnJob, VideoJob } from "@/api/types"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface TryOnResultProps {
   job: TryOnJob | null
@@ -82,10 +83,12 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
 
   const handleGenerateVideo = useCallback(async () => {
     if (!job?.output_image_url) return
+    const sourceUrl = resolveMediaUrl(job.output_image_url)
+    if (!sourceUrl) return
     setVideoLoading(true)
     setVideoJob(null)
     try {
-      const vJob = await api.video.generate(job.output_image_url)
+      const vJob = await api.video.generate(sourceUrl)
       setVideoJob(vJob)
       startVideoPolling(vJob.job_id)
     } catch (err: any) {
@@ -217,10 +220,10 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           {viewMode === "photo" && job.output_image_url && (
             <div
               className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-foreground/15 shadow-lg"
-              onClick={() => setZoomedImage(job.output_image_url!)}
+              onClick={() => setZoomedImage(resolveMediaUrl(job.output_image_url) ?? null)}
             >
               <img
-                src={job.output_image_url}
+                src={resolveMediaUrl(job.output_image_url)}
                 alt={t.tryon.after}
                 className="w-full rounded-xl object-contain"
                 style={{ maxHeight: "65vh" }}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface SavedOutfit {
   id: string
@@ -105,7 +106,7 @@ export function OutfitHistoryPage() {
                 {outfit.items.map((item: any, idx: number) => (
                   <div key={idx} className="flex min-w-22.5 flex-col items-center gap-1 rounded-lg border p-2">
                     <div className="h-14 w-14 overflow-hidden rounded-lg">
-                      <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" loading="lazy"
+                      <img src={resolveMediaUrl(item.image_url)} alt={item.name} className="h-full w-full object-cover" loading="lazy"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
                     </div>
                     <p className="line-clamp-1 text-center text-[10px] font-medium">{item.name}</p>

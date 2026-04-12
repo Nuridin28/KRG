@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { formatPrice, cn } from "@/lib/utils"
 import type { Outfit } from "@/api/types"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface ShareOutfitProps {
   outfit: Outfit
@@ -135,7 +136,7 @@ async function renderOutfitToCanvas(outfit: Outfit): Promise<HTMLCanvasElement> 
 
   const images: (HTMLImageElement | null)[] = await Promise.all(
     outfit.items.map((item) =>
-      loadImage(item.product.image_url).catch(() => null)
+      loadImage(resolveMediaUrl(item.product.image_url) || item.product.image_url).catch(() => null)
     )
   )
 
@@ -335,7 +336,7 @@ export function ShareOutfit({ outfit, open, onOpenChange }: ShareOutfitProps) {
                 style={{ animationDelay: `${idx * 60}ms` }}
               >
                 <img
-                  src={item.product.image_url || undefined}
+                  src={resolveMediaUrl(item.product.image_url)}
                   alt={item.product.name}
                   className="h-full w-full object-cover"
                   loading="lazy"

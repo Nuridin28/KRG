@@ -33,7 +33,7 @@ MOTION_PROMPT = (
 class VeoService:
     def __init__(self) -> None:
         self._jobs: Dict[str, VideoJobResponse] = {}
-        self._use_veo = bool(settings.VERTEX_AI_PROJECT)
+        self._use_veo = bool((settings.VERTEX_AI_PROJECT or "").strip())
 
         if self._use_veo:
             try:

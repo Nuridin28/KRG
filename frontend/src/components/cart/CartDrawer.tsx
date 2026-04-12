@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useCart } from "@/store/cart"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 interface CartDrawerProps {
   open: boolean
@@ -72,7 +73,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 <div key={item.product.id} className="flex gap-3">
                   <div className="h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                     <img
-                      src={item.product.image_url || undefined}
+                      src={resolveMediaUrl(item.product.image_url)}
                       alt={item.product.name}
                       className="h-full w-full object-cover"
                     />

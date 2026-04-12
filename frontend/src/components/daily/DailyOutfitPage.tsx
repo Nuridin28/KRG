@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 import { formatPrice } from "@/lib/utils"
 import { useT } from "@/i18n"
 import type { DailyOutfit } from "@/api/types"
+import { resolveMediaUrl } from "@/lib/apiEnv"
 
 /* ---------- Weather helpers ---------- */
 
@@ -274,7 +275,7 @@ export function DailyOutfitPage() {
               <Card key={item.product.id} className="overflow-hidden">
                 <div className="aspect-square bg-muted/50">
                   <img
-                    src={item.product.image_url || undefined}
+                    src={resolveMediaUrl(item.product.image_url)}
                     alt={item.product.name}
                     className="h-full w-full object-cover"
                     onError={(e) => {
