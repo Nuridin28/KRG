@@ -34,6 +34,14 @@ async def create_tryon_job(
         person_image_bytes=person_bytes,
         product_id=product_id,
         product_image_url=product.image_url,
+        product_meta={
+            "category": product.category.value if hasattr(product.category, "value") else product.category,
+            "subcategory": product.subcategory,
+            "fit": product.fit,
+            "name": product.name,
+            "description": product.description,
+            "style_tags": product.style_tags,
+        },
     )
     return job
 
@@ -57,6 +65,11 @@ async def create_outfit_tryon_job(
                 "product_id": product.id,
                 "product_name": product.name,
                 "product_image_url": product.image_url,
+                "category": product.category.value if hasattr(product.category, "value") else product.category,
+                "subcategory": product.subcategory,
+                "fit": product.fit,
+                "description": product.description,
+                "style_tags": product.style_tags,
             })
 
     if not product_items:

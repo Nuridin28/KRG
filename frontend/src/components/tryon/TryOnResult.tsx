@@ -6,7 +6,7 @@ import { api } from "@/api/client"
 import { useToast } from "@/hooks/use-toast"
 import type { TryOnJob, VideoJob } from "@/api/types"
 import { useT } from "@/i18n"
-import { resolveMediaUrl } from "@/lib/apiEnv"
+import { backendMediaUrl } from "@/lib/utils"
 
 interface TryOnResultProps {
   job: TryOnJob | null
@@ -83,7 +83,7 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
 
   const handleGenerateVideo = useCallback(async () => {
     if (!job?.output_image_url) return
-    const sourceUrl = resolveMediaUrl(job.output_image_url)
+    const sourceUrl = backendMediaUrl(job.output_image_url)
     if (!sourceUrl) return
     setVideoLoading(true)
     setVideoJob(null)
@@ -100,6 +100,8 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
 
   const hasVideo = videoJob?.status === "completed" && videoJob.video_url
   const videoGenerating = videoJob && (videoJob.status === "queued" || videoJob.status === "processing")
+  const resultImageSrc = job?.output_image_url ? backendMediaUrl(job.output_image_url) : ""
+  const motionVideoSrc = hasVideo && videoJob?.video_url ? backendMediaUrl(videoJob.video_url) : ""
 
   if (!job) {
     return (
@@ -220,10 +222,10 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           {viewMode === "photo" && job.output_image_url && (
             <div
               className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-foreground/15 shadow-lg"
-              onClick={() => setZoomedImage(resolveMediaUrl(job.output_image_url) ?? null)}
+              onClick={() => setZoomedImage(resultImageSrc)}
             >
               <img
-                src={resolveMediaUrl(job.output_image_url)}
+                src={resultImageSrc}
                 alt={t.tryon.after}
                 className="w-full rounded-xl object-contain"
                 style={{ maxHeight: "65vh" }}
@@ -254,10 +256,11 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
           )}
 
           {/* Video view */}
-          {viewMode === "video" && hasVideo && (
+          {viewMode === "video" && hasVideo && motionVideoSrc && (
             <div className="overflow-hidden rounded-xl border-2 border-foreground/15 shadow-lg">
               <video
-                src={videoJob!.video_url!}
+                key={motionVideoSrc}
+                src={motionVideoSrc}
                 className="w-full rounded-xl"
                 style={{ maxHeight: "65vh" }}
                 controls
@@ -265,7 +268,16 @@ export function TryOnResult({ job, personPreview, onBuildOutfit }: TryOnResultPr
                 loop
                 playsInline
                 muted
-              />
+                preload="auto"
+                onError={() => {
+                  toast({
+                    title: t.tryon.videoPlaybackFailed,
+                    description: t.tryon.videoPlaybackHint,
+                  })
+                }}
+              >
+                <source src={motionVideoSrc} type="video/mp4" />
+              </video>
             </div>
           )}
 

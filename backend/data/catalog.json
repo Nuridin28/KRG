@@ -2567,5 +2567,765 @@
     ],
     "season": "all",
     "seller_id": "avishu-official"
+  },
+  {
+    "id": "dress-009",
+    "sku_id": "SS-WED-BOHO-IVORY-F",
+    "name": "Кружевное свадебное платье Bohemian Ocean",
+    "brand": "Secret Sposa",
+    "category": "dresses",
+    "subcategory": "wedding_dress",
+    "gender": "female",
+    "description": "Романтичное свадебное платье А-силуэта в оттенке слоновой кости: корсетный верх с косточками, квадратный вырез с лёгкой линией сердца, кружевная флора на полупрозрачных вертикальных панелях, фестон по линии декольте и талии. Объёмные рукава-бишоп из лёгкого шифона с кружевными манжетами. Подол из струящегося шифона или шёлка до пола с высоким разрезом на бедре и коротким шлейфом. Идеально для летней и пляжной свадьбы.",
+    "color": "ivory",
+    "color_name": "Ivory",
+    "color_hex": "#FFFFF0",
+    "pattern": "lace",
+    "fit": "fitted",
+    "material": "Шифон, кружево, подкладка",
+    "price": 428000,
+    "currency": "KZT",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/wedding-secret-sposa.png",
+    "style_tags": [
+      "evening",
+      "date",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "event",
+      "date",
+      "party"
+    ],
+    "season": "spring_summer",
+    "seller_id": "secret-sposa-official"
+  },
+  {
+    "id": "dress-010",
+    "sku_id": "BRD-AURORA-IVORY-F",
+    "name": "Платье Aurora Lace A-Line",
+    "brand": "deluna",
+    "category": "dresses",
+    "subcategory": "wedding_dress",
+    "gender": "female",
+    "description": "Воздушное свадебное платье с прозрачным кружевным верхом и длинными рукавами. Легкая многослойная юбка А-силуэта мягко струится и подчеркивает силуэт.",
+    "color": "ivory",
+    "color_name": "Ivory White",
+    "color_hex": "#F8F4EA",
+    "pattern": "lace",
+    "fit": "a_line",
+    "material": "Фатин, кружево, мягкий подклад",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/wedding-aurora-lace-a-line.png",
+    "style_tags": [
+      "evening",
+      "romantic",
+      "minimal"
+    ],
+    "occasion_tags": [
+      "wedding",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "deluna-official"
+  },
+  {
+    "id": "dress-011",
+    "sku_id": "BRD-STARLIT-CRYSTAL-F",
+    "name": "Платье Starlit Beaded Mermaid",
+    "brand": "deluna",
+    "category": "dresses",
+    "subcategory": "wedding_dress",
+    "gender": "female",
+    "description": "Эффектное свадебное платье с сияющей отделкой бисером и кристаллами. Приталенный силуэт русалка с длинными рукавами визуально вытягивает фигуру.",
+    "color": "white",
+    "color_name": "Crystal White",
+    "color_hex": "#FFFFFF",
+    "pattern": "beaded",
+    "fit": "mermaid",
+    "material": "Атлас, сетка, бисер и кристаллы",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/wedding-starlit-beaded-mermaid.png",
+    "style_tags": [
+      "evening",
+      "glam",
+      "luxury"
+    ],
+    "occasion_tags": [
+      "wedding",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "deluna-official"
+  },
+  {
+    "id": "dress-012",
+    "sku_id": "DLN-LUNA-SLIT-IVORY-F",
+    "name": "Платье Luna Slit Cape",
+    "brand": "deluna",
+    "category": "dresses",
+    "subcategory": "wedding_dress",
+    "gender": "female",
+    "description": "Сияющее свадебное платье с глубоким V-образным вырезом, открытой линией плеч и эффектной юбкой с высоким разрезом. Легкие кейп-рукава добавляют воздушность и драматичный силуэт.",
+    "color": "ivory",
+    "color_name": "Champagne Ivory",
+    "color_hex": "#F2E3D5",
+    "pattern": "glitter",
+    "fit": "fitted",
+    "material": "Глиттерный фатин, подкладка, мягкая сетка",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/wedding-deluna-luna-slit.png",
+    "style_tags": [
+      "evening",
+      "glam",
+      "luxury"
+    ],
+    "occasion_tags": [
+      "wedding",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "deluna-official"
+  },
+  {
+    "id": "dress-013",
+    "sku_id": "DLN-ARIA-BALLGOWN-IVORY-F",
+    "name": "Платье Aria Royal Ballgown",
+    "brand": "deluna",
+    "category": "dresses",
+    "subcategory": "wedding_dress",
+    "gender": "female",
+    "description": "Классическое свадебное платье с корсетным верхом и кружевными длинными рукавами. Пышная юбка в стиле royal ballgown создает торжественный и элегантный образ.",
+    "color": "white",
+    "color_name": "Pearl White",
+    "color_hex": "#FDFDFD",
+    "pattern": "lace",
+    "fit": "ballgown",
+    "material": "Сатин, фатин, кружево",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/wedding-deluna-aria-ballgown.png",
+    "style_tags": [
+      "romantic",
+      "luxury",
+      "evening"
+    ],
+    "occasion_tags": [
+      "wedding",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "deluna-official"
+  },
+  {
+    "id": "dress-014",
+    "sku_id": "DLN-ROYAL-SPARKLE-BALLGOWN-F",
+    "name": "Платье Royal Sparkle Ballgown",
+    "brand": "deluna",
+    "category": "dresses",
+    "subcategory": "wedding_dress",
+    "gender": "female",
+    "description": "Свадебное платье в королевском стиле с глубоким V-вырезом и длинными кружевными рукавами. Пышная юбка с сияющей фактурой и мягким шлейфом создает выразительный bridal-образ.",
+    "color": "white",
+    "color_name": "Diamond White",
+    "color_hex": "#FCFCFC",
+    "pattern": "lace",
+    "fit": "ballgown",
+    "material": "Кружево, глиттерный фатин, атласный подклад",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/wedding-deluna-royal-sparkle-ballgown.png",
+    "style_tags": [
+      "wedding",
+      "luxury",
+      "evening"
+    ],
+    "occasion_tags": [
+      "wedding",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "deluna-official"
+  },
+  {
+    "id": "top-018",
+    "sku_id": "TSX-HOODIE-INSP-BLU-U",
+    "name": "HOODIE \"INSPIRATION\"",
+    "brand": "the six",
+    "category": "tops",
+    "subcategory": "hoodie",
+    "gender": "unisex",
+    "description": "Оверсайз худи THE SIX с надписью INSPIRATION на груди, мягкий плотный футер и удобный kangaroo-карман.",
+    "color": "blue",
+    "color_name": "Dusty Blue",
+    "color_hex": "#5E7387",
+    "pattern": "text",
+    "fit": "oversized",
+    "material": "Хлопок, футер",
+    "price": 107.0,
+    "currency": "USD",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/the-six-hoodie-inspiration.png",
+    "style_tags": [
+      "street",
+      "casual",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
+    "season": "all",
+    "seller_id": "the-six-official"
+  },
+  {
+    "id": "top-019",
+    "sku_id": "TSX-LS-KHAKI-CRSTATE-U",
+    "name": "Khaki Longsleeve The six / creator state",
+    "brand": "the six",
+    "category": "tops",
+    "subcategory": "longsleeve",
+    "gender": "unisex",
+    "description": "Базовый лонгслив в цвете хаки от THE SIX / creator state, расслабленный крой и мягкая плотная ткань для ежедневных образов.",
+    "color": "khaki",
+    "color_name": "Khaki",
+    "color_hex": "#C7BEAC",
+    "pattern": "text",
+    "fit": "relaxed",
+    "material": "Хлопок",
+    "price": 66.0,
+    "currency": "USD",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/the-six-khaki-longsleeve-creator-state.png",
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
+    "season": "all",
+    "seller_id": "the-six-official"
+  },
+  {
+    "id": "top-020",
+    "sku_id": "TSX-LS-SOUTHCAP-WHT-U",
+    "name": "South capital Longsleeve white",
+    "brand": "the six",
+    "category": "tops",
+    "subcategory": "longsleeve",
+    "gender": "unisex",
+    "description": "Белый лонгслив South Capital от the six / creator state с мягкой плотной тканью и relaxed силуэтом.",
+    "color": "white",
+    "color_name": "White",
+    "color_hex": "#F7F7F7",
+    "pattern": "text",
+    "fit": "relaxed",
+    "material": "Хлопок",
+    "price": 66.0,
+    "currency": "USD",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/the-six-south-capital-longsleeve-white.png",
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "casual",
+      "travel"
+    ],
+    "season": "all",
+    "seller_id": "the-six-official"
+  },
+  {
+    "id": "dress-015",
+    "sku_id": "LSP-NEW-BEIGE-4248-F",
+    "name": "La sposa New in stock Beige Evening Gown",
+    "brand": "La sposa",
+    "category": "dresses",
+    "subcategory": "evening_gown",
+    "gender": "female",
+    "description": "New in stock. Размеры: 42/44/46/48. 1000+ моделей, созданных для особых встреч. Almaty, Желтоксан 75. 11:00 — 21:00.",
+    "color": "beige",
+    "color_name": "Champagne Beige",
+    "color_hex": "#D9C2A2",
+    "pattern": "solid",
+    "fit": "a_line",
+    "material": "Плотный атлас",
+    "price": 65000,
+    "currency": "KZT",
+    "sizes": [
+      "42",
+      "44",
+      "46",
+      "48"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/la-sposa-new-in-stock-beige-gown.png",
+    "style_tags": [
+      "evening",
+      "romantic",
+      "elegant"
+    ],
+    "occasion_tags": [
+      "event",
+      "party",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "la-sposa-official"
+  },
+  {
+    "id": "dress-016",
+    "sku_id": "LSP-NEW-ROSEBLACK-4248-F",
+    "name": "La sposa New in stock Rose Pleated Gown",
+    "brand": "La sposa",
+    "category": "dresses",
+    "subcategory": "evening_gown",
+    "gender": "female",
+    "description": "New in stock. Цена: 65 000 тенге. Размеры: 42/44/46/48. 1000+ моделей, созданных для особых встреч. Almaty, Желтоксан 75. 11:00 — 21:00.",
+    "color": "pink",
+    "color_name": "Dusty Rose",
+    "color_hex": "#D89AA5",
+    "pattern": "pleated",
+    "fit": "maxi",
+    "material": "Шифон, плиссе, костюмный верх",
+    "price": 65000,
+    "currency": "KZT",
+    "sizes": [
+      "42",
+      "44",
+      "46",
+      "48"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/la-sposa-new-in-stock-rose-black-gown.png",
+    "style_tags": [
+      "evening",
+      "luxury",
+      "romantic"
+    ],
+    "occasion_tags": [
+      "event",
+      "party",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "la-sposa-official"
+  },
+  {
+    "id": "dress-017",
+    "sku_id": "INS-MUSTARD-SLIT-MAXI-F",
+    "name": "Inspira Mustard Corset Slit Dress",
+    "brand": "Inspira",
+    "category": "dresses",
+    "subcategory": "evening_gown",
+    "gender": "female",
+    "description": "Эффектное макси-платье в оттенке горчицы: корсетный верх без бретелей, драпировка по бедрам и высокий разрез. Подчеркивает силуэт и подходит для вечерних выходов.",
+    "color": "yellow",
+    "color_name": "Mustard",
+    "color_hex": "#C98C0E",
+    "pattern": "solid",
+    "fit": "fitted",
+    "material": "Струящийся креп",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "42",
+      "44",
+      "46",
+      "48"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/inspira-dress-mustard-slit-maxi.png",
+    "style_tags": [
+      "evening",
+      "date",
+      "luxury"
+    ],
+    "occasion_tags": [
+      "event",
+      "party",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "inspira-official"
+  },
+  {
+    "id": "dress-018",
+    "sku_id": "INS-BLUE-FLORAL-MAXI-F",
+    "name": "Inspira Blue Floral Maxi Dress",
+    "brand": "Inspira",
+    "category": "dresses",
+    "subcategory": "maxi_dress",
+    "gender": "female",
+    "description": "New collection. 23.500 тг. Заказать в direct / WhatsApp 87080718181. Примерить по адресу: Наурызбай батыра 50, ТД АРБАТ, бутик 30. С 11:00 до 20:00.",
+    "color": "blue",
+    "color_name": "Sky Blue Floral",
+    "color_hex": "#9FC3E6",
+    "pattern": "floral",
+    "fit": "a_line",
+    "material": "Плотный хлопок с принтом",
+    "price": 23500,
+    "currency": "KZT",
+    "sizes": [
+      "42",
+      "44",
+      "46",
+      "48"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/inspira-dress-blue-floral-maxi.png",
+    "style_tags": [
+      "romantic",
+      "evening",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "event",
+      "date",
+      "party"
+    ],
+    "season": "spring_summer",
+    "seller_id": "inspira-official"
+  },
+  {
+    "id": "dress-019",
+    "sku_id": "INS-SILVER-HALTER-MINI-F",
+    "name": "Inspira Silver Halter Mini Dress",
+    "brand": "Inspira",
+    "category": "dresses",
+    "subcategory": "mini_dress",
+    "gender": "female",
+    "description": "Мини-платье с открытой спиной и акцентным халтер-верхом в серебристом оттенке. Легкая расклешенная юбка добавляет динамику и подходит для вечеринок и особых встреч.",
+    "color": "silver",
+    "color_name": "Soft Silver",
+    "color_hex": "#9A9288",
+    "pattern": "textured",
+    "fit": "fit_and_flare",
+    "material": "Фактурный трикотаж",
+    "price": 0,
+    "currency": "KZT",
+    "sizes": [
+      "42",
+      "44",
+      "46",
+      "48"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/inspira-dress-silver-halter-mini.png",
+    "style_tags": [
+      "evening",
+      "party",
+      "date"
+    ],
+    "occasion_tags": [
+      "party",
+      "event",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "inspira-official"
+  },
+  {
+    "id": "dress-020",
+    "sku_id": "ML-BLK-POLKA-MAXI-F",
+    "name": "My Look Black Polka Maxi Dress",
+    "brand": "my look",
+    "category": "dresses",
+    "subcategory": "maxi_dress",
+    "gender": "female",
+    "description": "Черное платье в горошек с многоярусной юбкой и декоративными рюшами. Легкий вечерний силуэт для прогулок и мероприятий.",
+    "color": "black",
+    "color_name": "Black Polka",
+    "color_hex": "#1A1A1A",
+    "pattern": "polka_dot",
+    "fit": "regular",
+    "material": "Легкий шифон",
+    "price": 20990,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/my-look-black-polka-maxi.png",
+    "style_tags": [
+      "romantic",
+      "evening",
+      "date"
+    ],
+    "occasion_tags": [
+      "date",
+      "event",
+      "party"
+    ],
+    "season": "all",
+    "seller_id": "my-look-official"
+  },
+  {
+    "id": "dress-021",
+    "sku_id": "ML-CRM-FLORAL-MINI-F",
+    "name": "My Look Cream Floral Mini Dress",
+    "brand": "my look",
+    "category": "dresses",
+    "subcategory": "mini_dress",
+    "gender": "female",
+    "description": "Мини-платье с цветочным принтом и открытыми плечами. Женственный летний вариант для свиданий и вечеринок.",
+    "color": "cream",
+    "color_name": "Cream Floral",
+    "color_hex": "#F2E8D4",
+    "pattern": "floral",
+    "fit": "fit_and_flare",
+    "material": "Хлопок",
+    "price": 22990,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/my-look-cream-floral-mini.png",
+    "style_tags": [
+      "romantic",
+      "date",
+      "casual"
+    ],
+    "occasion_tags": [
+      "date",
+      "party",
+      "daily"
+    ],
+    "season": "spring_summer",
+    "seller_id": "my-look-official"
+  },
+  {
+    "id": "dress-022",
+    "sku_id": "ML-RED-SATIN-MAXI-F",
+    "name": "My Look Red Satin Maxi Dress",
+    "brand": "my look",
+    "category": "dresses",
+    "subcategory": "maxi_dress",
+    "gender": "female",
+    "description": "Яркое красное макси-платье на тонких бретелях с мягким летящим подолом. Эффектный образ для вечера и торжественных событий.",
+    "color": "red",
+    "color_name": "Ruby Red",
+    "color_hex": "#C3132C",
+    "pattern": "solid",
+    "fit": "a_line",
+    "material": "Сатин",
+    "price": 25990,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/my-look-red-satin-maxi.png",
+    "style_tags": [
+      "evening",
+      "party",
+      "luxury"
+    ],
+    "occasion_tags": [
+      "event",
+      "party",
+      "date"
+    ],
+    "season": "all",
+    "seller_id": "my-look-official"
+  },
+  {
+    "id": "dress-023",
+    "sku_id": "BSN-SUM-PINK-MAXI-F",
+    "name": "Be Sunshine Pink Summer Maxi Dress",
+    "brand": "be sunshine",
+    "category": "dresses",
+    "subcategory": "maxi_dress",
+    "gender": "female",
+    "description": "Летнее макси-платье в нежно-розовом оттенке с легким принтом и воротником-бантом. Легкий, воздушный вариант для теплой погоды.",
+    "color": "pink",
+    "color_name": "Soft Pink",
+    "color_hex": "#E9C7CE",
+    "pattern": "floral",
+    "fit": "regular",
+    "material": "Шифон",
+    "price": 24990,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/be-sunshine-summer-pink-maxi.png",
+    "style_tags": [
+      "casual",
+      "romantic",
+      "travel"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "travel"
+    ],
+    "season": "spring_summer",
+    "seller_id": "be-sunshine-official"
+  },
+  {
+    "id": "dress-024",
+    "sku_id": "BSN-SUM-WHT-POLKA-F",
+    "name": "Be Sunshine White Summer Polka Maxi Dress",
+    "brand": "be sunshine",
+    "category": "dresses",
+    "subcategory": "maxi_dress",
+    "gender": "female",
+    "description": "Летнее белое макси-платье в мелкий горох с коротким рукавом и мягкой драпировкой. Комфортный и женственный силуэт на каждый день.",
+    "color": "white",
+    "color_name": "White Polka",
+    "color_hex": "#F7F7F2",
+    "pattern": "polka_dot",
+    "fit": "regular",
+    "material": "Вискоза",
+    "price": 24990,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/be-sunshine-summer-white-polka-maxi.png",
+    "style_tags": [
+      "casual",
+      "romantic",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "date",
+      "event"
+    ],
+    "season": "spring_summer",
+    "seller_id": "be-sunshine-official"
+  },
+  {
+    "id": "dress-025",
+    "sku_id": "BSN-SUM-PLAID-SHIRT-F",
+    "name": "Be Sunshine Summer Plaid Dress",
+    "brand": "be sunshine",
+    "category": "dresses",
+    "subcategory": "shirt_dress",
+    "gender": "female",
+    "description": "Летнее платье-рубашка в клетку с длинным рукавом и поясом на талии. Универсальный вариант для повседневных образов.",
+    "color": "brown",
+    "color_name": "Brown Plaid",
+    "color_hex": "#6C5846",
+    "pattern": "plaid",
+    "fit": "regular",
+    "material": "Хлопок",
+    "price": 10000,
+    "currency": "KZT",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "in_stock": true,
+    "image_url": "http://localhost:8000/storage/images/products/be-sunshine-summer-plaid-dress.png",
+    "style_tags": [
+      "casual",
+      "street",
+      "smart_casual"
+    ],
+    "occasion_tags": [
+      "daily",
+      "work",
+      "travel"
+    ],
+    "season": "spring_summer",
+    "seller_id": "be-sunshine-official"
   }
 ]

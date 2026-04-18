@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from app.core.config import absolute_public_url
 from app.models.schemas import VideoJobResponse
 from app.services.veo_service import VeoService
 
@@ -29,7 +30,7 @@ async def generate_video(req: VideoGenerateRequest) -> VideoJobResponse:
         kwargs["prompt"] = req.prompt
 
     job = await veo_service.create_video_job(
-        source_image_url=req.source_image_url,
+        source_image_url=absolute_public_url(req.source_image_url),
         **kwargs,
     )
     return job

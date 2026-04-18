@@ -4,10 +4,16 @@ import json
 import logging
 import os
 import tempfile
+from pathlib import Path
 from typing import Any, List, Optional, Union
 
+from dotenv import load_dotenv
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
+
+# Expose all .env keys to os.environ (Google client libs read GOOGLE_* vars directly).
+_env_path = Path(__file__).resolve().parents[2] / ".env"
+load_dotenv(_env_path)
 
 
 class Settings(BaseSettings):
@@ -200,4 +206,3 @@ def log_gcp_application_credentials_status() -> None:
 
 
 log_gcp_application_credentials_status()
-

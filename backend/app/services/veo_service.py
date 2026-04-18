@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 VIDEO_DIR = Path(settings.IMAGE_STORAGE_PATH) / "videos"
 VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 
-VEO_MODEL = "veo-3.1-generate-001"
+VEO_MODEL = "veo-3.1-lite-generate-001"
+_VEO_MAX_RETRIES = 3
 
 MOTION_PROMPT = (
     "Person slowly and naturally turning to show the outfit from different angles, "
@@ -34,23 +35,26 @@ MOTION_PROMPT = (
 class VeoService:
     def __init__(self) -> None:
         self._jobs: Dict[str, VideoJobResponse] = {}
-        self._use_veo = bool((settings.VERTEX_AI_PROJECT or "").strip())
+        self._client = None
+        self._init_error: Optional[str] = None
+        project = (settings.VERTEX_AI_PROJECT or "").strip()
+        self._project_configured = bool(project)
 
-        if self._use_veo:
+        if self._project_configured:
             try:
                 from google import genai
+
                 self._client = genai.Client(
-                    project=settings.VERTEX_AI_PROJECT,
+                    project=project,
                     location=settings.VERTEX_AI_LOCATION,
                     vertexai=True,
                 )
-                logger.info(f"Veo enabled via google-genai SDK (project={settings.VERTEX_AI_PROJECT})")
+                logger.info("Veo enabled via google-genai SDK (project=%s)", project)
             except Exception as e:
-                logger.warning(f"Could not init google-genai client: {e}")
-                self._client = None
-                self._use_veo = False
+                self._init_error = str(e)
+                logger.warning("Could not init google-genai client: %s", e)
         else:
-            self._client = None
+            self._init_error = "VERTEX_AI_PROJECT пустой в .env"
 
     async def create_video_job(
         self,
@@ -68,13 +72,23 @@ class VeoService:
         )
         self._jobs[job_id] = job
 
-        if self._use_veo and self._client:
+        if self._client:
             asyncio.create_task(
                 self._process_veo(job_id, source_image_url, prompt)
             )
         else:
             job.status = VideoJobStatus.FAILED
-            job.failure_reason = "Генерация видео недоступна (Veo не настроен)"
+            if self._project_configured:
+                job.failure_reason = (
+                    "Клиент Google Veo не инициализировался. Обновите зависимости бэкенда "
+                    "(pip install -r requirements.txt — нужны google-genai и google-auth>=2.48), "
+                    "проверьте ADC: gcloud auth application-default login. Детали: "
+                    + (self._init_error or "см. лог сервера")
+                )
+            else:
+                job.failure_reason = (
+                    "Генерация видео недоступна: задайте VERTEX_AI_PROJECT в .env и настройте Vertex AI / Veo."
+                )
             job.completed_at = now
 
         return job
@@ -129,7 +143,7 @@ class VeoService:
             job.progress = 20
 
             # Step 4: Call Veo API (runs sync, so wrap in thread)
-            def _generate():
+            def _generate_once():
                 operation = self._client.models.generate_videos(
                     model=VEO_MODEL,
                     source=source,
@@ -141,7 +155,35 @@ class VeoService:
                     operation = self._client.operations.get(operation)
                 return operation
 
-            operation = await asyncio.to_thread(_generate)
+            operation = None
+            last_error = ""
+            for attempt in range(1, _VEO_MAX_RETRIES + 1):
+                try:
+                    operation = await asyncio.to_thread(_generate_once)
+                    response = operation.result
+                    if response and response.generated_videos:
+                        break
+
+                    error_detail = ""
+                    if hasattr(operation, "error") and operation.error:
+                        error_detail = str(operation.error)
+                    last_error = error_detail or "Veo returned empty response"
+                    is_high_load = "high load" in last_error.lower() or "code': 8" in last_error.lower()
+                    if attempt < _VEO_MAX_RETRIES and is_high_load:
+                        # Backoff for transient provider overload.
+                        await asyncio.sleep(5 * attempt)
+                        continue
+                    raise RuntimeError(last_error)
+                except Exception as e:
+                    last_error = str(e)
+                    is_high_load = "high load" in last_error.lower() or "code': 8" in last_error.lower()
+                    if attempt < _VEO_MAX_RETRIES and is_high_load:
+                        await asyncio.sleep(5 * attempt)
+                        continue
+                    raise
+
+            if operation is None:
+                raise RuntimeError(last_error or "Veo operation failed")
             job.progress = 90
 
             # Step 5: Extract result
@@ -202,7 +244,10 @@ class VeoService:
         except Exception as e:
             logger.error(f"Veo video failed for job {job_id}: {e}")
             job.status = VideoJobStatus.FAILED
-            job.failure_reason = str(e)
+            msg = str(e)
+            if "high load" in msg.lower():
+                msg = "Veo перегружен. Попробуйте снова через 1-2 минуты."
+            job.failure_reason = msg
             job.completed_at = datetime.now(timezone.utc)
 
     async def _simulate_processing(

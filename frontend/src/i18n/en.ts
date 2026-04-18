@@ -227,6 +227,9 @@ export const en: Translations = {
     showInMotion: "Show in motion",
     videoCreating: "Creating video ~40 sec...",
     videoFailed: "Failed to create video",
+    videoPlaybackFailed: "Video won’t play",
+    videoPlaybackHint:
+      "Ensure the API server is running and matches VITE_API_BASE. If the file loads in Network but the player stays blank, the MP4 codec may be unsupported in this browser.",
     sessionLost: "Try-on session lost. Please try again.",
   },
   imageUpload: {

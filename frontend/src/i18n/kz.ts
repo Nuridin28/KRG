@@ -227,6 +227,9 @@ export const kz: Translations = {
     showInMotion: "Қозғалыста көрсету",
     videoCreating: "Бейне жасалуда ~40 сек...",
     videoFailed: "Бейне жасау мүмкін болмады",
+    videoPlaybackFailed: "Бейне ойнамайды",
+    videoPlaybackHint:
+      "API сервері іске қосылғанын және VITE_API_BASE сәйкес келетінін тексеріңіз. Файл жүктелсе де плеер бос болса, браузер MP4 кодегін қолдамайтын болуы мүмкін.",
     sessionLost: "Киіп көру сеансы жоғалды. Қайталап көріңіз.",
   },
   imageUpload: {

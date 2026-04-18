@@ -17,6 +17,11 @@ export default defineConfig({
         target: "http://localhost:8000",
         changeOrigin: true,
       },
+      // Try-on / Veo images & MP4 — same-origin in dev when using relative /storage URLs
+      "/storage": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
     },
   },
 })

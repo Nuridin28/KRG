@@ -212,6 +212,14 @@ async def quick_tryon(
         product_id=req.product_id,
         product_image_url=product.image_url,
         user_id=str(user.id),
+        product_meta={
+            "category": product.category.value if hasattr(product.category, "value") else product.category,
+            "subcategory": product.subcategory,
+            "fit": product.fit,
+            "name": product.name,
+            "description": product.description,
+            "style_tags": product.style_tags,
+        },
     )
     return job
 
