@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     # Empty = try-on / Veo use mock paths (no GCP). Set project + credentials for real Vertex VTO.
     VERTEX_AI_PROJECT: str = ""
     VERTEX_AI_LOCATION: str = "us-central1"
+    # Path to service account JSON (optional). Copied into os.environ so google.auth sees it when set only in .env.
+    GOOGLE_APPLICATION_CREDENTIALS: str = ""
     # Full JSON of GCP service account key (Render: add as Secret). See _materialize_gcp_sa_json below.
     GCP_SERVICE_ACCOUNT_JSON: str = ""
     MAPP_FASHION_API_KEY: str = ""
@@ -113,6 +115,11 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# Pydantic loads .env into Settings fields only; google.auth reads os.environ — bridge path from .env.
+_gac_setting = (settings.GOOGLE_APPLICATION_CREDENTIALS or "").strip()
+if _gac_setting and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _gac_setting
+
 # Temp file path if we created it from GCP_SERVICE_ACCOUNT_JSON (removed on app shutdown).
 _gcp_sa_tempfile: Optional[str] = None
 
@@ -153,3 +160,44 @@ def cleanup_gcp_sa_tempfile() -> None:
 
 
 _materialize_gcp_sa_json()
+
+
+def log_gcp_application_credentials_status() -> None:
+    """One-line diagnostics for Vertex/ADC (no secret values logged)."""
+    log = logging.getLogger(__name__)
+    gac = (os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") or "").strip()
+    json_configured = bool((settings.GCP_SERVICE_ACCOUNT_JSON or "").strip())
+
+    if not gac:
+        if json_configured:
+            log.warning(
+                "GOOGLE_APPLICATION_CREDENTIALS is unset but GCP_SERVICE_ACCOUNT_JSON is set — "
+                "JSON was not applied (invalid JSON, wrong type, or error writing temp file). "
+                "Vertex will rely on other ADC sources if any."
+            )
+        else:
+            log.info(
+                "GOOGLE_APPLICATION_CREDENTIALS not set — using Application Default Credentials only "
+                "(e.g. `gcloud auth application-default login`, or attach a service account on GCE/Cloud Run)."
+            )
+        return
+
+    exists = os.path.isfile(gac)
+    base = os.path.basename(gac)
+    if _gcp_sa_tempfile and os.path.abspath(gac) == os.path.abspath(_gcp_sa_tempfile):
+        source = "from GCP_SERVICE_ACCOUNT_JSON (temp file)"
+    else:
+        source = "from environment GOOGLE_APPLICATION_CREDENTIALS"
+
+    if exists:
+        log.info("GCP credentials file OK (%s): %s", source, base)
+    else:
+        log.warning(
+            "GOOGLE_APPLICATION_CREDENTIALS is set but file is missing or not a file (%s): %s",
+            source,
+            base,
+        )
+
+
+log_gcp_application_credentials_status()
+

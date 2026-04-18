@@ -14,6 +14,7 @@ from typing import Dict, Optional
 import httpx
 
 from app.core.config import settings
+from app.core.http_url import absolute_http_url
 from app.models.schemas import TryOnJobResponse, TryOnJobStatus
 
 logger = logging.getLogger(__name__)
@@ -156,8 +157,9 @@ class TryOnService:
             job.progress = 20
 
             # Step 2: Download garment image
+            garment_url = absolute_http_url(product_image_url)
             async with httpx.AsyncClient(timeout=30.0) as client:
-                garment_resp = await client.get(product_image_url)
+                garment_resp = await client.get(garment_url)
                 garment_resp.raise_for_status()
                 garment_bytes = garment_resp.content
             job.progress = 35
@@ -342,8 +344,9 @@ class TryOnService:
 
                 # Download garment image
                 job.progress = base_progress + int(step_size * 0.1)
+                gurl = absolute_http_url(item["product_image_url"])
                 async with httpx.AsyncClient(timeout=30.0) as client:
-                    garment_resp = await client.get(item["product_image_url"])
+                    garment_resp = await client.get(gurl)
                     garment_resp.raise_for_status()
                     garment_bytes = garment_resp.content
 

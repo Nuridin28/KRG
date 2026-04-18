@@ -14,6 +14,7 @@ from typing import Dict, Optional
 import httpx
 
 from app.core.config import settings
+from app.core.http_url import absolute_http_url
 from app.models.schemas import VideoJobResponse, VideoJobStatus
 
 logger = logging.getLogger(__name__)
@@ -93,8 +94,9 @@ class VeoService:
 
             # Step 1: Download source image (try-on result)
             job.progress = 10
+            src = absolute_http_url(source_image_url)
             async with httpx.AsyncClient(timeout=30.0) as client:
-                img_resp = await client.get(source_image_url)
+                img_resp = await client.get(src)
                 img_resp.raise_for_status()
                 image_bytes = img_resp.content
             job.progress = 15
