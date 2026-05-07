@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react"
-import { Sparkles, Wand2, Shirt, User, ArrowRight } from "lucide-react"
+import { Sparkles, Shirt, User, ArrowRight } from "lucide-react"
 import { ImageDropzone } from "@/components/ImageDropzone"
 import { Result } from "@/components/Result"
 import { ThemeToggle } from "@/components/ThemeToggle"
@@ -87,7 +87,7 @@ function TryOnPage() {
             <Sparkles className="size-4" />
           </div>
           <span className="font-display text-lg font-semibold tracking-tight">
-            Try-On
+            Koktem
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -104,11 +104,7 @@ function TryOnPage() {
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
         <section className="pt-8 pb-12 text-center sm:pt-16 sm:pb-20">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-            <Wand2 className="size-3" />
-            <span>{t.hero.badge}</span>
-          </div>
-          <h1 className="mt-6 font-display text-4xl font-medium leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+          <h1 className="font-display text-4xl font-medium leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
             {t.hero.title1}
             <br />
             <span className="bg-gradient-to-r from-accent to-foreground bg-clip-text text-transparent">
@@ -202,7 +198,7 @@ function TryOnPage() {
       <footer className="mx-auto max-w-6xl border-t border-border px-5 py-8 sm:px-8">
         <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
           <span>
-            © {new Date().getFullYear()} Try-On. {t.footer.rights}
+            © {new Date().getFullYear()} Koktem. {t.footer.rights}
           </span>
           <span className="flex items-center gap-1.5">
             <span className="size-1.5 rounded-full bg-success" />

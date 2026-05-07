@@ -139,7 +139,9 @@ export function ImageDropzone({
             </div>
             <div>
               <p className="text-sm font-medium">{t.dropzone.tap}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+              {description && (
+                <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+              )}
             </div>
           </div>
         )}
