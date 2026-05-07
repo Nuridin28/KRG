@@ -18,7 +18,7 @@ export function Footer() {
     <footer className="mt-24 border-t border-border/60 bg-background">
       {/* Newsletter banner */}
       <div className="border-b border-border/60">
-        <div className="mx-auto grid max-w-[1400px] gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-20">
+        <div className="mx-auto grid max-w-350 gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-20">
           <div>
             <p className="eyebrow text-foreground/50 mb-4">Newsletter</p>
             <h2 className="font-display text-3xl leading-[1.05] tracking-tight sm:text-4xl lg:text-[44px]">
@@ -57,7 +57,7 @@ export function Footer() {
       </div>
 
       {/* Link columns */}
-      <div className="mx-auto grid max-w-[1400px] gap-12 px-4 py-16 sm:grid-cols-2 sm:px-6 lg:grid-cols-5 lg:px-10">
+      <div className="mx-auto grid max-w-350 gap-12 px-4 py-16 sm:grid-cols-2 sm:px-6 lg:grid-cols-5 lg:px-10">
         <div className="lg:col-span-2">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-2xl font-semibold leading-none tracking-tight">Atelier</span>
@@ -113,7 +113,7 @@ export function Footer() {
 
       {/* Bottom rule */}
       <div className="border-t border-border/60">
-        <div className="mx-auto flex max-w-[1400px] flex-col items-start justify-between gap-3 px-4 py-6 text-[11px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:px-6 lg:px-10">
+        <div className="mx-auto flex max-w-350 flex-col items-start justify-between gap-3 px-4 py-6 text-[11px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:px-6 lg:px-10">
           <p>© {year} Atelier Stylist · Almaty</p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <a href="#" className="transition-colors hover:text-foreground">Privacy</a>

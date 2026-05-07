@@ -117,7 +117,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
     <>
       {/* Editorial hero */}
       <section className="border-b border-border/60 bg-background">
-        <div className="mx-auto max-w-[1400px] px-4 pb-10 pt-12 sm:px-6 sm:pb-14 sm:pt-16 lg:px-10 lg:pb-20 lg:pt-24">
+        <div className="mx-auto max-w-350 px-4 pb-10 pt-12 sm:px-6 sm:pb-14 sm:pt-16 lg:px-10 lg:pb-20 lg:pt-24">
           <p className="eyebrow text-foreground/50 mb-5">SS26 · The Edit</p>
           <div className="grid gap-8 lg:grid-cols-12 lg:gap-16">
             <h1 className="font-display text-[44px] leading-[0.95] tracking-tight sm:text-[64px] lg:col-span-8 lg:text-[88px]">
@@ -144,7 +144,7 @@ export function CatalogPage({ onTryOn, onBuildOutfit }: CatalogPageProps) {
         </div>
       </section>
 
-      <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+      <div className="mx-auto max-w-350 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
         <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-12">
           {/* Desktop sidebar filters */}
           <aside className="hidden lg:block">

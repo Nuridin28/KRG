@@ -92,14 +92,14 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
     >
       {/* Announcement strip */}
       <div className="hidden border-b border-border/40 bg-foreground text-background sm:block">
-        <div className="mx-auto flex h-8 max-w-[1400px] items-center justify-between px-6 text-[11px] tracking-[0.18em] uppercase font-medium">
+        <div className="mx-auto flex h-8 max-w-350 items-center justify-between px-6 text-[11px] tracking-[0.18em] uppercase font-medium">
           <span className="hidden md:inline opacity-80">Complimentary shipping on orders above ₸ 25 000</span>
           <span className="opacity-90">New arrivals · SS26 collection</span>
           <span className="hidden md:inline opacity-80">Atelier Almaty · Astana</span>
         </div>
       </div>
 
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-10">
+      <div className="mx-auto flex h-16 max-w-350 items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-10">
         {/* Logo */}
         <button
           onClick={() => onTabChange("catalog")}
@@ -163,8 +163,8 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                       onClick={() => handleNav(item.value)}
                       className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-[12px] font-medium uppercase tracking-[0.14em] transition-colors ${
                         activeTab === item.value
-                          ? "bg-foreground/[0.04] text-foreground"
-                          : "text-foreground/65 hover:bg-foreground/[0.04] hover:text-foreground"
+                          ? "bg-foreground/4 text-foreground"
+                          : "text-foreground/65 hover:bg-foreground/4 hover:text-foreground"
                       }`}
                     >
                       <Icon className="h-3.5 w-3.5" />
@@ -230,7 +230,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
             className="relative flex h-9 w-9 items-center justify-center text-foreground/65 transition-colors hover:text-foreground"
             title={t.nav.cart}
           >
-            <CartIcon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+            <CartIcon className="h-4.5 w-4.5" strokeWidth={1.5} />
             {totalItems > 0 && (
               <span className="absolute right-0.5 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold text-background">
                 {totalItems}
@@ -289,7 +289,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
         {user && (
           <button
             onClick={() => handleNav("profile")}
-            className="flex w-full items-center gap-3 border-b border-border/60 px-6 py-5 text-left transition-colors hover:bg-foreground/[0.03]"
+            className="flex w-full items-center gap-3 border-b border-border/60 px-6 py-5 text-left transition-colors hover:bg-foreground/3"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border">
               <User className="h-4 w-4" strokeWidth={1.5} />
@@ -313,7 +313,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                   className={`flex w-full items-center justify-between px-4 py-3.5 text-sm font-medium transition-colors ${
                     activeTab === item.value
                       ? "bg-foreground text-background"
-                      : "text-foreground/75 hover:bg-foreground/[0.04] hover:text-foreground"
+                      : "text-foreground/75 hover:bg-foreground/4 hover:text-foreground"
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -330,7 +330,7 @@ export function Header({ activeTab, onTabChange, darkMode, onToggleTheme, onOpen
                 className={`flex w-full items-center gap-3 px-4 py-3.5 text-sm font-medium transition-colors ${
                   activeTab === "admin"
                     ? "bg-foreground text-background"
-                    : "text-foreground/75 hover:bg-foreground/[0.04] hover:text-foreground"
+                    : "text-foreground/75 hover:bg-foreground/4 hover:text-foreground"
                 }`}
               >
                 <Shield className="h-4 w-4" strokeWidth={1.5} />

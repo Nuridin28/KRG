@@ -73,18 +73,18 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
   return (
     <article
       className={`group relative flex h-full cursor-pointer flex-col ${
-        tryOnSelected ? "outline outline-offset-[10px] outline-foreground" : ""
+        tryOnSelected ? "outline outline-offset-10 outline-foreground" : ""
       }`}
     >
       {/* Image */}
       <div
-        className="relative aspect-[3/4] overflow-hidden bg-muted/40"
+        className="relative aspect-3/4 overflow-hidden bg-muted/40"
         onClick={() => onSelect(product)}
       >
         <img
           src={resolveMediaUrl(product.image_url)}
           alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
+          className="h-full w-full object-cover transition-transform duration-900 ease-out group-hover:scale-[1.04]"
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement
