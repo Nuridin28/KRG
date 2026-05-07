@@ -1,0 +1,29 @@
+{
+  "name": "krg-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "frontend",
+    "frontend-b2c"
+  ],
+  "scripts": {
+    "dev:b2b": "npm run dev --workspace=frontend",
+    "dev:b2c": "npm run dev --workspace=frontend-b2c",
+    "build:b2b": "npm run build --workspace=frontend",
+    "build:b2c": "npm run build --workspace=frontend-b2c",
+    "lint": "npm run lint --workspaces --if-present",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,tsx,js,jsx}": [
+      "npm run lint --workspace=frontend -- --fix"
+    ],
+    "frontend-b2c/**/*.{ts,tsx,js,jsx}": [
+      "npm run lint --workspace=frontend-b2c -- --fix"
+    ]
+  }
+}

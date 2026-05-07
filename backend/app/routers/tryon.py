@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import uuid
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.schemas import TryOnJobResponse
 from app.services.catalog_service import CatalogService
@@ -13,6 +17,9 @@ from app.services.tryon_service import TryOnService
 router = APIRouter(prefix="/tryon", tags=["Virtual Try-On"])
 
 tryon_service = TryOnService()
+
+_ANON_DIR = Path(settings.IMAGE_STORAGE_PATH) / "anonymous"
+_ANON_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @router.post(
@@ -62,6 +69,51 @@ async def create_tryon_job(
             "description": product.description,
             "style_tags": product.style_tags,
         },
+    )
+    return job
+
+
+@router.post(
+    "/anonymous",
+    response_model=TryOnJobResponse,
+    summary="Анонимная примерка (B2C, без сохранения в БД)",
+    description=(
+        "Принимает два изображения: фото пользователя и изображение одежды. "
+        "Не требует авторизации, не использует каталог, не сохраняет в БД. "
+        "Файл одежды временно сохраняется на диск, чтобы провайдер VTO мог его скачать."
+    ),
+    responses={
+        200: {"description": "Задача создана"},
+        400: {"description": "Пустой файл изображения"},
+    },
+)
+async def create_anonymous_tryon(
+    person_image: UploadFile = File(..., description="Фото человека (JPEG/PNG)"),
+    garment_image: UploadFile = File(..., description="Фото одежды (JPEG/PNG)"),
+) -> TryOnJobResponse:
+    person_bytes = await person_image.read()
+    garment_bytes = await garment_image.read()
+    if not person_bytes or not garment_bytes:
+        raise HTTPException(400, "Both images are required")
+
+    garment_id = uuid.uuid4().hex[:12]
+    suffix = ".png"
+    if garment_image.content_type:
+        if "jpeg" in garment_image.content_type or "jpg" in garment_image.content_type:
+            suffix = ".jpg"
+        elif "webp" in garment_image.content_type:
+            suffix = ".webp"
+    garment_path = _ANON_DIR / f"{garment_id}{suffix}"
+    garment_path.write_bytes(garment_bytes)
+
+    base = settings.PUBLIC_BASE_URL.rstrip("/")
+    garment_url = f"{base}/storage/images/anonymous/{garment_path.name}"
+
+    job = await tryon_service.create_job(
+        person_image_bytes=person_bytes,
+        product_id=f"anon-{garment_id}",
+        product_image_url=garment_url,
+        user_id="anonymous-b2c",
     )
     return job
 
