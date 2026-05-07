@@ -12,7 +12,7 @@
     "build:b2b": "npm run build --workspace=frontend",
     "build:b2c": "npm run build --workspace=frontend-b2c",
     "lint": "npm run lint --workspaces --if-present",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "husky": "^9.1.7",
