@@ -26,9 +26,11 @@ VEO_MODEL = "veo-3.1-lite-generate-001"
 _VEO_MAX_RETRIES = 3
 
 MOTION_PROMPT = (
-    "Person slowly and naturally turning to show the outfit from different angles, "
-    "smooth gentle rotation, fashion lookbook video style, studio lighting, "
-    "professional fashion photography, subtle movement"
+    "Fashion model standing confidently facing the camera throughout the entire shot, "
+    "subtle natural movement, slight weight shift, gentle shoulder and head micro-movements, "
+    "hands relaxed or light hand gesture, maintaining front-facing pose, eye contact with camera, "
+    "fashion lookbook video style, studio lighting, professional fashion photography. "
+    "Do NOT turn around, do NOT show back view, do NOT rotate, no 360 spin, no walking away."
 )
 
 

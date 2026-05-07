@@ -121,9 +121,9 @@ class CatalogService:
 
         total_pages = max(1, (total + filters.page_size - 1) // filters.page_size)
 
-        # Paginate
+        # Paginate (newest first)
         offset = (filters.page - 1) * filters.page_size
-        query = query.offset(offset).limit(filters.page_size)
+        query = query.order_by(ProductDB.created_at.desc()).offset(offset).limit(filters.page_size)
 
         result = await self.db.execute(query)
         rows = result.scalars().all()
