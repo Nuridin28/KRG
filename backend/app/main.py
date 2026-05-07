@@ -174,7 +174,6 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     contact={
         "name": "KRG Engineering",
-        "email": "support@krg.local",
     },
     license_info={
         "name": "Proprietary",
