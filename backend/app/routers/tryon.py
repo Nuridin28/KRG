@@ -3,16 +3,22 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, UploadFile
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.security import decode_access_token
+from app.models.db_models import User
 from app.models.schemas import TryOnJobResponse
 from app.services.catalog_service import CatalogService
 from app.services.tryon_service import TryOnService
+
+DAILY_QUOTA = 5
 
 router = APIRouter(prefix="/tryon", tags=["Virtual Try-On"])
 
@@ -90,11 +96,36 @@ async def create_tryon_job(
 async def create_anonymous_tryon(
     person_image: UploadFile = File(..., description="Фото человека (JPEG/PNG)"),
     garment_image: UploadFile = File(..., description="Фото одежды (JPEG/PNG)"),
+    authorization: str | None = Header(default=None),
+    db: AsyncSession = Depends(get_db),
 ) -> TryOnJobResponse:
     person_bytes = await person_image.read()
     garment_bytes = await garment_image.read()
     if not person_bytes or not garment_bytes:
         raise HTTPException(400, "Both images are required")
+
+    user_label = "anonymous-b2c"
+    auth_user: User | None = None
+    if authorization and authorization.lower().startswith("bearer "):
+        token = authorization.split(" ", 1)[1].strip()
+        payload = decode_access_token(token)
+        if payload and payload.get("sub"):
+            res = await db.execute(select(User).where(User.id == int(payload["sub"])))
+            auth_user = res.scalar_one_or_none()
+
+    if auth_user:
+        today = datetime.now(timezone.utc).date().isoformat()
+        if auth_user.tryon_count_date != today:
+            auth_user.tryon_count_today = 0
+            auth_user.tryon_count_date = today
+        if auth_user.tryon_count_today >= DAILY_QUOTA:
+            raise HTTPException(
+                429,
+                f"Дневной лимит исчерпан ({DAILY_QUOTA}/день). Возвращайтесь завтра.",
+            )
+        auth_user.tryon_count_today += 1
+        await db.commit()
+        user_label = f"user-{auth_user.id}"
 
     garment_id = uuid.uuid4().hex[:12]
     suffix = ".png"
@@ -113,8 +144,9 @@ async def create_anonymous_tryon(
         person_image_bytes=person_bytes,
         product_id=f"anon-{garment_id}",
         product_image_url=garment_url,
-        user_id="anonymous-b2c",
+        user_id=user_label,
     )
+    job.garment_image_url = garment_url
     return job
 
 

@@ -22,8 +22,8 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import cleanup_gcp_sa_tempfile, settings
 from app.core.database import Base, engine
 from app.routers import (
-    admin, auth, catalog, daily_outfit, outfits, profile,
-    saved_outfits, stylist_chat, tracking, tryon, video, wardrobe,
+    admin, auth, auth_b2c, catalog, daily_outfit, outfits, profile,
+    saved_outfits, stylist_chat, tracking, tryon, video, wardrobe, wardrobe_b2c,
 )
 
 
@@ -35,6 +35,8 @@ async def lifespan(app: FastAPI):
             ("preferred_styles", "JSONB"),
             ("preferred_gender", "VARCHAR(20)"),
             ("city", "VARCHAR(100)"),
+            ("tryon_count_today", "INTEGER DEFAULT 0"),
+            ("tryon_count_date", "VARCHAR(10) DEFAULT ''"),
         ]:
             await conn.execute(
                 __import__("sqlalchemy").text(
@@ -177,6 +179,8 @@ app.mount("/storage", StaticFiles(directory=str(storage_path.parent)), name="sto
 
 # Public routes
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(auth_b2c.router, prefix=settings.API_V1_PREFIX)
+app.include_router(wardrobe_b2c.router, prefix=settings.API_V1_PREFIX)
 app.include_router(catalog.router, prefix=settings.API_V1_PREFIX)
 app.include_router(outfits.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tryon.router, prefix=settings.API_V1_PREFIX)

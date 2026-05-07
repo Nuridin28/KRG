@@ -1,23 +1,28 @@
 import { Download, Loader2, Sparkles, AlertCircle, RotateCcw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/i18n/context"
+import { SaveToWardrobe } from "./SaveToWardrobe"
 
 interface ResultProps {
   status: "idle" | "processing" | "success" | "error"
   progress: number
   imageUrl?: string | null
+  garmentImageUrl?: string | null
   error?: string | null
   currentStep?: string | null
   onReset: () => void
+  onRequireSignIn: () => void
 }
 
 export function Result({
   status,
   progress,
   imageUrl,
+  garmentImageUrl,
   error,
   currentStep,
   onReset,
+  onRequireSignIn,
 }: ResultProps) {
   const { t } = useI18n()
 
@@ -92,17 +97,25 @@ export function Result({
       </div>
 
       {status === "success" && imageUrl && (
-        <a
-          href={imageUrl}
-          download="tryon-result.png"
-          className={cn(
-            "mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3",
-            "text-sm font-medium text-background transition hover:opacity-90 active:scale-[0.99]",
+        <>
+          <a
+            href={imageUrl}
+            download="tryon-result.png"
+            className={cn(
+              "mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3",
+              "text-sm font-medium text-background transition hover:opacity-90 active:scale-[0.99]",
+            )}
+          >
+            <Download className="size-4" />
+            {t.result.download}
+          </a>
+          {garmentImageUrl && (
+            <SaveToWardrobe
+              garmentImageUrl={garmentImageUrl}
+              onRequireSignIn={onRequireSignIn}
+            />
           )}
-        >
-          <Download className="size-4" />
-          {t.result.download}
-        </a>
+        </>
       )}
     </div>
   )

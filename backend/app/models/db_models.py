@@ -22,6 +22,23 @@ class User(Base):
     preferred_styles: Mapped[list | None] = mapped_column(JSON, nullable=True)
     preferred_gender: Mapped[str | None] = mapped_column(String(20), nullable=True)
     city: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    # B2C daily try-on quota
+    tryon_count_today: Mapped[int] = mapped_column(Integer, default=0)
+    tryon_count_date: Mapped[str] = mapped_column(String(10), default="")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class EmailVerificationCode(Base):
+    """One-time codes for email-based passwordless auth (B2C)."""
+    __tablename__ = "email_verification_codes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    code_hash: Mapped[str] = mapped_column(String(255))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    consumed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

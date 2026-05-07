@@ -155,6 +155,7 @@ class TryOnJobResponse(BaseModel):
     status: TryOnJobStatus
     progress: int = 0
     output_image_url: Optional[str] = None
+    garment_image_url: Optional[str] = None
     failure_reason: Optional[str] = None
     provider_used: Optional[str] = None
     created_at: datetime
