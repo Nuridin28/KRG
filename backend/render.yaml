@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: krg-backend
+    runtime: python
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /docs
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: APP_NAME
+        value: AI Stylist API
+      - key: DEBUG
+        value: "false"
+      - key: API_V1_PREFIX
+        value: /api/v1
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: ALGORITHM
+        value: HS256
+      - key: VERTEX_AI_LOCATION
+        value: us-central1
+      - key: IMAGE_STORAGE_PATH
+        value: ./storage/images
+      - key: IMAGE_RETENTION_HOURS
+        value: "24"
+      - key: TRYON_RATE_LIMIT_PER_USER
+        value: "20"
+      - key: TRYON_RATE_LIMIT_WINDOW_MINUTES
+        value: "60"
+      - key: BUDGET_TOLERANCE_PERCENT
+        value: "5.0"
+      - key: MAX_OUTFITS_PER_REQUEST
+        value: "10"
+      - key: DEFAULT_OUTFITS_COUNT
+        value: "3"
+      # --- Set these manually in Render dashboard (Secrets) ---
+      # SECRET_KEY              -> openssl rand -hex 32
+      # DATABASE_URL            -> Neon/Supabase postgres connection (postgresql+asyncpg://...)
+      # OPENAI_API_KEY          -> your key
+      # VERTEX_AI_PROJECT       -> krghack
+      # GCP_SERVICE_ACCOUNT_JSON -> full JSON of service account key (one line)
+      # CORS_ORIGINS            -> ["https://your-app.vercel.app"]

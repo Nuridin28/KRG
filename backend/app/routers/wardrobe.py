@@ -16,7 +16,13 @@ from app.services.capsule_service import CapsuleService
 router = APIRouter(prefix="/wardrobe", tags=["Wardrobe"])
 
 
-@router.get("/items", response_model=List[WardrobeItemResponse])
+@router.get(
+    "/items",
+    response_model=List[WardrobeItemResponse],
+    summary="Список вещей в гардеробе",
+    description="Возвращает все вещи капсульного гардероба текущего пользователя.",
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def list_wardrobe(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -39,13 +45,26 @@ async def list_wardrobe(
     ]
 
 
-@router.post("/upload", response_model=WardrobeItemResponse)
+@router.post(
+    "/upload",
+    response_model=WardrobeItemResponse,
+    summary="Добавить вещь по фото (GPT Vision)",
+    description=(
+        "Принимает фото одежды и автоматически распознаёт её через GPT Vision: "
+        "категория, цвет, стиль. Распознанная вещь добавляется в гардероб.\n\n"
+        "**Ограничения:** размер файла 1 КБ – 10 МБ."
+    ),
+    responses={
+        200: {"description": "Вещь добавлена"},
+        400: {"description": "Файл слишком маленький / слишком большой"},
+        401: {"description": "Требуется авторизация"},
+    },
+)
 async def upload_clothing_photo(
-    photo: UploadFile = File(...),
+    photo: UploadFile = File(..., description="JPEG/PNG фото одежды"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Upload a photo of clothing — GPT Vision identifies and adds to wardrobe."""
     content = await photo.read()
     if len(content) < 1000:
         raise HTTPException(400, "Файл слишком маленький")
@@ -68,7 +87,16 @@ async def upload_clothing_photo(
     )
 
 
-@router.post("/items", response_model=WardrobeItemResponse)
+@router.post(
+    "/items",
+    response_model=WardrobeItemResponse,
+    summary="Добавить вещь вручную",
+    description=(
+        "Добавляет вещь в гардероб по структурированным данным (можно указать `product_id` "
+        "из каталога — тогда метаданные подтянутся автоматически)."
+    ),
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def add_wardrobe_item(
     data: WardrobeItemCreate,
     user: User = Depends(get_current_user),
@@ -97,7 +125,16 @@ async def add_wardrobe_item(
     )
 
 
-@router.delete("/items/{item_id}")
+@router.delete(
+    "/items/{item_id}",
+    summary="Удалить вещь из гардероба",
+    description="Удаляет указанную вещь из капсулы пользователя.",
+    responses={
+        200: {"description": "Вещь удалена"},
+        401: {"description": "Требуется авторизация"},
+        404: {"description": "Вещь не найдена"},
+    },
+)
 async def remove_wardrobe_item(
     item_id: int,
     user: User = Depends(get_current_user),
@@ -110,7 +147,17 @@ async def remove_wardrobe_item(
     return {"deleted": item_id}
 
 
-@router.post("/analyze", response_model=CapsuleAnalysisResponse)
+@router.post(
+    "/analyze",
+    response_model=CapsuleAnalysisResponse,
+    summary="Анализ капсульного гардероба",
+    description=(
+        "Анализирует имеющуюся капсулу: сколько образов можно собрать, какие категории не хватает, "
+        "что докупить для расширения возможностей. Использует пол из предпочтений пользователя "
+        "(`preferred_gender`, по умолчанию `female`)."
+    ),
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def analyze_capsule(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

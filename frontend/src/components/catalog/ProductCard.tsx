@@ -1,9 +1,6 @@
 import { useState, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { Shirt, Check, Heart, Zap, Plus, Loader2 } from "lucide-react"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import { useWishlist } from "@/store/wishlist"
 import { useProfile } from "@/store/profile"
@@ -36,187 +33,245 @@ export function ProductCard({ product, onSelect, onTryOn, tryOnSelected, onToggl
   const [quickLoading, setQuickLoading] = useState(false)
   const [wardrobeLoading, setWardrobeLoading] = useState(false)
 
-  const handleQuickTryOn = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setQuickLoading(true)
-    try {
-      const job = await api.profile.quickTryOn(product.id)
-      toast({ title: t.product.selectedForTryOn, description: product.name })
-      navigate(`/tryon?job=${job.job_id}`)
-    } catch (err: any) {
-      toast({ title: t.common.error, description: err.message })
-    } finally {
-      setQuickLoading(false)
-    }
-  }, [product, navigate, toast, t])
+  const handleQuickTryOn = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation()
+      setQuickLoading(true)
+      try {
+        const job = await api.profile.quickTryOn(product.id)
+        toast({ title: t.product.selectedForTryOn, description: product.name })
+        navigate(`/tryon?job=${job.job_id}`)
+      } catch (err: any) {
+        toast({ title: t.common.error, description: err.message })
+      } finally {
+        setQuickLoading(false)
+      }
+    },
+    [product, navigate, toast, t]
+  )
 
-  const handleAddToWardrobe = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (inWardrobe) return
-    setWardrobeLoading(true)
-    try {
-      const item = await api.wardrobe.addItem({ product_id: product.id })
-      wardrobeAdd(item)
-      toast({ title: t.product.addedToWardrobe, description: product.name })
-    } catch (err: any) {
-      toast({ title: t.common.error, description: err.message })
-    } finally {
-      setWardrobeLoading(false)
-    }
-  }, [product, inWardrobe, wardrobeAdd, toast, t])
+  const handleAddToWardrobe = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation()
+      if (inWardrobe) return
+      setWardrobeLoading(true)
+      try {
+        const item = await api.wardrobe.addItem({ product_id: product.id })
+        wardrobeAdd(item)
+        toast({ title: t.product.addedToWardrobe, description: product.name })
+      } catch (err: any) {
+        toast({ title: t.common.error, description: err.message })
+      } finally {
+        setWardrobeLoading(false)
+      }
+    },
+    [product, inWardrobe, wardrobeAdd, toast, t]
+  )
+
+  const showQuickTryOn = isLoggedIn() && hasPhotos()
 
   return (
-    <Card className={`group flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
-      tryOnSelected ? "ring-2 ring-foreground" : ""
-    }`}>
-      <div className="relative shrink-0" onClick={() => onSelect(product)}>
-        <div className="aspect-square overflow-hidden bg-muted/50">
-          <img
-            src={resolveMediaUrl(product.image_url)}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement
-              target.style.display = "none"
-              target.parentElement!.innerHTML = `<div class="flex h-full w-full items-center justify-center"><div class="h-32 w-32 rounded-full shadow-inner" style="background-color: ${product.color_hex || '#ccc'}"></div></div>`
-            }}
-          />
-        </div>
-        {product.promo_price && (
-          <Badge variant="coral" className="absolute left-2 top-2">
-            {t.catalog.discount}
-          </Badge>
-        )}
-        {!product.in_stock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/60">
-            <span className="text-sm font-medium text-muted-foreground">{t.catalog.outOfStock}</span>
-          </div>
-        )}
-
-        {/* Wishlist heart */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            wishlist.toggle({
-              id: product.id, name: product.name, brand: product.brand,
-              category: product.category, color_hex: product.color_hex,
-              color_name: product.color_name, price: product.price,
-              promo_price: product.promo_price, currency: product.currency,
-              image_url: product.image_url, in_stock: product.in_stock,
-            })
+    <article
+      className={`group relative flex h-full cursor-pointer flex-col ${
+        tryOnSelected ? "outline outline-offset-[10px] outline-foreground" : ""
+      }`}
+    >
+      {/* Image */}
+      <div
+        className="relative aspect-[3/4] overflow-hidden bg-muted/40"
+        onClick={() => onSelect(product)}
+      >
+        <img
+          src={resolveMediaUrl(product.image_url)}
+          alt={product.name}
+          className="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
+          loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement
+            target.style.display = "none"
+            target.parentElement!.innerHTML = `<div class="flex h-full w-full items-center justify-center"><div class="h-32 w-32 rounded-full" style="background-color: ${product.color_hex || '#ccc'}"></div></div>`
           }}
-          className={`absolute left-2 ${product.promo_price ? "top-9" : "top-2"} flex h-7 w-7 items-center justify-center rounded-full transition-all ${
-            isWished
-              ? "bg-red-500 text-white"
-              : "bg-black/30 text-white hover:bg-red-500"
-          }`}
-          title={isWished ? t.product.removeFromWishlist : t.product.addToWishlist}
-        >
-          <Heart className={`h-3.5 w-3.5 ${isWished ? "fill-current" : ""}`} />
-        </button>
+        />
 
-        {/* Try-on selection checkbox */}
-        {onToggleTryOn && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onToggleTryOn(product) }}
-            className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all ${
-              tryOnSelected
-                ? "border-foreground bg-foreground text-background"
-                : "border-white/80 bg-black/30 text-white hover:bg-foreground/80 hover:border-foreground"
-            }`}
-            title={tryOnSelected ? t.product.removeFromTryOn : t.product.addToTryOn}
-          >
-            {tryOnSelected ? <Check className="h-4 w-4" /> : <Shirt className="h-3.5 w-3.5" />}
-          </button>
-        )}
-      </div>
-
-      <CardContent className="flex-1 space-y-2 p-4" onClick={() => onSelect(product)}>
-        <p className="text-xs text-muted-foreground">{product.brand}</p>
-        <h3 className="line-clamp-2 text-sm font-medium leading-tight">{product.name}</h3>
-        <div className="flex items-center gap-2">
-          <div
-            className="h-4 w-4 shrink-0 rounded-full border"
-            style={{ backgroundColor: product.color_hex || "#ccc" }}
-            title={product.color_name}
-          />
-          <span className="text-xs text-muted-foreground">{product.color_name}</span>
-        </div>
-        <div className="flex items-baseline gap-2">
-          {product.promo_price ? (
-            <>
-              <span className="text-sm font-bold text-foreground">
-                {formatPrice(product.promo_price, product.currency)}
-              </span>
-              <span className="text-xs text-muted-foreground line-through">
-                {formatPrice(product.price, product.currency)}
-              </span>
-            </>
-          ) : (
-            <span className="text-sm font-semibold">
-              {formatPrice(product.price, product.currency)}
+        {/* Top badges */}
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5">
+          {product.promo_price && (
+            <span className="bg-foreground px-2 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-background">
+              {t.catalog.discount}
             </span>
           )}
         </div>
-        {product.style_tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {product.style_tags.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-[10px]">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </CardContent>
 
-      <CardFooter className="mt-auto border-t p-2.5">
-        <div className="flex w-full flex-col gap-1.5">
-          {/* Quick try-on (if user has saved photos) */}
-          {isLoggedIn() && hasPhotos() ? (
-            <Button
-              size="sm"
-              variant="coral"
-              className="w-full text-xs"
-              disabled={quickLoading}
-              onClick={handleQuickTryOn}
-            >
-              {quickLoading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Zap className="mr-1.5 h-3.5 w-3.5" />}
-              {t.common.tryOnSelf}
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="coral"
-              className="w-full text-xs"
-              onClick={(e) => { e.stopPropagation(); onTryOn(product) }}
-            >
-              <Shirt className="mr-1.5 h-3.5 w-3.5" />
-              {t.common.tryOn}
-            </Button>
-          )}
+        {/* Top-right actions */}
+        <div className="absolute right-2.5 top-2.5 flex flex-col gap-1.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:opacity-100">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              wishlist.toggle({
+                id: product.id,
+                name: product.name,
+                brand: product.brand,
+                category: product.category,
+                color_hex: product.color_hex,
+                color_name: product.color_name,
+                price: product.price,
+                promo_price: product.promo_price,
+                currency: product.currency,
+                image_url: product.image_url,
+                in_stock: product.in_stock,
+              })
+            }}
+            className={`flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-md transition-all ${
+              isWished
+                ? "bg-foreground text-background"
+                : "bg-background/85 text-foreground/80 hover:bg-foreground hover:text-background"
+            }`}
+            title={isWished ? t.product.removeFromWishlist : t.product.addToWishlist}
+            aria-label="wishlist"
+          >
+            <Heart className={`h-3.5 w-3.5 ${isWished ? "fill-current" : ""}`} strokeWidth={1.5} />
+          </button>
 
-          {/* Add to wardrobe */}
-          {isLoggedIn() && (
-            <Button
-              size="sm"
-              variant={inWardrobe ? "secondary" : "outline"}
-              className="w-full text-xs"
-              disabled={inWardrobe || wardrobeLoading}
-              onClick={handleAddToWardrobe}
+          {onToggleTryOn && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onToggleTryOn(product)
+              }}
+              className={`flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-md transition-all ${
+                tryOnSelected
+                  ? "bg-foreground text-background"
+                  : "bg-background/85 text-foreground/80 hover:bg-foreground hover:text-background"
+              }`}
+              title={tryOnSelected ? t.product.removeFromTryOn : t.product.addToTryOn}
+              aria-label="try on selection"
             >
-              {wardrobeLoading ? (
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-              ) : inWardrobe ? (
-                <Check className="mr-1.5 h-3.5 w-3.5" />
-              ) : (
-                <Plus className="mr-1.5 h-3.5 w-3.5" />
-              )}
-              {inWardrobe ? t.product.inWardrobe : t.product.toWardrobe}
-            </Button>
+              {tryOnSelected ? <Check className="h-3.5 w-3.5" strokeWidth={2} /> : <Shirt className="h-3.5 w-3.5" strokeWidth={1.5} />}
+            </button>
           )}
         </div>
-      </CardFooter>
-    </Card>
+
+        {/* Out of stock overlay */}
+        {!product.in_stock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/75 backdrop-blur-[2px]">
+            <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-foreground/80">
+              {t.catalog.outOfStock}
+            </span>
+          </div>
+        )}
+
+        {/* Hover CTA bar — desktop only */}
+        <div className="absolute inset-x-3 bottom-3 hidden translate-y-3 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:block">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              if (showQuickTryOn) handleQuickTryOn(e)
+              else onTryOn(product)
+            }}
+            disabled={quickLoading || !product.in_stock}
+            className="flex w-full items-center justify-center gap-2 bg-foreground/95 px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.2em] text-background backdrop-blur-md transition-all hover:bg-foreground disabled:opacity-60"
+          >
+            {quickLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : showQuickTryOn ? (
+              <Zap className="h-3.5 w-3.5" strokeWidth={1.5} />
+            ) : (
+              <Shirt className="h-3.5 w-3.5" strokeWidth={1.5} />
+            )}
+            {showQuickTryOn ? t.common.tryOnSelf : t.common.tryOn}
+          </button>
+        </div>
+      </div>
+
+      {/* Caption */}
+      <div className="flex flex-1 flex-col gap-1.5 pt-4" onClick={() => onSelect(product)}>
+        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-foreground/55">
+          {product.brand}
+        </p>
+        <h3 className="line-clamp-2 font-display text-[15px] font-normal leading-tight tracking-tight text-foreground sm:text-base">
+          {product.name}
+        </h3>
+
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <div className="flex items-baseline gap-2">
+            {product.promo_price ? (
+              <>
+                <span className="font-display text-[15px] font-medium tracking-tight text-foreground">
+                  {formatPrice(product.promo_price, product.currency)}
+                </span>
+                <span className="text-xs text-foreground/40 line-through">
+                  {formatPrice(product.price, product.currency)}
+                </span>
+              </>
+            ) : (
+              <span className="font-display text-[15px] font-medium tracking-tight text-foreground">
+                {formatPrice(product.price, product.currency)}
+              </span>
+            )}
+          </div>
+          <div
+            className="h-3.5 w-3.5 shrink-0 rounded-full border border-border/80"
+            style={{ backgroundColor: product.color_hex || "#ccc" }}
+            title={product.color_name}
+          />
+        </div>
+
+        {/* Mobile-only actions row */}
+        <div className="mt-3 flex gap-1.5 md:hidden">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              if (showQuickTryOn) handleQuickTryOn(e)
+              else onTryOn(product)
+            }}
+            disabled={quickLoading || !product.in_stock}
+            className="flex flex-1 items-center justify-center gap-1.5 border border-foreground bg-foreground px-3 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-background disabled:opacity-60"
+          >
+            {quickLoading ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : showQuickTryOn ? (
+              <Zap className="h-3 w-3" strokeWidth={1.5} />
+            ) : (
+              <Shirt className="h-3 w-3" strokeWidth={1.5} />
+            )}
+            {showQuickTryOn ? t.common.tryOnSelf : t.common.tryOn}
+          </button>
+          {isLoggedIn() && (
+            <button
+              onClick={handleAddToWardrobe}
+              disabled={inWardrobe || wardrobeLoading}
+              className="flex h-9 w-9 items-center justify-center border border-border text-foreground/75 transition-colors hover:border-foreground hover:text-foreground disabled:opacity-60"
+              aria-label={inWardrobe ? t.product.inWardrobe : t.product.toWardrobe}
+            >
+              {wardrobeLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : inWardrobe ? (
+                <Check className="h-3.5 w-3.5" strokeWidth={2} />
+              ) : (
+                <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Desktop wardrobe link */}
+        {isLoggedIn() && (
+          <button
+            onClick={handleAddToWardrobe}
+            disabled={inWardrobe || wardrobeLoading}
+            className="mt-2 hidden items-center gap-1.5 self-start text-[10px] font-medium uppercase tracking-[0.18em] text-foreground/60 transition-colors hover:text-foreground disabled:opacity-60 md:inline-flex"
+          >
+            {wardrobeLoading ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : inWardrobe ? (
+              <Check className="h-3 w-3" strokeWidth={2} />
+            ) : (
+              <Plus className="h-3 w-3" strokeWidth={1.5} />
+            )}
+            {inWardrobe ? t.product.inWardrobe : t.product.toWardrobe}
+          </button>
+        )}
+      </div>
+    </article>
   )
 }

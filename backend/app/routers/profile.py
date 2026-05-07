@@ -36,13 +36,26 @@ tryon_service = TryOnService()
 # Photo management
 # ---------------------------------------------------------------------------
 
-@router.post("/photos", response_model=UserPhotoResponse)
+@router.post(
+    "/photos",
+    response_model=UserPhotoResponse,
+    summary="Загрузить фото пользователя",
+    description=(
+        "Сохраняет фото пользователя для последующих quick try-on.\n\n"
+        f"**Ограничения:** макс. {MAX_PHOTOS} фото на пользователя, размер 1 КБ – 10 МБ. "
+        "Первое загруженное фото автоматически становится `default`."
+    ),
+    responses={
+        200: {"description": "Фото загружено"},
+        400: {"description": "Превышен лимит, файл слишком маленький или слишком большой"},
+        401: {"description": "Требуется авторизация"},
+    },
+)
 async def upload_photo(
-    photo: UploadFile = File(...),
+    photo: UploadFile = File(..., description="JPEG/PNG фото пользователя"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # Check limit
     result = await db.execute(
         select(UserPhoto).where(UserPhoto.user_id == user.id)
     )
@@ -50,21 +63,19 @@ async def upload_photo(
     if len(existing) >= MAX_PHOTOS:
         raise HTTPException(400, f"Максимум {MAX_PHOTOS} фото. Удалите старое перед загрузкой.")
 
-    # Validate
     content = await photo.read()
     if len(content) < 1000:
         raise HTTPException(400, "Файл слишком маленький")
     if len(content) > 10 * 1024 * 1024:
         raise HTTPException(400, "Файл слишком большой (макс. 10 МБ)")
 
-    # Save to disk
     user_dir = IMAGE_DIR / "users" / str(user.id)
     user_dir.mkdir(parents=True, exist_ok=True)
     filename = f"{uuid.uuid4().hex[:12]}.jpg"
     filepath = user_dir / filename
     filepath.write_bytes(content)
 
-    is_default = len(existing) == 0  # first photo becomes default
+    is_default = len(existing) == 0
 
     row = UserPhoto(
         user_id=user.id,
@@ -83,7 +94,13 @@ async def upload_photo(
     )
 
 
-@router.get("/photos", response_model=List[UserPhotoResponse])
+@router.get(
+    "/photos",
+    response_model=List[UserPhotoResponse],
+    summary="Список фото пользователя",
+    description="Возвращает все сохранённые фото текущего пользователя.",
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def list_photos(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -105,7 +122,19 @@ async def list_photos(
     ]
 
 
-@router.delete("/photos/{photo_id}")
+@router.delete(
+    "/photos/{photo_id}",
+    summary="Удалить фото",
+    description=(
+        "Удаляет фото пользователя (и файл с диска). "
+        "Если удалённое фото было `default`, любое из оставшихся автоматически становится дефолтным."
+    ),
+    responses={
+        200: {"description": "Фото удалено"},
+        401: {"description": "Требуется авторизация"},
+        404: {"description": "Фото не найдено"},
+    },
+)
 async def delete_photo(
     photo_id: int,
     user: User = Depends(get_current_user),
@@ -118,7 +147,6 @@ async def delete_photo(
     if not row:
         raise HTTPException(404, "Фото не найдено")
 
-    # Delete file
     filepath = IMAGE_DIR / row.image_path
     if filepath.exists():
         filepath.unlink()
@@ -127,7 +155,6 @@ async def delete_photo(
     await db.delete(row)
     await db.commit()
 
-    # If deleted photo was default, promote another
     if was_default:
         result = await db.execute(
             select(UserPhoto).where(UserPhoto.user_id == user.id).limit(1)
@@ -140,19 +167,27 @@ async def delete_photo(
     return {"deleted": photo_id}
 
 
-@router.put("/photos/{photo_id}/default", response_model=UserPhotoResponse)
+@router.put(
+    "/photos/{photo_id}/default",
+    response_model=UserPhotoResponse,
+    summary="Сделать фото дефолтным",
+    description="Помечает указанное фото как `default` (используется в quick try-on без явного `photo_id`).",
+    responses={
+        200: {"description": "Фото помечено как default"},
+        401: {"description": "Требуется авторизация"},
+        404: {"description": "Фото не найдено"},
+    },
+)
 async def set_default_photo(
     photo_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # Unset all defaults
     await db.execute(
         update(UserPhoto)
         .where(UserPhoto.user_id == user.id)
         .values(is_default=False)
     )
-    # Set new default
     result = await db.execute(
         select(UserPhoto).where(UserPhoto.id == photo_id, UserPhoto.user_id == user.id)
     )
@@ -176,13 +211,28 @@ async def set_default_photo(
 # Quick try-on (uses saved photo)
 # ---------------------------------------------------------------------------
 
-@router.post("/quick-tryon", response_model=TryOnJobResponse)
+@router.post(
+    "/quick-tryon",
+    response_model=TryOnJobResponse,
+    summary="Быстрая примерка по сохранённому фото",
+    description=(
+        "Создаёт try-on задачу по сохранённому фото пользователя — без повторной загрузки изображения.\n\n"
+        "Если в теле запроса передан `photo_id` — используется именно это фото, "
+        "иначе берётся фото с флагом `is_default=true`."
+    ),
+    responses={
+        200: {"description": "Задача создана"},
+        400: {"description": "Нет сохранённых фото у пользователя"},
+        401: {"description": "Требуется авторизация"},
+        404: {"description": "Товар не найден"},
+        500: {"description": "Файл фото отсутствует на диске (рассинхронизация)"},
+    },
+)
 async def quick_tryon(
     req: QuickTryOnRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # Get photo
     if req.photo_id:
         result = await db.execute(
             select(UserPhoto).where(UserPhoto.id == req.photo_id, UserPhoto.user_id == user.id)
@@ -195,13 +245,11 @@ async def quick_tryon(
     if not photo:
         raise HTTPException(400, "Нет сохранённых фото. Загрузите фото в профиле.")
 
-    # Get product
     catalog = CatalogService(db)
     product = await catalog.get_product(req.product_id)
     if not product:
         raise HTTPException(404, "Товар не найден")
 
-    # Read photo from disk
     filepath = IMAGE_DIR / photo.image_path
     if not filepath.exists():
         raise HTTPException(500, "Файл фото не найден на сервере")
@@ -228,7 +276,13 @@ async def quick_tryon(
 # Preferences
 # ---------------------------------------------------------------------------
 
-@router.get("/preferences", response_model=UserPreferencesResponse)
+@router.get(
+    "/preferences",
+    response_model=UserPreferencesResponse,
+    summary="Получить предпочтения пользователя",
+    description="Возвращает сохранённые предпочтения (любимые стили, пол для подбора, город для погоды).",
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def get_preferences(user: User = Depends(get_current_user)):
     return UserPreferencesResponse(
         preferred_styles=user.preferred_styles or [],
@@ -237,7 +291,16 @@ async def get_preferences(user: User = Depends(get_current_user)):
     )
 
 
-@router.put("/preferences", response_model=UserPreferencesResponse)
+@router.put(
+    "/preferences",
+    response_model=UserPreferencesResponse,
+    summary="Обновить предпочтения пользователя",
+    description=(
+        "Частичное обновление предпочтений (только переданные поля). "
+        "Используется на онбординге и в настройках профиля."
+    ),
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def update_preferences(
     data: UserPreferencesUpdate,
     user: User = Depends(get_current_user),

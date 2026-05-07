@@ -14,30 +14,51 @@ from app.services.daily_outfit_service import DailyOutfitService
 router = APIRouter(prefix="/daily-outfit", tags=["Daily Outfit"])
 
 
-@router.get("", response_model=DailyOutfitResponse)
+@router.get(
+    "",
+    response_model=DailyOutfitResponse,
+    summary="Получить «образ дня»",
+    description=(
+        "Возвращает сегодняшний персональный образ пользователя. Если он ещё не сгенерирован "
+        "(первый запрос за день) — генерирует на лету с учётом погоды и предпочтений.\n\n"
+        "Подбор учитывает: `preferred_styles`, `preferred_gender`, `city` (для погоды через OpenWeather)."
+    ),
+    responses={
+        200: {"description": "Образ дня получен"},
+        401: {"description": "Требуется авторизация"},
+        404: {"description": "Не удалось сгенерировать образ дня"},
+    },
+)
 async def get_daily_outfit(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get today's outfit. Generates on-the-fly if not yet created."""
     svc = DailyOutfitService(db)
     result = await svc.get_today(user.id)
     if result:
         return result
 
-    # Lazy generation
     result = await svc.generate_for_user(user)
     if not result:
         raise HTTPException(404, "Не удалось сгенерировать образ дня. Попробуйте позже.")
     return result
 
 
-@router.post("/regenerate", response_model=DailyOutfitResponse)
+@router.post(
+    "/regenerate",
+    response_model=DailyOutfitResponse,
+    summary="Перегенерировать образ дня",
+    description="Принудительно пересоздаёт сегодняшний образ дня (например, по кнопке «Не нравится — другой»).",
+    responses={
+        200: {"description": "Образ перегенерирован"},
+        401: {"description": "Требуется авторизация"},
+        500: {"description": "Не удалось сгенерировать образ"},
+    },
+)
 async def regenerate_daily_outfit(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Force regenerate today's outfit."""
     svc = DailyOutfitService(db)
     result = await svc.generate_for_user(user)
     if not result:
@@ -45,12 +66,24 @@ async def regenerate_daily_outfit(
     return result
 
 
-@router.post("/generate-all")
+@router.post(
+    "/generate-all",
+    summary="[Admin] Сгенерировать образ дня для всех пользователей",
+    description=(
+        "Запускает массовую генерацию «образа дня» для всех пользователей с заполненными предпочтениями. "
+        "Используется по cron-расписанию (например, утром в 6:00 локального времени). "
+        "Требует роль `admin`."
+    ),
+    responses={
+        200: {"description": "Сгенерировано N образов"},
+        401: {"description": "Требуется авторизация"},
+        403: {"description": "Требуется роль admin"},
+    },
+)
 async def generate_all(
     admin: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Admin: generate daily outfits for all users with preferences."""
     svc = DailyOutfitService(db)
     count = await svc.generate_for_all()
     return {"generated": count}

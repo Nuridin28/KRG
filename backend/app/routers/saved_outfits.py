@@ -1,9 +1,9 @@
-"""Saved outfits -- share by link and outfit history."""
+"""Saved outfits — share by link and outfit history."""
 
 from __future__ import annotations
 
 import uuid
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -57,7 +57,21 @@ class SavedOutfitResponse(BaseModel):
         from_attributes = True
 
 
-@router.post("/save", response_model=SavedOutfitResponse, status_code=201)
+@router.post(
+    "/save",
+    response_model=SavedOutfitResponse,
+    status_code=201,
+    summary="Сохранить образ",
+    description=(
+        "Сохраняет собранный образ в историю пользователя. "
+        "Возвращает `outfit_id`, по которому образ можно открыть позже "
+        "или поделиться публичной ссылкой `/outfits/shared/{outfit_id}`."
+    ),
+    responses={
+        201: {"description": "Образ сохранён"},
+        401: {"description": "Требуется авторизация"},
+    },
+)
 async def save_outfit(
     body: SaveOutfitRequest,
     db: AsyncSession = Depends(get_db),
@@ -81,11 +95,17 @@ async def save_outfit(
     return _to_response(row)
 
 
-@router.get("/history", response_model=List[SavedOutfitResponse])
+@router.get(
+    "/history",
+    response_model=List[SavedOutfitResponse],
+    summary="История образов пользователя",
+    description="Возвращает последние сохранённые образы текущего пользователя (по убыванию даты).",
+    responses={401: {"description": "Требуется авторизация"}},
+)
 async def get_outfit_history(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(20, ge=1, le=100, description="Максимальное количество образов в выборке"),
 ):
     result = await db.execute(
         select(SavedOutfit)
@@ -96,7 +116,16 @@ async def get_outfit_history(
     return [_to_response(r) for r in result.scalars().all()]
 
 
-@router.delete("/history/{outfit_id}")
+@router.delete(
+    "/history/{outfit_id}",
+    summary="Удалить сохранённый образ",
+    description="Удаляет образ из истории. Доступно только владельцу.",
+    responses={
+        200: {"description": "Образ удалён"},
+        401: {"description": "Требуется авторизация"},
+        404: {"description": "Образ не найден"},
+    },
+)
 async def delete_saved_outfit(
     outfit_id: str,
     db: AsyncSession = Depends(get_db),
@@ -113,8 +142,19 @@ async def delete_saved_outfit(
     return {"deleted": outfit_id}
 
 
-# Public endpoint — share by link (no auth required)
-@router.get("/shared/{outfit_id}", response_model=SavedOutfitResponse)
+@router.get(
+    "/shared/{outfit_id}",
+    response_model=SavedOutfitResponse,
+    summary="Публичный просмотр образа по ссылке",
+    description=(
+        "Открывает сохранённый образ по `outfit_id` без авторизации — "
+        "используется для публичных шеринг-ссылок (Telegram / WhatsApp / Instagram)."
+    ),
+    responses={
+        200: {"description": "Образ найден"},
+        404: {"description": "Образ не найден"},
+    },
+)
 async def get_shared_outfit(
     outfit_id: str,
     db: AsyncSession = Depends(get_db),

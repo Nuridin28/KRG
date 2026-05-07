@@ -1,4 +1,4 @@
-"""Admin / backoffice endpoints -- protected by admin role."""
+"""Admin / backoffice endpoints — protected by admin role."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import delete, func, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_admin_user
@@ -18,7 +18,14 @@ from app.core.database import get_db
 from app.models.db_models import Product as ProductDB, TrackingEvent as TrackingEventDB, User
 from app.models.schemas import Product
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(
+    prefix="/admin",
+    tags=["Admin"],
+    responses={
+        401: {"description": "Требуется авторизация"},
+        403: {"description": "Требуется роль `admin`"},
+    },
+)
 
 
 # ---------------------------------------------------------------------------
@@ -67,7 +74,7 @@ class ProductCreateRequest(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# In-memory rules & feature flags (unchanged)
+# In-memory rules & feature flags
 # ---------------------------------------------------------------------------
 
 _rules: Dict[str, AdminRule] = {}
@@ -84,19 +91,34 @@ _feature_flags: Dict[str, bool] = {
 # Rules CRUD
 # ---------------------------------------------------------------------------
 
-@router.get("/rules", response_model=List[AdminRule])
+@router.get(
+    "/rules",
+    response_model=List[AdminRule],
+    summary="Список бизнес-правил",
+    description="Возвращает текущие правила рекомендаций (хранятся in-memory).",
+)
 async def list_rules(_: User = Depends(get_admin_user)) -> List[AdminRule]:
     return list(_rules.values())
 
 
-@router.post("/rules", response_model=AdminRule)
+@router.post(
+    "/rules",
+    response_model=AdminRule,
+    summary="Создать бизнес-правило",
+    description="Создаёт новое правило рекомендаций. `id` присваивается автоматически.",
+)
 async def create_rule(rule: AdminRule, _: User = Depends(get_admin_user)) -> AdminRule:
     rule.id = f"rule-{uuid.uuid4().hex[:8]}"
     _rules[rule.id] = rule
     return rule
 
 
-@router.put("/rules/{rule_id}", response_model=AdminRule)
+@router.put(
+    "/rules/{rule_id}",
+    response_model=AdminRule,
+    summary="Обновить бизнес-правило",
+    responses={404: {"description": "Правило не найдено"}},
+)
 async def update_rule(rule_id: str, rule: AdminRule, _: User = Depends(get_admin_user)) -> AdminRule:
     if rule_id not in _rules:
         raise HTTPException(404, "Rule not found")
@@ -105,7 +127,11 @@ async def update_rule(rule_id: str, rule: AdminRule, _: User = Depends(get_admin
     return rule
 
 
-@router.delete("/rules/{rule_id}")
+@router.delete(
+    "/rules/{rule_id}",
+    summary="Удалить бизнес-правило",
+    responses={404: {"description": "Правило не найдено"}},
+)
 async def delete_rule(rule_id: str, _: User = Depends(get_admin_user)) -> dict:
     if rule_id not in _rules:
         raise HTTPException(404, "Rule not found")
@@ -117,7 +143,30 @@ async def delete_rule(rule_id: str, _: User = Depends(get_admin_user)) -> dict:
 # Statistics (real data from DB)
 # ---------------------------------------------------------------------------
 
-@router.get("/stats")
+@router.get(
+    "/stats",
+    summary="Сводная статистика",
+    description=(
+        "Возвращает агрегированные счётчики по системе: товары, пользователи, события, "
+        "сгенерированные образы и try-on. Источник — PostgreSQL."
+    ),
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "total_products": 1240,
+                        "total_users": 318,
+                        "total_events": 56120,
+                        "total_outfits_generated": 4210,
+                        "total_tryon_jobs": 1870,
+                        "active_rules": 7,
+                    }
+                }
+            }
+        }
+    },
+)
 async def get_stats(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_admin_user),
@@ -148,20 +197,35 @@ async def get_stats(
 # Product CRUD
 # ---------------------------------------------------------------------------
 
-@router.get("/products", response_model=List[Product])
+@router.get(
+    "/products",
+    response_model=List[Product],
+    summary="Листинг товаров (admin)",
+    description="Постраничный листинг товаров без фильтров по статусу — для админ-панели.",
+)
 async def list_products(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_admin_user),
     page: int = 1,
     page_size: int = 50,
 ):
-    from app.services.catalog_service import CatalogService, _row_to_product
+    from app.services.catalog_service import _row_to_product
     offset = (page - 1) * page_size
     result = await db.execute(select(ProductDB).offset(offset).limit(page_size))
     return [_row_to_product(r) for r in result.scalars().all()]
 
 
-@router.post("/products", response_model=Product, status_code=201)
+@router.post(
+    "/products",
+    response_model=Product,
+    status_code=201,
+    summary="Создать товар",
+    description="Создаёт новый товар. Если `id` не передан — генерируется автоматически.",
+    responses={
+        201: {"description": "Товар создан"},
+        400: {"description": "Товар с таким ID уже существует"},
+    },
+)
 async def create_product(
     body: ProductCreateRequest,
     db: AsyncSession = Depends(get_db),
@@ -207,7 +271,13 @@ async def create_product(
     return _row_to_product(row)
 
 
-@router.put("/products/{product_id}", response_model=Product)
+@router.put(
+    "/products/{product_id}",
+    response_model=Product,
+    summary="Обновить товар",
+    description="Полное обновление полей товара. Передавайте все поля, поскольку это PUT, а не PATCH.",
+    responses={404: {"description": "Товар не найден"}},
+)
 async def update_product(
     product_id: str,
     body: ProductCreateRequest,
@@ -234,7 +304,11 @@ async def update_product(
     return _row_to_product(row)
 
 
-@router.delete("/products/{product_id}")
+@router.delete(
+    "/products/{product_id}",
+    summary="Удалить товар",
+    responses={404: {"description": "Товар не найден"}},
+)
 async def delete_product(
     product_id: str,
     db: AsyncSession = Depends(get_db),
@@ -254,7 +328,12 @@ async def delete_product(
 # Providers & Feature Flags
 # ---------------------------------------------------------------------------
 
-@router.get("/providers", response_model=List[ProviderStatus])
+@router.get(
+    "/providers",
+    response_model=List[ProviderStatus],
+    summary="Статус внешних провайдеров",
+    description="Текущее состояние интеграций (Vertex VTO, FASHN, OpenAI, Mapp Fashion API).",
+)
 async def get_providers(_: User = Depends(get_admin_user)) -> List[ProviderStatus]:
     now = datetime.now(timezone.utc)
     return [
@@ -265,12 +344,20 @@ async def get_providers(_: User = Depends(get_admin_user)) -> List[ProviderStatu
     ]
 
 
-@router.get("/feature-flags")
+@router.get(
+    "/feature-flags",
+    summary="Получить feature-флаги",
+    description="Текущее состояние фича-флагов системы.",
+)
 async def get_feature_flags(_: User = Depends(get_admin_user)) -> dict:
     return _feature_flags
 
 
-@router.post("/feature-flags")
+@router.post(
+    "/feature-flags",
+    summary="Обновить feature-флаги",
+    description="Частично обновляет состояние фича-флагов (передавайте только те, что нужно изменить).",
+)
 async def update_feature_flags(flags: Dict[str, bool], _: User = Depends(get_admin_user)) -> dict:
     _feature_flags.update(flags)
     return _feature_flags
@@ -280,7 +367,11 @@ async def update_feature_flags(flags: Dict[str, bool], _: User = Depends(get_adm
 # Users management
 # ---------------------------------------------------------------------------
 
-@router.get("/users")
+@router.get(
+    "/users",
+    summary="Список пользователей",
+    description="Возвращает всех зарегистрированных пользователей системы (без хеша пароля).",
+)
 async def list_users(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_admin_user),
@@ -295,12 +386,28 @@ async def list_users(
 # Image upload for products
 # ---------------------------------------------------------------------------
 
-@router.post("/upload-image")
+@router.post(
+    "/upload-image",
+    summary="Загрузить изображение товара",
+    description=(
+        "Принимает файл изображения товара (jpg/jpeg/png/webp, до 10 МБ) "
+        "и возвращает относительный URL для использования в поле `image_url` товара."
+    ),
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {"image_url": "/storage/images/products/0a1b2c3d4e5f.jpg"}
+                }
+            }
+        },
+        400: {"description": "Файл слишком большой (>10 МБ)"},
+    },
+)
 async def upload_product_image(
-    image: UploadFile = File(...),
+    image: UploadFile = File(..., description="JPG/JPEG/PNG/WEBP, до 10 МБ"),
     _: User = Depends(get_admin_user),
 ):
-    """Upload a product image and return its URL."""
     from app.core.config import settings
 
     content = await image.read()
@@ -324,7 +431,19 @@ async def upload_product_image(
 # Embeddings
 # ---------------------------------------------------------------------------
 
-@router.post("/embed-products")
+@router.post(
+    "/embed-products",
+    summary="Перевычислить эмбеддинги для всех товаров",
+    description=(
+        "Запускает пересчёт текстовых/визуальных эмбеддингов для всех товаров каталога. "
+        "Используется после массового обновления каталога — может занять несколько минут."
+    ),
+    responses={
+        200: {
+            "content": {"application/json": {"example": {"embedded": 1240}}},
+        }
+    },
+)
 async def embed_products(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_admin_user),

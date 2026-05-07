@@ -1,6 +1,5 @@
 import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -52,115 +51,115 @@ export function ProductFilters({ filters, onFilterChange, brands }: ProductFilte
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== "")
 
+  const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div className="border-b border-border/50 pb-5">
+      <p className="eyebrow text-foreground/55 mb-3">{label}</p>
+      {children}
+    </div>
+  )
+
   return (
-    <div className="space-y-4 rounded-lg border bg-card p-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{t.filters.title}</h3>
+        <p className="eyebrow text-foreground">{t.filters.title}</p>
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs">
-            <X className="mr-1 h-3 w-3" />
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] text-foreground/60 transition-colors hover:text-foreground"
+          >
+            <X className="h-3 w-3" />
             {t.filters.reset}
-          </Button>
+          </button>
         )}
       </div>
 
+      {/* Search */}
       <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
+        <Search className="absolute left-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground/45" strokeWidth={1.5} />
+        <input
           placeholder={t.filters.searchPlaceholder}
           value={filters.search}
           onChange={(e) => updateFilter("search", e.target.value)}
-          className="pl-8"
+          className="w-full border-0 border-b border-input bg-transparent py-2.5 pl-6 pr-2 text-sm transition-colors placeholder:text-foreground/45 focus:border-foreground focus:outline-none"
         />
       </div>
 
-      <div className="space-y-3">
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            {t.filters.categoryLabel}
-          </label>
-          <Select value={filters.category} onValueChange={(v) => updateFilter("category", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder={t.filters.allCategories} />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Section label={t.filters.categoryLabel}>
+        <Select value={filters.category} onValueChange={(v) => updateFilter("category", v)}>
+          <SelectTrigger className="border-0 border-b border-input bg-transparent rounded-none px-0 hover:border-foreground focus:border-foreground">
+            <SelectValue placeholder={t.filters.allCategories} />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Section>
 
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t.filters.styleLabel}</label>
-          <Select value={filters.style} onValueChange={(v) => updateFilter("style", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder={t.filters.anyStyle} />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(STYLE_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Section label={t.filters.styleLabel}>
+        <Select value={filters.style} onValueChange={(v) => updateFilter("style", v)}>
+          <SelectTrigger className="border-0 border-b border-input bg-transparent rounded-none px-0 hover:border-foreground focus:border-foreground">
+            <SelectValue placeholder={t.filters.anyStyle} />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(STYLE_LABELS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Section>
 
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t.filters.genderLabel}</label>
-          <Select value={filters.gender} onValueChange={(v) => updateFilter("gender", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder={t.filters.forAll} />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(GENDER_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Section label={t.filters.genderLabel}>
+        <Select value={filters.gender} onValueChange={(v) => updateFilter("gender", v)}>
+          <SelectTrigger className="border-0 border-b border-input bg-transparent rounded-none px-0 hover:border-foreground focus:border-foreground">
+            <SelectValue placeholder={t.filters.forAll} />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(GENDER_LABELS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Section>
 
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t.filters.brandLabel}</label>
-          <Select value={filters.brand} onValueChange={(v) => updateFilter("brand", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder={t.filters.allBrands} />
-            </SelectTrigger>
-            <SelectContent>
-              {brands.map((brand) => (
-                <SelectItem key={brand} value={brand}>
-                  {brand}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Section label={t.filters.brandLabel}>
+        <Select value={filters.brand} onValueChange={(v) => updateFilter("brand", v)}>
+          <SelectTrigger className="border-0 border-b border-input bg-transparent rounded-none px-0 hover:border-foreground focus:border-foreground">
+            <SelectValue placeholder={t.filters.allBrands} />
+          </SelectTrigger>
+          <SelectContent>
+            {brands.map((brand) => (
+              <SelectItem key={brand} value={brand}>
+                {brand}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Section>
 
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            {t.filters.priceLabel}
-          </label>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              placeholder={t.filters.priceFrom}
-              value={filters.priceMin}
-              onChange={(e) => updateFilter("priceMin", e.target.value)}
-              className="text-sm"
-            />
-            <Input
-              type="number"
-              placeholder={t.filters.priceTo}
-              value={filters.priceMax}
-              onChange={(e) => updateFilter("priceMax", e.target.value)}
-              className="text-sm"
-            />
-          </div>
+      <div>
+        <p className="eyebrow text-foreground/55 mb-3">{t.filters.priceLabel}</p>
+        <div className="flex items-center gap-3">
+          <Input
+            type="number"
+            placeholder={t.filters.priceFrom}
+            value={filters.priceMin}
+            onChange={(e) => updateFilter("priceMin", e.target.value)}
+          />
+          <span className="text-foreground/40">—</span>
+          <Input
+            type="number"
+            placeholder={t.filters.priceTo}
+            value={filters.priceMax}
+            onChange={(e) => updateFilter("priceMax", e.target.value)}
+          />
         </div>
       </div>
     </div>
