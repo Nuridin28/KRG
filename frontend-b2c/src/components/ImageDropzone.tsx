@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ImagePlus, X, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/i18n/context"
 
 interface ImageDropzoneProps {
   label: string
@@ -20,6 +21,7 @@ export function ImageDropzone({
   onChange,
   accent = "person",
 }: ImageDropzoneProps) {
+  const { t } = useI18n()
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -34,11 +36,14 @@ export function ImageDropzone({
     return () => URL.revokeObjectURL(previewUrl)
   }, [previewUrl])
 
-  const validate = useCallback((f: File): string | null => {
-    if (!ACCEPTED.includes(f.type)) return "Только JPG, PNG или WebP"
-    if (f.size > MAX_SIZE) return "Изображение больше 12 МБ"
-    return null
-  }, [])
+  const validate = useCallback(
+    (f: File): string | null => {
+      if (!ACCEPTED.includes(f.type)) return t.dropzone.errorType
+      if (f.size > MAX_SIZE) return t.dropzone.errorSize
+      return null
+    },
+    [t.dropzone.errorType, t.dropzone.errorSize],
+  )
 
   const handleFile = useCallback(
     (f: File | undefined | null) => {
@@ -77,10 +82,10 @@ export function ImageDropzone({
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             <RefreshCw className="size-3" />
-            Заменить
+            {t.dropzone.replace}
           </button>
         ) : (
-          <span className="text-xs text-muted-foreground">JPG · PNG · до 12 МБ</span>
+          <span className="text-xs text-muted-foreground">{t.dropzone.sizeHint}</span>
         )}
       </div>
 
@@ -114,7 +119,7 @@ export function ImageDropzone({
             <button
               type="button"
               onClick={clear}
-              aria-label="Удалить изображение"
+              aria-label={t.dropzone.remove}
               className="absolute right-3 top-3 inline-flex size-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition hover:bg-black/80"
             >
               <X className="size-4" />
@@ -133,7 +138,7 @@ export function ImageDropzone({
               <ImagePlus className="size-6" />
             </div>
             <div>
-              <p className="text-sm font-medium">Перетащите или кликните</p>
+              <p className="text-sm font-medium">{t.dropzone.tap}</p>
               <p className="mt-1 text-xs text-muted-foreground">{description}</p>
             </div>
           </div>

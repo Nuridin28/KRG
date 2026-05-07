@@ -15,6 +15,7 @@
     --color-danger: var(--danger);
 }
 
+/* Light theme (default) */
 :root {
     --bg: oklch(98.5% 0.005 95);
     --fg: oklch(15% 0.01 270);
@@ -27,16 +28,30 @@
     --success: oklch(65% 0.16 145);
     --danger: oklch(60% 0.22 25);
     --radius: 1rem;
+    color-scheme: light;
 }
 
+/* Explicit dark theme */
+[data-theme="dark"] {
+    --bg: oklch(12% 0.01 270);
+    --fg: oklch(96% 0.005 95);
+    --muted: oklch(18% 0.01 270);
+    --muted-fg: oklch(65% 0.01 270);
+    --border: oklch(22% 0.01 270);
+    --card: oklch(15% 0.01 270);
+    color-scheme: dark;
+}
+
+/* System dark (only when no explicit preference set) */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme]) {
         --bg: oklch(12% 0.01 270);
         --fg: oklch(96% 0.005 95);
         --muted: oklch(18% 0.01 270);
         --muted-fg: oklch(65% 0.01 270);
         --border: oklch(22% 0.01 270);
         --card: oklch(15% 0.01 270);
+        color-scheme: dark;
     }
 }
 
@@ -51,6 +66,7 @@ html, body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body {

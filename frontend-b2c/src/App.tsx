@@ -2,12 +2,17 @@ import { useState, useCallback, useRef } from "react"
 import { Sparkles, Wand2, Shirt, User, ArrowRight } from "lucide-react"
 import { ImageDropzone } from "@/components/ImageDropzone"
 import { Result } from "@/components/Result"
+import { ThemeToggle } from "@/components/ThemeToggle"
+import { LanguageToggle } from "@/components/LanguageToggle"
+import { I18nProvider, useI18n } from "@/i18n/context"
+import { ThemeProvider } from "@/theme/context"
 import { startAnonymousTryOn, pollTryOn } from "@/lib/api"
 import { cn } from "@/lib/utils"
 
 type Status = "idle" | "processing" | "success" | "error"
 
-export default function App() {
+function TryOnPage() {
+  const { t } = useI18n()
   const [personFile, setPersonFile] = useState<File | null>(null)
   const [garmentFile, setGarmentFile] = useState<File | null>(null)
   const [status, setStatus] = useState<Status>("idle")
@@ -59,14 +64,15 @@ export default function App() {
       setStatus("success")
     } catch (e) {
       if ((e as Error).name === "AbortError") return
-      setError((e as Error).message || "Что-то пошло не так")
+      setError((e as Error).message || t.errors.generic)
       setStatus("error")
     }
-  }, [personFile, garmentFile])
+  }, [personFile, garmentFile, t.errors.generic])
+
+  const steps = [User, Shirt, Sparkles] as const
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-background">
-      {/* Decorative blobs */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 -left-32 size-[420px] rounded-full bg-accent/20 blur-3xl animate-blob" />
         <div
@@ -75,7 +81,7 @@ export default function App() {
         />
       </div>
 
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
+      <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-6 sm:px-8">
         <div className="flex items-center gap-2">
           <div className="flex size-8 items-center justify-center rounded-lg bg-foreground text-background">
             <Sparkles className="size-4" />
@@ -84,46 +90,47 @@ export default function App() {
             Try-On
           </span>
         </div>
-        <a
-          href="#how"
-          className="hidden text-sm text-muted-foreground hover:text-foreground transition sm:block"
-        >
-          Как это работает
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="#how"
+            className="hidden text-sm text-muted-foreground hover:text-foreground transition sm:block"
+          >
+            {t.nav.howItWorks}
+          </a>
+          <ThemeToggle />
+          <LanguageToggle />
+        </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
-        {/* Hero */}
         <section className="pt-8 pb-12 text-center sm:pt-16 sm:pb-20">
           <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
             <Wand2 className="size-3" />
-            <span>Powered by Vertex AI · Бесплатно · Без регистрации</span>
+            <span>{t.hero.badge}</span>
           </div>
           <h1 className="mt-6 font-display text-4xl font-medium leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-            Примерь любую одежду
+            {t.hero.title1}
             <br />
             <span className="bg-gradient-to-r from-accent to-foreground bg-clip-text text-transparent">
-              за пару секунд
+              {t.hero.title2}
             </span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Загрузите своё фото и фото одежды — ИИ соберёт реалистичную примерку.
-            Без сохранения данных.
+            {t.hero.subtitle}
           </p>
         </section>
 
-        {/* Try-on grid */}
         <section className="grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
           <ImageDropzone
-            label="1. Ваше фото"
-            description="В полный рост, лицом к камере"
+            label={t.dropzone.personLabel}
+            description={t.dropzone.personHint}
             file={personFile}
             onChange={setPersonFile}
             accent="person"
           />
           <ImageDropzone
-            label="2. Одежда"
-            description="Чёткое фото на белом фоне"
+            label={t.dropzone.garmentLabel}
+            description={t.dropzone.garmentHint}
             file={garmentFile}
             onChange={setGarmentFile}
             accent="garment"
@@ -138,7 +145,6 @@ export default function App() {
           />
         </section>
 
-        {/* CTA */}
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <button
             type="button"
@@ -150,7 +156,7 @@ export default function App() {
               "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40",
             )}
           >
-            {status === "processing" ? "Идёт примерка…" : "Примерить"}
+            {status === "processing" ? t.cta.submitting : t.cta.submit}
             <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
           </button>
           {(personFile || garmentFile) && status !== "processing" && (
@@ -159,50 +165,36 @@ export default function App() {
               onClick={startOver}
               className="text-sm text-muted-foreground hover:text-foreground transition"
             >
-              Очистить всё
+              {t.cta.clearAll}
             </button>
           )}
         </div>
 
-        {/* How it works */}
         <section id="how" className="mt-24 sm:mt-32">
           <h2 className="text-center font-display text-3xl font-medium tracking-tight sm:text-4xl">
-            Три шага до результата
+            {t.how.title}
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-3">
-            {[
-              {
-                icon: User,
-                title: "Загрузите своё фото",
-                desc: "В полный рост, на однотонном фоне — для лучшего результата.",
-              },
-              {
-                icon: Shirt,
-                title: "Добавьте одежду",
-                desc: "Скриншот или фото вещи. Чем чище фон, тем точнее примерка.",
-              },
-              {
-                icon: Sparkles,
-                title: "Получите результат",
-                desc: "ИИ сгенерирует фото за 15–40 секунд. Скачайте и делитесь.",
-              },
-            ].map(({ icon: Icon, title, desc }, i) => (
-              <div
-                key={title}
-                className="rounded-2xl border border-border bg-card p-6 transition hover:bg-muted/40"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                    <Icon className="size-4" />
+            {t.how.steps.map((step, i) => {
+              const Icon = steps[i]
+              return (
+                <div
+                  key={step.title}
+                  className="rounded-2xl border border-border bg-card p-6 transition hover:bg-muted/40"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                      <Icon className="size-4" />
+                    </div>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      0{i + 1}
+                    </span>
                   </div>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    0{i + 1}
-                  </span>
+                  <h3 className="mt-4 font-medium">{step.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{step.desc}</p>
                 </div>
-                <h3 className="mt-4 font-medium">{title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
       </main>
@@ -210,14 +202,24 @@ export default function App() {
       <footer className="mx-auto max-w-6xl border-t border-border px-5 py-8 sm:px-8">
         <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
           <span>
-            © {new Date().getFullYear()} Try-On. Без сохранения ваших фото.
+            © {new Date().getFullYear()} Try-On. {t.footer.rights}
           </span>
           <span className="flex items-center gap-1.5">
             <span className="size-1.5 rounded-full bg-success" />
-            Сервис работает
+            {t.footer.online}
           </span>
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <I18nProvider>
+        <TryOnPage />
+      </I18nProvider>
+    </ThemeProvider>
   )
 }

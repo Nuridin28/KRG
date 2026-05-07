@@ -1,5 +1,6 @@
 import { Download, Loader2, Sparkles, AlertCircle, RotateCcw } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/i18n/context"
 
 interface ResultProps {
   status: "idle" | "processing" | "success" | "error"
@@ -18,11 +19,13 @@ export function Result({
   currentStep,
   onReset,
 }: ResultProps) {
+  const { t } = useI18n()
+
   return (
     <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-xl font-medium tracking-tight">
-          {status === "success" ? "Готово" : "Результат"}
+          {status === "success" ? t.result.done : t.result.title}
         </h3>
         {status !== "idle" && (
           <button
@@ -31,7 +34,7 @@ export function Result({
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition"
           >
             <RotateCcw className="size-3" />
-            Заново
+            {t.result.reset}
           </button>
         )}
       </div>
@@ -40,9 +43,7 @@ export function Result({
         {status === "idle" && (
           <div className="flex flex-col items-center gap-3 px-6 text-center text-muted-foreground">
             <Sparkles className="size-7 opacity-50" />
-            <p className="text-sm">
-              Загрузите фото и одежду, чтобы увидеть результат
-            </p>
+            <p className="text-sm">{t.result.idle}</p>
           </div>
         )}
 
@@ -52,9 +53,9 @@ export function Result({
             <div className="relative z-10 flex flex-col items-center gap-3">
               <Loader2 className="size-6 animate-spin text-accent" />
               <div>
-                <p className="text-sm font-medium">Создаём примерку</p>
+                <p className="text-sm font-medium">{t.result.processing}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {currentStep || "Обычно занимает 15–40 секунд"}
+                  {currentStep || t.result.processingHint}
                 </p>
               </div>
               <div className="mt-2 h-1 w-32 overflow-hidden rounded-full bg-foreground/10">
@@ -70,7 +71,7 @@ export function Result({
         {status === "success" && imageUrl && (
           <img
             src={imageUrl}
-            alt="Результат примерки"
+            alt={t.result.done}
             className="size-full object-cover animate-in"
           />
         )}
@@ -81,9 +82,9 @@ export function Result({
               <AlertCircle className="size-6" />
             </div>
             <div>
-              <p className="text-sm font-medium">Не получилось</p>
+              <p className="text-sm font-medium">{t.result.error}</p>
               <p className="mt-1 text-xs text-muted-foreground max-w-xs">
-                {error || "Попробуйте другие фото"}
+                {error || t.result.errorHint}
               </p>
             </div>
           </div>
@@ -100,7 +101,7 @@ export function Result({
           )}
         >
           <Download className="size-4" />
-          Скачать результат
+          {t.result.download}
         </a>
       )}
     </div>
