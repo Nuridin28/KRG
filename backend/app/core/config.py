@@ -62,6 +62,11 @@ class Settings(BaseSettings):
     FASHN_API_KEY: str = ""
     FASHN_BASE_URL: str = "https://api.fashn.ai/v1"
 
+    # Email (Resend) for B2C OTP delivery
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = "Koktem <onboarding@resend.dev>"
+    RESEND_BRAND_NAME: str = "Koktem"
+
     # Redis (optional for caching)
     REDIS_URL: str = ""
 

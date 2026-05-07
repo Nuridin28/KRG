@@ -54,10 +54,50 @@ def _hash_code(code: str) -> str:
     return hashlib.sha256(code.encode()).hexdigest()
 
 
+def _build_email_html(brand: str, code: str) -> str:
+    return f"""\
+<!doctype html>
+<html>
+  <body style="margin:0;padding:24px;background:#f7f7f5;font-family:-apple-system,Segoe UI,Inter,sans-serif;color:#15151b;">
+    <div style="max-width:480px;margin:0 auto;background:#fff;border-radius:16px;padding:32px;border:1px solid #ececea;">
+      <h1 style="margin:0 0 8px;font-size:22px;letter-spacing:-0.01em;">{brand}</h1>
+      <p style="margin:0 0 24px;color:#666;font-size:14px;">Ваш код для входа</p>
+      <div style="font-size:36px;letter-spacing:0.4em;font-weight:600;text-align:center;padding:20px;border-radius:12px;background:#f0eee9;">
+        {code}
+      </div>
+      <p style="margin:24px 0 0;color:#888;font-size:13px;line-height:1.5;">
+        Код действителен {CODE_TTL_MINUTES} минут. Если вы не запрашивали вход — просто проигнорируйте это письмо.
+      </p>
+    </div>
+  </body>
+</html>
+"""
+
+
 async def _send_email_code(email: str, code: str) -> None:
-    # TODO: wire SMTP / Resend / SendGrid in production.
-    # For now we log and rely on dev_code in the response when DEBUG=true.
-    logger.info("[B2C OTP] code for %s = %s (valid %d min)", email, code, CODE_TTL_MINUTES)
+    """Send OTP via Resend; fall back to logging if not configured."""
+    from app.core.config import settings
+
+    api_key = (settings.RESEND_API_KEY or "").strip()
+    if not api_key:
+        logger.info("[B2C OTP] code for %s = %s (Resend not configured)", email, code)
+        return
+
+    try:
+        import resend  # type: ignore[import-not-found]
+
+        resend.api_key = api_key
+        resend.Emails.send(
+            {
+                "from": settings.RESEND_FROM_EMAIL,
+                "to": [email],
+                "subject": f"{settings.RESEND_BRAND_NAME}: код {code}",
+                "html": _build_email_html(settings.RESEND_BRAND_NAME, code),
+            }
+        )
+        logger.info("[B2C OTP] sent code to %s via Resend", email)
+    except Exception as e:
+        logger.warning("[B2C OTP] Resend failed for %s: %s. Code: %s", email, e, code)
 
 
 @router.post(
