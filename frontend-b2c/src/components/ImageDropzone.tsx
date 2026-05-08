@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { ImagePlus, X, RefreshCw } from "lucide-react"
+import { ImagePlus, X, RefreshCw, Crop } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/i18n/context"
+import { ImageEditor } from "./ImageEditor"
 
 interface ImageDropzoneProps {
   label: string
@@ -24,6 +25,7 @@ export function ImageDropzone({
   const { t } = useI18n()
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [editorOpen, setEditorOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const previewUrl = useMemo(
@@ -73,17 +75,28 @@ export function ImageDropzone({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-baseline justify-between gap-2">
         <label className="text-sm font-medium text-foreground">{label}</label>
         {file ? (
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <RefreshCw className="size-3" />
-            {t.dropzone.replace}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setEditorOpen(true)}
+              className="inline-flex items-center gap-1 text-xs text-accent hover:opacity-80 transition"
+            >
+              <Crop className="size-3" />
+              {t.editor.edit}
+            </button>
+            <span className="text-muted-foreground/40">·</span>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <RefreshCw className="size-3" />
+              {t.dropzone.replace}
+            </button>
+          </div>
         ) : (
           <span className="text-xs text-muted-foreground">{t.dropzone.sizeHint}</span>
         )}
@@ -159,6 +172,16 @@ export function ImageDropzone({
         accept={ACCEPTED.join(",")}
         className="sr-only"
         onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+
+      <ImageEditor
+        open={editorOpen}
+        source={file}
+        onClose={() => setEditorOpen(false)}
+        onConfirm={(edited) => {
+          onChange(edited)
+          setEditorOpen(false)
+        }}
       />
     </div>
   )
