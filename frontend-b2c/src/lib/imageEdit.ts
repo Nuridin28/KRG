@@ -103,19 +103,3 @@ export async function applyCropAndResize(
 
   return new File([blob], outputName, { type: "image/png" })
 }
-
-/**
- * Run client-side background removal. The model lazily downloads on first call
- * and is cached by the browser. Returns a PNG File with transparency.
- */
-export async function removeBackground(
-  source: File | Blob,
-  outputName = "no-bg.png",
-): Promise<File> {
-  // Dynamic import keeps the heavy model out of the main bundle.
-  const { removeBackground: imglyRemoveBg } = await import(
-    "@imgly/background-removal"
-  )
-  const blob = await imglyRemoveBg(source)
-  return new File([blob], outputName, { type: "image/png" })
-}
