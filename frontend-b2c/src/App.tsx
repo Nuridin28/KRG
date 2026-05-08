@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react"
+import { Analytics } from "@vercel/analytics/react"
 import { Sparkles, Shirt, User, ArrowRight, LogOut, Wand2 } from "lucide-react"
 import { ImageDropzone } from "@/components/ImageDropzone"
 import { Result } from "@/components/Result"
@@ -376,6 +377,7 @@ export default function App() {
       <I18nProvider>
         <AuthProvider>
           <AppShell />
+          <Analytics />
         </AuthProvider>
       </I18nProvider>
     </ThemeProvider>
