@@ -44,6 +44,20 @@ class EmailVerificationCode(Base):
     )
 
 
+class AnonTryonUsage(Base):
+    """Per-IP daily counter for anonymous (B2C, no JWT) try-on requests."""
+    __tablename__ = "anon_tryon_usage"
+    __table_args__ = (UniqueConstraint("ip", "date", name="uq_anon_ip_date"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ip: Mapped[str] = mapped_column(String(64), index=True)
+    date: Mapped[str] = mapped_column(String(10), index=True)
+    count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 class Product(Base):
     __tablename__ = "products"
 

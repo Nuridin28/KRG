@@ -6,19 +6,59 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    Header,
+    HTTPException,
+    Request,
+    UploadFile,
+)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import decode_access_token
-from app.models.db_models import User
+from app.models.db_models import AnonTryonUsage, User
 from app.models.schemas import TryOnJobResponse
 from app.services.catalog_service import CatalogService
 from app.services.tryon_service import TryOnService
 
 DAILY_QUOTA = 5
+ANON_IP_DAILY_LIMIT = 5
+
+
+def _client_ip(request: Request) -> str:
+    """Best-effort real-client IP behind Cloud Run / Vercel proxy."""
+    fwd = request.headers.get("x-forwarded-for") or ""
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+async def _enforce_anon_ip_quota(db: AsyncSession, ip: str) -> None:
+    today = datetime.now(timezone.utc).date().isoformat()
+    res = await db.execute(
+        select(AnonTryonUsage).where(
+            AnonTryonUsage.ip == ip, AnonTryonUsage.date == today
+        )
+    )
+    row = res.scalar_one_or_none()
+    if row is None:
+        db.add(AnonTryonUsage(ip=ip, date=today, count=1))
+        await db.commit()
+        return
+    if row.count >= ANON_IP_DAILY_LIMIT:
+        raise HTTPException(
+            429,
+            f"Превышен бесплатный лимит ({ANON_IP_DAILY_LIMIT}/день). "
+            f"Войдите по почте, чтобы получить персональный лимит.",
+        )
+    row.count += 1
+    await db.commit()
 
 router = APIRouter(prefix="/tryon", tags=["Virtual Try-On"])
 
@@ -94,6 +134,7 @@ async def create_tryon_job(
     },
 )
 async def create_anonymous_tryon(
+    request: Request,
     person_image: UploadFile = File(..., description="Фото человека (JPEG/PNG)"),
     garment_image: UploadFile = File(..., description="Фото одежды (JPEG/PNG)"),
     authorization: str | None = Header(default=None),
@@ -126,6 +167,8 @@ async def create_anonymous_tryon(
         auth_user.tryon_count_today += 1
         await db.commit()
         user_label = f"user-{auth_user.id}"
+    else:
+        await _enforce_anon_ip_quota(db, _client_ip(request))
 
     garment_id = uuid.uuid4().hex[:12]
     suffix = ".png"

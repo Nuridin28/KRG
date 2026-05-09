@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth import get_current_user
 from app.core.database import get_db
 from app.models.db_models import SavedOutfit, User, WardrobeItem
+from app.models.schemas import TryOnJobResponse
+from app.routers.tryon import DAILY_QUOTA, tryon_service
 
 router = APIRouter(prefix="/b2c/wardrobe", tags=["B2C Wardrobe"])
 
@@ -199,6 +202,75 @@ async def list_outfits(
             )
         )
     return out
+
+
+@router.post(
+    "/outfits/{outfit_id}/tryon",
+    response_model=TryOnJobResponse,
+    summary="Примерить сохранённый образ",
+    description=(
+        "Берёт все вещи из образа и запускает мульти-VTO. Учитывается дневной "
+        "лимит зарегистрированного пользователя."
+    ),
+)
+async def tryon_outfit(
+    outfit_id: str,
+    person_image: UploadFile = File(..., description="Фото пользователя"),
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> TryOnJobResponse:
+    today = datetime.now(timezone.utc).date().isoformat()
+    if user.tryon_count_date != today:
+        user.tryon_count_today = 0
+        user.tryon_count_date = today
+    if user.tryon_count_today >= DAILY_QUOTA:
+        raise HTTPException(
+            429,
+            f"Дневной лимит исчерпан ({DAILY_QUOTA}/день). Возвращайтесь завтра.",
+        )
+
+    res = await db.execute(
+        select(SavedOutfit).where(
+            SavedOutfit.id == outfit_id, SavedOutfit.user_id == user.id
+        )
+    )
+    outfit = res.scalar_one_or_none()
+    if not outfit:
+        raise HTTPException(404, "Outfit not found")
+
+    items_raw = outfit.items_json or []
+    product_items: List[dict] = []
+    for it in items_raw:
+        if not isinstance(it, dict):
+            continue
+        image_url = str(it.get("image_url") or "").strip()
+        if not image_url:
+            continue
+        product_items.append({
+            "product_id": f"wardrobe-{it.get('id')}",
+            "product_name": str(it.get("name") or ""),
+            "product_image_url": image_url,
+            "category": str(it.get("category") or "tops"),
+            "subcategory": "",
+            "fit": "regular",
+            "description": "",
+            "style_tags": [],
+        })
+
+    if not product_items:
+        raise HTTPException(400, "Outfit has no items with images")
+
+    person_bytes = await person_image.read()
+    if not person_bytes:
+        raise HTTPException(400, "Empty person image")
+
+    user.tryon_count_today += 1
+    await db.commit()
+
+    return await tryon_service.create_outfit_job(
+        person_image_bytes=person_bytes,
+        product_items=product_items,
+    )
 
 
 @router.delete("/outfits/{outfit_id}", summary="Удалить образ")

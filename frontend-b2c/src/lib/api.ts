@@ -225,6 +225,29 @@ export async function listOutfits(token: string): Promise<Outfit[]> {
   return expectJson<Outfit[]>(res)
 }
 
+export async function tryOnOutfit(
+  token: string,
+  outfitId: string,
+  personFile: File,
+): Promise<TryOnJob> {
+  const fd = new FormData()
+  fd.append("person_image", personFile)
+  const res = await fetch(apiUrl(`/b2c/wardrobe/outfits/${outfitId}/tryon`), {
+    method: "POST",
+    body: fd,
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (res.status === 429) {
+    const text = await res.text().catch(() => "")
+    throw new QuotaExceededError(text || "Daily quota exceeded")
+  }
+  if (!res.ok) {
+    const text = await res.text().catch(() => "")
+    throw new Error(text || `HTTP ${res.status}`)
+  }
+  return (await res.json()) as TryOnJob
+}
+
 export async function deleteOutfit(token: string, id: string): Promise<void> {
   const res = await authedFetch(`/b2c/wardrobe/outfits/${id}`, token, {
     method: "DELETE",

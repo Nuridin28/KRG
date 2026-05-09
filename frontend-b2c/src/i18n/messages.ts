@@ -141,6 +141,15 @@ const ru = {
     deleteOutfit: "Удалить",
     needAtLeastOne: "Выберите хотя бы одну вещь",
     needName: "Введите название",
+    tryon: "Примерить образ",
+    tryonTitle: "Примерить «{name}»",
+    tryonHint: "Загрузите ваше фото в полный рост",
+    tryonStart: "Запустить примерку",
+    tryonProcessing: "Создаём образ…",
+    tryonSuccess: "Готово",
+    tryonError: "Не удалось создать примерку",
+    saveResult: "Скачать",
+    cancel: "Отмена",
   },
 }
 
@@ -289,6 +298,15 @@ const en: Messages = {
     deleteOutfit: "Delete",
     needAtLeastOne: "Select at least one item",
     needName: "Enter a name",
+    tryon: "Try on outfit",
+    tryonTitle: "Try on «{name}»",
+    tryonHint: "Upload your full-body photo",
+    tryonStart: "Start try-on",
+    tryonProcessing: "Building the outfit…",
+    tryonSuccess: "Done",
+    tryonError: "Try-on failed",
+    saveResult: "Download",
+    cancel: "Cancel",
   },
 }
 
@@ -435,6 +453,15 @@ const kz: Messages = {
     deleteOutfit: "Жою",
     needAtLeastOne: "Кемінде бір зат таңдаңыз",
     needName: "Атауын енгізіңіз",
+    tryon: "Лукты өлшеп көру",
+    tryonTitle: "«{name}» өлшеп көру",
+    tryonHint: "Толық бой суретіңізді жүктеңіз",
+    tryonStart: "Бастау",
+    tryonProcessing: "Лук жасалуда…",
+    tryonSuccess: "Дайын",
+    tryonError: "Өлшеп көру сәтсіз",
+    saveResult: "Жүктеу",
+    cancel: "Болдырмау",
   },
 }
 

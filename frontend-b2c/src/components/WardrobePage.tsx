@@ -8,10 +8,12 @@ import {
   Check,
   Inbox,
   X,
+  Wand2,
 } from "lucide-react"
 import { cn, resolveImageUrl } from "@/lib/utils"
 import { useI18n } from "@/i18n/context"
 import { useAuth } from "@/auth/context"
+import { TryOnOutfitModal } from "./TryOnOutfitModal"
 import {
   createOutfit,
   deleteOutfit as apiDeleteOutfit,
@@ -47,6 +49,7 @@ export function WardrobePage({ onSignInRequest }: WardrobePageProps) {
   const [outfitName, setOutfitName] = useState("")
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [tryonOutfit, setTryonOutfit] = useState<Outfit | null>(null)
 
   const refresh = useCallback(async () => {
     if (!token) return
@@ -284,6 +287,12 @@ export function WardrobePage({ onSignInRequest }: WardrobePageProps) {
         )}
       </section>
 
+      <TryOnOutfitModal
+        open={!!tryonOutfit}
+        outfit={tryonOutfit}
+        onClose={() => setTryonOutfit(null)}
+      />
+
       {/* Outfits */}
       <section>
         <h2 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
@@ -301,6 +310,7 @@ export function WardrobePage({ onSignInRequest }: WardrobePageProps) {
                 key={outfit.id}
                 outfit={outfit}
                 onDelete={() => handleDeleteOutfit(outfit.id)}
+                onTryOn={() => setTryonOutfit(outfit)}
               />
             ))}
           </div>
@@ -380,10 +390,13 @@ function ItemCard({ item, selectMode, selected, onToggle, onDelete }: ItemCardPr
 function OutfitCard({
   outfit,
   onDelete,
+  onTryOn,
 }: {
   outfit: Outfit
   onDelete: () => void
+  onTryOn: () => void
 }) {
+  const { t } = useI18n()
   return (
     <div className="group rounded-2xl border border-border bg-card p-4 transition hover:bg-muted/40">
       <div className="flex items-start justify-between gap-2">
@@ -419,6 +432,14 @@ function OutfitCard({
           </div>
         ))}
       </div>
+      <button
+        type="button"
+        onClick={onTryOn}
+        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background transition hover:opacity-90 active:scale-[0.99]"
+      >
+        <Wand2 className="size-3.5" />
+        {t.outfits.tryon}
+      </button>
     </div>
   )
 }
